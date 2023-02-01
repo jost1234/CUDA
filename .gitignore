@@ -36,3 +36,8 @@
 \.vs
 \x64
 *.pdb
+
+# VS Project Files
+*.sln
+*.vcxproj
+*.vcxproj.*
