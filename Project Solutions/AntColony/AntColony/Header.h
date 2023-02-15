@@ -29,63 +29,63 @@ __device__ __host__ int my_ceil(int osztando, int oszto) {
     else return	osztando / oszto + 1;
 }
 
-// Meghívandó CUDA függvény
+// Meghï¿½vandï¿½ CUDA fï¿½ggvï¿½ny
 cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_FoundRoute, unsigned int antNum, size_t size);
 
-// Inicializálja minden szál számára a random seedet
+// Inicializï¿½lja minden szï¿½l szï¿½mï¿½ra a random seedet
 __global__ void setup_kernel(curandState* state, unsigned long seed);
 
-// 1 blokkos függvény
+// 1 blokkos fï¿½ggvï¿½ny
 __global__ void AntKernel_1Block(
-    double* Dist,       // Költségfüggvény input
+    double* Dist,       // Kï¿½ltsï¿½gfï¿½ggvï¿½ny input
     double* Pheromone,
     int* Route,         // Sorrend output
-    bool* FoundRoute,   // Létezés output
-    size_t size,        // Gráf csúcsainak száma
-    int* antRoute,      // Segédtömb
-    int antNum,         // Hangyák száma
+    bool* FoundRoute,   // Lï¿½tezï¿½s output
+    size_t size,        // Grï¿½f csï¿½csainak szï¿½ma
+    int* antRoute,      // Segï¿½dtï¿½mb
+    int antNum,         // Hangyï¿½k szï¿½ma
     curandState* state
 );
 
 __global__ void AntKernel_multiBlock(
-    double* Dist,       // Költségfüggvény input
+    double* Dist,       // Kï¿½ltsï¿½gfï¿½ggvï¿½ny input
     double* Pheromone,
     int* Route,         // Sorrend output
-    bool* FoundRoute,   // Létezés output
-    size_t size,        // Gráf csúcsainak száma
-    int* antRoute,      // Segédtömb
-    int antNum,         // Hangyák száma
+    bool* FoundRoute,   // Lï¿½tezï¿½s output
+    size_t size,        // Grï¿½f csï¿½csainak szï¿½ma
+    int* antRoute,      // Segï¿½dtï¿½mb
+    int antNum,         // Hangyï¿½k szï¿½ma
     curandState* state,
 
-    // Globális változók
-    bool* invalidInput,   // Hibás bemenetet idõben kell észlelni
-    bool* isolatedVertex, // Ha van izolált csúcs, akkor nincs bejárás (egyszerû teszt)
+    // Globï¿½lis vï¿½ltozï¿½k
+    bool* invalidInput,   // Hibï¿½s bemenetet idï¿½ben kell ï¿½szlelni
+    bool* isolatedVertex, // Ha van izolï¿½lt csï¿½cs, akkor nincs bejï¿½rï¿½s (egyszerï¿½ teszt)
     double* bestFit
 );
 
-// Megadja, hogy az idx. csúcstól milyen távol van a legközelebbi csúcs
+// Megadja, hogy az idx. csï¿½cstï¿½l milyen tï¿½vol van a legkï¿½zelebbi csï¿½cs
 __device__ double minDist(double* Dist, int idx, size_t size);
 
-// Megadja, hogy az idx. csúcshoz melyik a legközelebbi csúcs
-// Dist tömbben megkeresi a legkisebb pozitív szám indexét, ha nincs: -1
+// Megadja, hogy az idx. csï¿½cshoz melyik a legkï¿½zelebbi csï¿½cs
+// Dist tï¿½mbben megkeresi a legkisebb pozitï¿½v szï¿½m indexï¿½t, ha nincs: -1
 __device__ int minDistIdx(double* Dist, int idx, size_t size);
 
-// Generál egy random csúcs sorrendet
-// Különlegesség: a 0. hangyát megpróbálja mindig a lehetõ legközelebbre küldeni (hátha)
+// Generï¿½l egy random csï¿½cs sorrendet
+// Kï¿½lï¿½nlegessï¿½g: a 0. hangyï¿½t megprï¿½bï¿½lja mindig a lehetï¿½ legkï¿½zelebbre kï¿½ldeni (hï¿½tha)
 __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex,int secondVertex, double* Dist, size_t size, curandState* state);
 
-// Sorrend generáláshoz használt függvény
+// Sorrend generï¿½lï¿½shoz hasznï¿½lt fï¿½ggvï¿½ny
 __device__ bool alreadyListed(int* antRoute, int antIndex, size_t size, int idx, int newParam);
 
-// Megadja egy adott bejárás hosszát
-// (-1) -gyel tér vissza ha az adott körút nem bejárható
+// Megadja egy adott bejï¿½rï¿½s hosszï¿½t
+// (-1) -gyel tï¿½r vissza ha az adott kï¿½rï¿½t nem bejï¿½rhatï¿½
 __device__ double antRouteLength(double* Dist, int* antRoute, int antIndex, size_t size);
 
-// Új hangyák indulnak a feromonok után
+// ï¿½j hangyï¿½k indulnak a feromonok utï¿½n
 __device__ void followPheromones(const double* Pheromone, int* antRoute, int antIndex, size_t size, curandState* state);
 
 __device__ __host__ double sequencePrint(int* Route, double* Dist, size_t size);
 
 
-// Kitörlendõ ha nem jó
+// Kitï¿½rlendï¿½ ha nem jï¿½
 __device__ void greedySequence(const double* Pheromone, int* antRoute, size_t size);
