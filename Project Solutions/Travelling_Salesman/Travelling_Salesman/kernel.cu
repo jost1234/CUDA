@@ -92,8 +92,7 @@ int main(int argc, char* argv[])
     double* Pheromone = (double*)malloc(size * size * sizeof(double));
     if (Pheromone == NULL)
         goto End;
-    // Sorrend vektor: Route[0] = 0, azaz a 0. városban kezdünk 
-    // (önkényesen kijelölt kezdő város)
+    // Sequence vector: Route[0] = 0, which means we start in vertex 0 
     int* Route = (int*)malloc(size * sizeof(int));
     if (Route == NULL)
         goto End;
@@ -147,70 +146,116 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
     bool* d_invalidInput;   // Variable used to detecting invalid input
     bool* d_isolatedVertex;  // Variable used to detecting isolated vertex (for optimization purposes)
     double* d_averageDist;
-    // Adathalmaz mérete, amit lefoglalunk
+    // Size of device malloc
     size_t Dist_bytes = size * size * sizeof(double);
     size_t Route_bytes = size * sizeof(int);
-    size_t FoundRoute_bytes = sizeof(bool); // Csak az átláthatóság érdekében...
+    size_t FoundRoute_bytes = sizeof(bool); // May be optimized, only for better transparency
 
     size_t antRoute_bytes = antNum * size * sizeof(int);
 
-    // Adatfoglalás
+    // CUDA Malloc
 
     // Dist
     cudaStatus = cudaMalloc((void**)&d_Dist, Dist_bytes);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "d_Dist cudaMalloc failed!");
-        goto Error;
+        cudaFree(d_Dist);
+        return cudaStatus;
     }
     // Pheromone
     cudaStatus = cudaMalloc((void**)&d_Pheromone, Dist_bytes);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "d_Pheromone cudaMalloc failed!");
-        goto Error;
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        
     }
     // Route
     cudaStatus = cudaMalloc((void**)&d_Route, Route_bytes);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "d_Route cudaMalloc failed!");
-        goto Error;
+        // Temporary device data structures
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        cudaFree(d_Route);
+        
     }
     // FoundRoute : flag
     cudaStatus = cudaMalloc((void**)&d_FoundRoute, FoundRoute_bytes);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "d_Route cudaMalloc failed!");
-        goto Error;
+        // Temporary device data structures
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        cudaFree(d_Route);
+        cudaFree(d_FoundRoute);
+        
     }
-    // antRoute : segédtömb
+    // antRoute : auxiliary array
     cudaStatus = cudaMalloc((void**)&antRoute, antRoute_bytes);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "antRoute cudaMalloc failed!");
-        goto Error;
+        // Temporary device data structures
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        cudaFree(d_Route);
+        cudaFree(d_FoundRoute);
+        cudaFree(antRoute);
     }
 
     cudaStatus = cudaMalloc((void**)&d_invalidInput, sizeof(bool));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
+        // Temporary device data structures
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        cudaFree(d_Route);
+        cudaFree(d_FoundRoute);
+        cudaFree(antRoute);
+
+        // Incidental global variables
+        cudaFree(d_invalidInput);
+        
     }
     cudaStatus = cudaMalloc((void**)&d_isolatedVertex, sizeof(bool));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
+        // Temporary device data structures
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        cudaFree(d_Route);
+        cudaFree(d_FoundRoute);
+        cudaFree(antRoute);
+
+        // Incidental global variables
+        cudaFree(d_invalidInput);
+        cudaFree(d_isolatedVertex);
+        
     }
     cudaStatus = cudaMalloc((void**)&d_averageDist, sizeof(double));
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
+        // Temporary device data structures
+        cudaFree(d_Dist);
+        cudaFree(d_Pheromone);
+        cudaFree(d_Route);
+        cudaFree(d_FoundRoute);
+        cudaFree(antRoute);
+
+        // Incidental global variables
+        cudaFree(d_invalidInput);
+        cudaFree(d_isolatedVertex);
+        cudaFree(d_averageDist);
     }
 
-    // Adatok másolása : Host -> Device
+    // Copying data : Host -> Device
     cudaStatus = cudaMemcpy(d_Dist, h_Dist, Dist_bytes, cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "Dist cudaMemcpy failed!");
         goto Error;
     }
 
-    h_Route[0] = 0; // Route[0] = 0, azaz a 0. városban kezdünk (önkényesen kijelölhető kezdő város)
+    h_Route[0] = 0; // Route[0] = 0, means we are starting in vertex 0 
     cudaStatus = cudaMemcpy(d_Route, h_Route, Route_bytes, cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "Route cudaMemcpy failed!");
@@ -225,9 +270,9 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
 
     // setup seeds
 
-    setup_kernel << < BlockNum, threadPerBlock >> > (devStates, time(NULL) * rand());
+    setup_kernel <<< BlockNum, threadPerBlock >>> (devStates, time(NULL) * rand());
 
-    // Kernel hívása
+    // Kernel call
 
     double min = 10000000.0;
     double sum = 0.0;
@@ -236,15 +281,14 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
         printf("Attempt #%d ||\n ", iter);
 
         if (BlockNum == 1) {
-            AntKernel_1Block << < 1, threadPerBlock >> > (d_Dist, d_Pheromone, d_Route, d_FoundRoute, size, antRoute, antNum, devStates);
+            AntKernel_1Block <<< 1, threadPerBlock >>> (d_Dist, d_Pheromone, d_Route, d_FoundRoute, size, antRoute, antNum, devStates);
         }
         else {
-            // Kernel hívás esetén fontos, hogy <<<...>>> syntax helyett
-            // a cudaLaunchCooperativeKernel CUDA runtime launch API-t kell használni
-            // vagy annak CUDA driver megfelelőjét
+            // During Kernel call it's important to use cudaLaunchCooperativeKernel CUDA runtime launch API
+            // or its CUDA driver equivalent instead of the <<<...>>> syntax
 
-            // 1-be állítja a supportsCoopLaunch-t ha a művelet támogatott a device 0-n.
-            // Csak compute capability 6.0 felett
+            // Sets supportsCoopLaunch=1 if the operation is supported on device 0
+            // Only compute capability 6.0 or higher!
             int dev = 0;
             int supportsCoopLaunch = 0;
             cudaDeviceGetAttribute(&supportsCoopLaunch, cudaDevAttrCooperativeLaunch, dev);
@@ -255,7 +299,7 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
 
 
 
-            // Hívás
+            // Call arguments
             void* kernelArgs[] = { &d_Dist,&d_Pheromone, &d_Route, &d_FoundRoute, &size, &antRoute,&antNum, &devStates,
                 &d_invalidInput, &d_isolatedVertex, &d_averageDist };
 
@@ -265,11 +309,11 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
         }
 
 
-        // Hibakeresés kernel lauch közben
+        // Error handling during Kernel execution
         cudaStatus = cudaGetLastError();
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "AntKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-            // Felszabdítjuk a lefoglalt GPU memoriát
+            // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
         }
 
@@ -277,27 +321,27 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
         cudaStatus = cudaDeviceSynchronize();
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n", cudaStatus);
-            // Felszabdítjuk a lefoglalt GPU memoriát
+            // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
         }
 
-        // Feldolgozott adat átvitele a GPU-ról
+        // Copying processed data from GPU device
         cudaStatus = cudaMemcpy(h_Route, d_Route, Route_bytes, cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Route dev->host cudaMemcpy failed!");
-            // Felszabdítjuk a lefoglalt GPU memoriát
+            // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
         }
         cudaStatus = cudaMemcpy(h_FoundRoute, d_FoundRoute, sizeof(bool), cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "FoundRoute flag dev->host cudaMemcpy failed!");
-            // Felszabdítjuk a lefoglalt GPU memoriát
+            // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
         }
         cudaStatus = cudaMemcpy(h_Pheromone, d_Pheromone, Dist_bytes, cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Pheromone dev->host cudaMemcpy failed!");
-            // Felszabdítjuk a lefoglalt GPU memoriát
+            // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
         }
 
@@ -316,21 +360,21 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
 
     printf("Average length: %.3f\n", sum / SERIALMAXTRIES);
     printf("Minimal length: %.3f", min);
-    // Felszabdítjuk a lefoglalt GPU memoriát
+    // Frees GPU device memory
 Error:
     Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
     return cudaStatus;
 };
 
 void Free_device_memory(double* d_Dist,double* d_Pheromone,  int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist) {
-    // Ideiglenes adattárolók felszabadítása
+    // Tempory device data structures
     cudaFree(d_Dist);
     cudaFree(d_Pheromone);
     cudaFree(d_Route);
     cudaFree(d_FoundRoute);
     cudaFree(antRoute);
 
-    // Esetleges globális változók
+    // Incidental global variables
     cudaFree(d_invalidInput);
     cudaFree(d_isolatedVertex);
     cudaFree(d_averageDist);
@@ -352,35 +396,35 @@ __device__ __host__ double sequencePrint(int* Route, double* Dist, size_t size) 
 
 __device__ double minRes;
 
-// 1 blokkos kernel függvény
+// 1 block sized kernel
 __global__ void AntKernel_1Block(
-    double* Dist,       // Költségfüggvény input
+    double* Dist,       // Cost function input
     double* Pheromone,
-    int* Route,         // Sorrend output
-    bool* FoundRoute,   // Létezés output
-    size_t size,        // Gráf csúcsainak száma
-    int* antRoute,      // Segédtömb
-    int antNum,         // Hangyák száma
-    curandState* state
+    int* Route,         // Sequence output
+    bool* FoundRoute,   // Existence output
+    size_t size,        // Number of graph vertices
+    int* antRoute,      // Temp array
+    int antNum,         // Number of ants
+    curandState* state  // CURAND random state
 )
 {
-    // Dist (a,b) eleme a. csúcsból a b. csúcs távolsága
-    // Ha nincs köztük él akkor Dist(i,j) = -1 (elvárt szintaktika)
+    // Dist (i,j) means the distance from vertex i to vertex j
+    // If no edge drawn between them: Dist(i,j) = -1 (expected syntax)
     thread_block block = this_thread_block();
 
-    int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // Hangya index 0 - (antNum-1)
+    int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // Ant index 0 - (antNum-1)
     int tr = block.thread_rank();   // elvileg ugyanaz mint az előző sor
                                     // Ott használom, ahol ez az átláthatóságot segíti
     
     if (antIndex >= antNum)     // Itt megtehető ez az egyszerűsítés
         return;                 // Segít elkerülni a túlcimzést
 
-    // Megosztott változók
-    __shared__ bool invalidInput;   // Hibás bemenetet időben kell észlelni
-    __shared__ bool isolatedVertex; // Ha van izolált csúcs, akkor nincs bejárás (egyszerű teszt)
-    __shared__ double averageDist;  // Átlagos élhossz
+    // Shared variables betwenn threads in the same block
+    __shared__ bool invalidInput;   // Variable used to detecting invalid input
+    __shared__ bool isolatedVertex; // Variable used to detecting isolated vertex (for optimization purposes)
+    __shared__ double averageDist;  // Average edge distance
     
-    // Kezdeti érték adása a 0. thread által
+    // Initialization with thread 0
     if (tr == 0) {
         invalidInput = false;
         isolatedVertex = false;
@@ -389,39 +433,39 @@ __global__ void AntKernel_1Block(
         minRes = DBL_MAX;
     }
 
-    // Kezeljük a size=0 vagy 1 esetet
-    if (size == 0 || size == 1)   // Nincs gráf, értelmetlen bemenet
+    // Managing when size=0 or size=1
+    if (size == 0 || size == 1)   // No graph, meaningless input
         return;
 
     block.sync();
 
-    // Hibatesztelések 1 szálon
     if (tr == 0) {
-        bool foundNeighboor = false;    // Minden csúcs izolált voltát ellenörizzük (ha van izolált, nincs bejárás)
+        bool foundNeighboor = false;    // Checking if any of the vertexes are isolated
         int ii, jj;
         for (ii = 0; ii < size; ii++) {
             for (jj = 0; jj < size; jj++) {
-                // Pheromone gráf kezdeti értéke (anti-egységmátrix, csak főátlóban 0)
-                // Ahol nem vezet él, szintén 0 feromon kerül
-                // Vizsgálat tárgya a megfelelő kezdeti feromon érték
+                // Initializing Pheromone graph (anti - unitmatrix, all main diagonal elements are 0)
+                // 0 Pheromone value if no edge drawn
+                // Initial Pheromone value is of consideration in the Control panel
                 if ( (ii == jj) || (Dist[ii * size + jj] < 0) )
                     Pheromone[ii * size + jj] = 0;
                 else
                     Pheromone[ii * size + jj] = INITIAL_PHEROMONE_VALUE;
- 
-                // Megvizsgáljuk, hogy van-e érvénytelenül megadott gráfél 
-                // (nem pozitív, vagy -1, vagy 0 ha i=j)
+  
+                // Error handling 
+                // Check if there are invalid given elements 
+                // Valid input if: positive OR -1 OR 0 (only if i=j)
                 if (ii != jj && Dist[ii * size + jj] <= 0 && Dist[ii * size + jj] != -1) {
                     printf("Dist(%d,%d) incorrect!\n", ii, jj);
                     invalidInput = true;
                     break;
                 }
-                if (Dist[ii * size + jj] > 0) {
-                    // Van szomszédja, tehát nem izolált csúcs
+                if (!foundNeighboor && Dist[ii * size + jj] > 0) {
+                    // Has neighboor therefore not isolated
                     foundNeighboor = true;
                 }
             }
-            if (!foundNeighboor) { // Nem volt szomszédja
+            if (!foundNeighboor) { // Did not have any neighboors => wrong model of TSP
                 printf("Vertex %d isolated!\n", ii);
                 isolatedVertex = true;
             }
@@ -448,12 +492,12 @@ __global__ void AntKernel_1Block(
         return;
     }
 
-    // Maradt: Helyes bemenet, legalább 3 csúcs, mindegyik mutat valahova
+    // Left: Connected graph with at least 3 vertices
 
-    // Számoljuk ki az átlagos úthosszat
+    // Calculating average distance
     if (tr == 0) {
-        double sum = 0.0; /////
-        int numPos = 0;
+        double sum = 0.0;   // Sum of edge values
+        int numPos = 0;     // Number of edges
         for(int i=0;i<size;i++)
             for (int j = 0; j < size; j++) {
                 double edge = Dist[i * size + j];
@@ -467,23 +511,25 @@ __global__ void AntKernel_1Block(
     }
     block.sync();
 
-    // Hangyák indulnak mindenfelé
+    // Ants travelling to all directions
     for (int repNumber = 0; repNumber < REPETITIONS; repNumber++) {
         
 
-        // Megpróbálunk legalább egyszer minden csúcsot 2. csúcsnak választani (ez még nem rontja el a polinomidejüséget mert O(n) )
-        for (int j = 1; j < size; j++) {
-            generateRandomSolution(antRoute, antIndex, j, Dist, size, state);
+        // Trying for every possible second vertices
+        for (int secondVertex = 1; secondVertex < size; secondVertex++) {
+            generateRandomSolution(antRoute, antIndex, secondVertex, Dist, size, state);
             double multiplicationConstant = averageDist / ALPHA * 5;
+            // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant,repNumber);
             block.sync();
         }
 
-        // Néhány teljesen random útra induló hangya
+        // Numerous random guess
         for (int j = 0; j < RANDOM_GENERATIONS; j++) {
-            // Random 2. csúcsok
+            // Random second vertices
             generateRandomSolution(antRoute, antIndex, -1, Dist, size, state);
             double multiplicationConstant = averageDist / ALPHA * (REPETITIONS + 1 - repNumber);
+            // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             block.sync();
         }
@@ -492,10 +538,10 @@ __global__ void AntKernel_1Block(
         //block.sync();
         
 
-        // Sok korábbit követö hangya
+        // Lots of ants following pheromone of previous ants
         for (int gen = 0; gen < FOLLOWER_GENERATIONS; gen++) {
 
-            // Előző ciklus feromonjainak mérséklése
+            // Reducing previous pheromon values by value ALPHA (modifiable in the Control Panel)
             if (tr == 0) {
                 for (int ii = 0; ii < size; ii++)
                     for (int jj = 0; jj < size; jj++)
@@ -503,22 +549,23 @@ __global__ void AntKernel_1Block(
             }
             block.sync();
 
-            // Új hangyák indulnak a feromonok után
+            // new ants following pheromone of previous ants
             followPheromones(Pheromone, antRoute, antIndex, size, state);
             block.sync();
-            // Kiértékeljük a kapott utat
+            
             double multiplicationConstant = averageDist / ALPHA * 10;
+            // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             block.sync();
         }
     }
 
-    // Küldjük el a feromon úton a végső hangyát
+    // After that we only need one ant (thread)
     if (tr != 0)
         return;
 
 
-
+    // Choosing path with greedy algorithm
     greedySequence(Pheromone, Route, size);
     //sequencePrint(antRoute, Dist, size);
 
@@ -568,10 +615,9 @@ __global__ void AntKernel_multiBlock(
     grid.sync();
 
     if (tr == 0) {
-        bool foundNeighboor;
+        bool foundNeighboor = false;
         int ii, jj;
         for (ii = 0; ii < size; ii++) {
-            foundNeighboor = false;
             for (jj = 0; jj < size; jj++) {
                 
                 // Initializing Pheromone graph (anti - unitmatrix, all main diagonal elements are 0)
@@ -597,7 +643,7 @@ __global__ void AntKernel_multiBlock(
                 }
             }
 
-            if (!foundNeighboor) { // Nem volt szomszédja
+            if (!foundNeighboor) { // Did not have any neighboors
                 printf("Vertex %d isolated!\n", ii);
                 *isolatedVertex = true;
                 break;
@@ -623,7 +669,6 @@ __global__ void AntKernel_multiBlock(
         return;
     }
 
-    // Maradt: Helyes bemenet, legalább 3 csúcs, mindegyik mutat valahova
     // Left: Connected graph with at least 3 vertices
 
     // Calculating average distance
@@ -665,10 +710,10 @@ __global__ void AntKernel_multiBlock(
             grid.sync();
         }
 
-        // Lots of ants following pheromoe of previous ants
+        // Lots of ants following pheromone of previous ants
         for (int gen = 0; gen < FOLLOWER_GENERATIONS; gen++) {
 
-            // Reducting previous pheromon values by value ALPHA (modifiable in the Control Panel)
+            // Reducing previous pheromon values by value ALPHA (modifiable in the Control Panel)
             if (tr == 0) {
                 for (int ii = 0; ii < size; ii++)
                     for (int jj = 0; jj < size; jj++)
@@ -730,30 +775,33 @@ __global__ void setup_kernel(curandState* state, unsigned long seed)
 
 
 
-// Generál egy random, de a 0. csúccsal kezdödö sorrendet
-// secondVertex: ha negatív, vagy nagyobb mint size, akkor nincs önkényes 2. csúcs (condition=0), különben van (condition=1) 
+// Generates a random sequence of numbers between 0 and (size - 1) starting with 0
+// secondVertex: Variable used for giving an arbitrary second vertex
+//      0 < secondvertex < size : valid input (condition = 1)
+//      else: invalid input, no mandatory second vertex (condition = 0) 
 __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex, int secondVertex, double* Dist, size_t size, curandState* state) {
-    // Azt elvárom, hogy a 0. csúcsban kezdjen
+    // Expected to start in vertex 0
     for (int idx = 0; idx < size; idx++) {    // Tömb [0, 1, 2 ... size-1]
         antRoute[antIndex * size + idx] = idx;
     }
     int min_rand_int, max_rand_int = size - 1;
     bool condition = (secondVertex > 0 && secondVertex < size);
     min_rand_int = condition ? 2 : 1;
-    // Ha van érvényes megadás a második csúcsra
-    if (condition) {    // Helyet cserél az 1-es indexü (valójában a 2.) elem a secondVertex indexüvel
+    // If there's valid input for second vertex
+    if (condition) {    // Swap with vertex 1
         antRoute[antIndex * size + 1] = secondVertex;
         antRoute[antIndex * size + secondVertex] = 1;
     }
 
     // n db random cserét hajtunk végre a sorrendben, ezzel megkeverve a csúcsokat
-    // min_rand_int jelöli ki a keverendö tartomány alsó határát
-    // -> ha van elöirt 2. csúcs, akkor csak a (3. - size.) csúcsok sorrendjét kell megváltoztatni
+    // executing [size] times random swaps
+    // min_rand_int means the lower limit for the swap range
+    // -> if there is an exact 2.vertex, then only the (3. - size.) vertex sequence needs to be changed
     for (int idx = min_rand_int; idx < size; idx++) {
         float myrandf;
         int myrand;
 
-        myrandf = curand_uniform(&state[antIndex]);  // 0 és 1 közötti számot ad
+        myrandf = curand_uniform(&state[antIndex]);  // RND Number between 0 and 1
         myrandf *= (max_rand_int - min_rand_int + 0.999999);
         myrandf += min_rand_int;
         myrand = (int)truncf(myrandf);
@@ -766,48 +814,49 @@ __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex, int
         antRoute[antIndex * size + myrand] = temp;
     }
     //if (antIndex == 0) {
-    //    printf("Generalt random sorrend: ");
+    //    printf("Generated random sequence: ");
     //    sequencePrint(antRoute, Dist, size);
     //
     //}
 }
 
-// Sorrend generáláshoz használt függvény
+// Auxiliary function for generating random sequence
 __device__ bool alreadyListed(int* antRoute, int antIndex, size_t size, int idx, int newParam) {
     if (idx >= size)
-        return true;    // Inkább okozzunk végtelen ciklust, mint túlcímzést
+        return true;    // Rather make infinite cicle than overaddressing
     for (int i = 0; i < idx; ++i)
         if (newParam == antRoute[antIndex * size + i])
             return true;
     return false;
 }
 
-// Megadja egy adott bejárás hosszát
-// (-1) -gyel tér vissza ha az adott körút nem bejárható
+// Returns the length of the given route
+// Returns -1 if route has dead end
 __device__ double antRouteLength(double* Dist, int* antRoute, int antIndex, size_t size) {
-    double length = 0;  // Visszatérési érték
+    double length = 0;  // Return value
     int source, dest;
 
     for (int i = 0; i < size; ++i) {
         source = antRoute[antIndex * size + i];
-        dest = antRoute[antIndex * size + (i + 1) % size];   // Következő csúcs
+        dest = antRoute[antIndex * size + (i + 1) % size];   // Next vertex
 
-        double x = Dist[source * size + dest];  // Dist(i,j) feldolgozása
-        if (x < 0)  // Nem fut közöttük él
+        double x = Dist[source * size + dest];  // Processing Dist(i,j) 
+        if (x < 0)  // No edge between them
             return -1;
-        else        // Fut közöttük él, hozzáadjuk a hosszát
+        else        // Edge between them, adding its value
             length += x;
     }
     return length;
 }
 
 
-// A feromon mátrix értékei alapján rulettkerék módszerrel választ következö csúcsot
+// Represents az ant who follows other ants' pheromones
+// Generates a route with Roulette wheel method given the values of the Pheromone matrix
 __device__ void followPheromones(const double* Pheromone, int* antRoute, int antIndex, size_t size, curandState* state) {
-    // Azt elvárom, hogy a 0. csúcsban kezdjen
+    // Expected to start in vertex 0
     antRoute[antIndex * size + 0] = 0;
 
-    double sumPheromone = 0.0;  // Súlyozott Rulettkerék: elöször kiszámoljuk a sorösszeget
+    double sumPheromone = 0.0;  // Weighted Roulette wheel: firstly caltulating the sum of weights
     for (int i = 0; i < size; i++)
         sumPheromone += Pheromone[i];
 
@@ -816,47 +865,37 @@ __device__ void followPheromones(const double* Pheromone, int* antRoute, int ant
         int newparam, maxTryNumber = 4 * size;
         bool foundVertexByRoulette;
         for (int j = 0; j < maxTryNumber; j++) {
-            // 0 és sumPheromone közötti random szám generálása
+            // RND Number between 0 and sumPheromone
             curandState* statePtr = &(state[antIndex]);
             double myranddbl = curand_uniform_double(statePtr) * sumPheromone;
-            double temp = Pheromone[source * size + 0]; // Ebben fogjuk összeadni a mátrix értékeket
+            double temp = Pheromone[source * size + 0]; // Used to store the matrix values
 
-            for (newparam = 0; newparam < size - 1; newparam++) {   // Ha newparam = size-1 akkor már nincs hova nagyobbat keresni
+            for (newparam = 0; newparam < size - 1; newparam++) {   // If newparam = size-1 then no other vertex to choose
                 if (myranddbl < temp)
                     break;
                 temp += Pheromone[source * size + newparam + 1];
-            }   // Ha még nincs a listában akkor beírjuk
+            }   // If not already listed then adding to the sequence
             foundVertexByRoulette = !alreadyListed(antRoute, antIndex, size, i, newparam);
-
-            //if (antIndex == 0 && source == 0)
-               //printf("Ant%d Source: %d \t rnd=%.2f\t max=%.2f, chosen %d\n", antIndex, source, myranddbl, sumPheromone, newparam);
 
             if (foundVertexByRoulette)
                 break;
         }
         if (!foundVertexByRoulette) {
-            // A következo csucs egyenlo eselyek alapjan
+            // Next vertex choosen by equal chances
             do {
-                float newfloat = curand_uniform(&state[antIndex]);  // 0 és 1 közötti számot ad
-                newfloat *= (size - 1) + 0.999999;  // A kívánt tartományba transzformáljuk
+                float newfloat = curand_uniform(&state[antIndex]);  // RND Number between 0 and 1
+                newfloat *= (size - 1) + 0.999999;  // Transforming into the needed range
                 newparam = (int)truncf(newfloat);
             } while (alreadyListed(antRoute, antIndex, size, i, newparam));
         }
-        // Végül a kapott új csúcs
+        // At last the new vertex
         antRoute[antIndex * size + i] = newparam;
     }
 }
 
 
-/// 
-/// Megadja, hogy az adott sorban melyik a legnagyobb még nem választott feromon
-/// Mohó algoritmus használja sorrend kialakításához
-/// param name="Pheromone" : Ez a mátrix tartalmazza a feromon értékeket
-/// <param name="row"></param>
-/// <param name="size"></param>
-/// <param name="idx"></param>
-/// <param name="antRoute"></param>
-/// <returns></returns>
+// Auxilary function for greedy sequence
+// Return the highest vertex index not yet chosen
 __device__ int maxInIdxRow(const double* Pheromone, int row, size_t size, int idx, int* antRoute) {
     int maxidx = idx;
     double max = Pheromone[row * size + idx];
@@ -868,13 +907,13 @@ __device__ int maxInIdxRow(const double* Pheromone, int row, size_t size, int id
             maxidx = i;
         }
     }
-    //printf("%d. elem %.2f ertekkel: %d\n", idx, max, maxidx);
+    //printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
 
     return maxidx;
 }
 
-// Mohó algoritmus alapján választ utat egy megadott Pheromone gráf szerint:
-// Mindig a még be nem járt csúcsok közül arra megy, ahol a legmagasabb a feromon értéke
+// Generates a sequnce using greedy algorithm
+// Always chooses the highest possible value for the next vertex
 __device__ void greedySequence(const double* Pheromone, int* antRoute, size_t size) {
     antRoute[0] = 0;
     for (int i = 1; i < size; i++) {

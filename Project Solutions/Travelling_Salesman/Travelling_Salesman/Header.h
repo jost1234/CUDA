@@ -9,7 +9,7 @@
 
 
 ///
-/// Control panel
+/// CONTROL PANEL
 ///
 
 // Number of threads = number of ants
@@ -29,6 +29,8 @@ const int ants = 1024;
 #define SERIALMAXTRIES 1    // Number of serial processes (for debug purposes)
 
 
+/// DIAGNOSTIC FUNCTIONS
+
 // Diagnostic printing of a matrix
 __host__ __device__ void print(double* A, size_t size) {
     for (int ii = 0; ii < size; ii++) {
@@ -39,17 +41,19 @@ __host__ __device__ void print(double* A, size_t size) {
     printf("\n");
 }
 
+// Diagnostic function for printing given sequence
+__device__ __host__ double sequencePrint(int* Route, double* Dist, size_t size);
+
 // ceil function used to calculate block count
 __device__ __host__ int my_ceil(int osztando, int oszto) {
     if (!(osztando % oszto)) return osztando / oszto;
     else return	osztando / oszto + 1;
 }
 
+/// CUDA LAUNCH AND KERNEL FUNCTIONS
+
 // Main CUDA function
 cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_FoundRoute, unsigned int antNum, size_t size);
-
-// Frees device memory
-void Free_device_memory(double* d_Dist, double* d_Pheromone, int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist);
 
 // Inicializes a random seed for different threads
 __global__ void setup_kernel(curandState* state, unsigned long seed);
@@ -83,6 +87,11 @@ __global__ void AntKernel_multiBlock(
     double* averageDist     
 );
 
+// Frees device memory
+void Free_device_memory(double* d_Dist, double* d_Pheromone, int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist);
+
+/// SEQUENCE GENERATING AND PROCESSING
+
 // Generates a random sequence of numbers between 0 and (size - 1) starting with 0
 // secondVertex: Variable used for giving an arbitrary second vertex
 //      0 < secondvertex < size : valid input (condition = 1)
@@ -93,19 +102,19 @@ __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex, int
 __device__ bool alreadyListed(int* antRoute, int antIndex, size_t size, int idx, int newParam);
 
 // Returns the length of the given route
-// Return -1 if route has dead end
+// Returns -1 if route has dead end
 __device__ double antRouteLength(double* Dist, int* antRoute, int antIndex, size_t size);
 
 // Evaluates the given solution: modifies Pheromone matrix more if shorter path found
 __device__ void evaluateSolution(double* Dist, double* Pheromone, int* antRoute, int antIndex, size_t size, double multiplConstant, int repNumber = 1);
 
-// Represent az ant who follows other ant' pheromones
+// Represents az ant who follows other ants' pheromones
 // Generates a route with Roulette wheel method given the values of the Pheromone matrix
 __device__ void followPheromones(const double* Pheromone, int* antRoute, int antIndex, size_t size, curandState* state);
 
-// Diagnostic function for printing given sequence
-__device__ __host__ double sequencePrint(int* Route, double* Dist, size_t size);
-
+// Auxilary function for greedy sequence
+// Return the highest vertex index not yet chosen
+__device__ int maxInIdxRow(const double* Pheromone, int row, size_t size, int idx, int* antRoute);
 
 // Generates a sequnce using greedy algorithm
 // Always chooses the highest possible value for the next vertex
