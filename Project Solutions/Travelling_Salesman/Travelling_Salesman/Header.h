@@ -13,10 +13,10 @@
 ///
 
 // Number of threads = number of ants
-const int ants = 1024;
+const int ants = 8192;
 
 // Repetition constants
-#define REPETITIONS 20
+#define REPETITIONS 10
 #define RANDOM_GENERATIONS 20
 #define FOLLOWER_GENERATIONS 500
 

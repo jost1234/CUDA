@@ -315,6 +315,7 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
             fprintf(stderr, "AntKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
             // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            return cudaStatus;
         }
 
         // cudaDeviceSynchronize vár arra, hogy befejeződjön a kernel, utána visszatér
@@ -323,6 +324,7 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
             fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n", cudaStatus);
             // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            return cudaStatus;
         }
 
         // Copying processed data from GPU device
@@ -331,18 +333,21 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
             fprintf(stderr, "Route dev->host cudaMemcpy failed!");
             // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            return cudaStatus;
         }
         cudaStatus = cudaMemcpy(h_FoundRoute, d_FoundRoute, sizeof(bool), cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "FoundRoute flag dev->host cudaMemcpy failed!");
             // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            return cudaStatus;
         }
         cudaStatus = cudaMemcpy(h_Pheromone, d_Pheromone, Dist_bytes, cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Pheromone dev->host cudaMemcpy failed!");
             // Frees GPU device memory
             Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            return cudaStatus;
         }
 
 
@@ -352,7 +357,6 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
             sum += _length;
             if (_length < min)
                 min = _length;
-            //printf("Length : %.3f\n\n", _length);
         }
         else
             printf("Route not found!\n\n");
@@ -608,6 +612,7 @@ __global__ void AntKernel_multiBlock(
         *isolatedVertex = false;
         *averageDist = 0.0;
         *FoundRoute = false;
+        minRes = DBL_MAX;
     }
     // Managing when size=0 or size=1
     if (size == 0 || size == 1)   // No graph, meaningless input

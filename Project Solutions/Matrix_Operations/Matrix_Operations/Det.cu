@@ -11,9 +11,9 @@ using namespace cooperative_groups;
 
 
 // Megkeresi az "első" nem nulla elemet az oszlopban
-__device__ bool firstNotZero(float (*Matrix)[N], int k, int* idx) {
+__device__ bool firstNotZero(float(*Matrix)[N], int k, int* idx) {
     int i;
-    for (i = k+1; i < N; ++i) {
+    for (i = k + 1; i < N; ++i) {
         if (Matrix[i][k]) {
             *idx = i;
             return true;
@@ -49,14 +49,14 @@ __global__ void detKernel_multiBlock(float(*Matrix)[N], float* det) {
     }
 
     for (k = 0; k < N - 1; ++k) {
-        
+
         //a már nem kellő szálak kiléphetnek
         //if (i < k || j < k)
         //    return;
-        
+
         //grid = this_grid();
         grid.sync();
-        
+
         // Mi van akkor, amikor a vezérelem 0?
         // Keresünk másik sort, ahol nem 0 vezérelem van, különben det=0
         // Mindig csak az egyik szálon teszteljük a vezérelem 0 voltát
@@ -75,11 +75,11 @@ __global__ void detKernel_multiBlock(float(*Matrix)[N], float* det) {
             grid.sync();
             if (fullZeroColoumn)
                 return;
-            if (k==5)
+            if (k == 5)
                 printf("thread=%d: for loop2 %d\n", tr, k);
             grid.sync();
             // A többi threadet is értesítjük arról, ha kész vagyunk; értéket már nem kell állítaniuk
-            
+
 
             // Kicseréltük a két sort: ilyenkor a determináns a -1 -szeresére változik
 
@@ -114,10 +114,10 @@ __global__ void detKernel_multiBlock(float(*Matrix)[N], float* det) {
         for (k = 0; k < N; ++k)
             *det *= Matrix[k][k];
     }
-  
+
 }
 
-__global__ void detKernel_1Block(float (*Matrix)[N], float* det) {
+__global__ void detKernel_1Block(float(*Matrix)[N], float* det) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopváltozó
     int j = blockIdx.y * blockDim.y + threadIdx.y;  // sorváltozó
     if (i >= N || j >= N)
@@ -125,17 +125,17 @@ __global__ void detKernel_1Block(float (*Matrix)[N], float* det) {
     int k;
     int idx;    // Sorcserénél használt változó
     float temp;
-    
-    
-    
+
+
+
     if (i == 0 && j == 0) {
         sign = 1;
         fullZeroColoumn = false;
-        
+
     }
 
 
-    for (k = 0; k < N-1; ++k) {
+    for (k = 0; k < N - 1; ++k) {
         //a már nem kellő szálak kiléphetnek
         if (i < k || j < k)
             return;
@@ -156,34 +156,34 @@ __global__ void detKernel_1Block(float (*Matrix)[N], float* det) {
                 }
                 sign = -sign;
             }
-            
+
             __syncthreads();
             // A többi threadet is értesítjük arról, ha kész vagyunk; értéket már nem kell állítaniuk
             if (fullZeroColoumn)
                 return;
-            
+
             // Kicseréltük a két sort: ilyenkor a determináns a -1 -szeresére változik
-            
+
             // 1 Dimenziós párhuzam, mert vektorművelet
             // !!! Helyett egy szálas mert valamiért nem akar működni a párhuzamos cserélés
             __syncthreads();
             if (i == k && j == k) {
-                
-                
+
+
                 //temp = Matrix[k][j];
                 //Matrix[k][j] = Matrix[idx][j];
                 //Matrix[idx][j] = temp;
-                
-                
+
+
                 for (int l = 0; l < N; l++) {
                     temp = Matrix[k][l];
                     Matrix[k][l] = Matrix[idx][l];
                     Matrix[idx][l] = temp;
-                }   
+                }
             }
         }
         __syncthreads();
-        
+
         // Nem nulla a vezérelem, kezdődhet a Gauss elimináció, a k-adik oszlopot felesleges kinullázni, többet nem kellenek
         if (i > k && j > k) // diagnosztika végett nem j>=k lehetséges
             Matrix[i][j] -= Matrix[i][k] / Matrix[k][k] * Matrix[k][j];
@@ -197,9 +197,9 @@ __global__ void detKernel_1Block(float (*Matrix)[N], float* det) {
 
 
 
-void detCUDA(float (*Matrix)[N], int n, float* det) {
+void detCUDA(float(*Matrix)[N], int n, float* det) {
     // Ideiglenes változó
-    float(*d_Matrix)[N], *d_det;
+    float(*d_Matrix)[N], * d_det;
     //float* d_temp;
 
     // Adathalmaz mérete, amit lefoglalunk
@@ -207,7 +207,7 @@ void detCUDA(float (*Matrix)[N], int n, float* det) {
 
     // Adatfoglalás
     cudaMalloc((void**)&d_Matrix, bytes);
-    
+
     cudaMalloc((void**)&d_det, sizeof(float));
     //cudaMalloc((void**)&d_temp, N * sizeof(float));
     // Adatok másolása
@@ -218,11 +218,11 @@ void detCUDA(float (*Matrix)[N], int n, float* det) {
 
     int dimGridx = my_ceil(N, dimBlock.x),
         dimGridy = my_ceil(N, dimBlock.y);
-    
+
 
     dim3 dimGrid(dimGridx, dimGridy);
-    if(dimGridx == 1 && dimGridy == 1)
-        detKernel_1Block <<< dimGrid, dimBlock >>> (d_Matrix, d_det);
+    if (dimGridx == 1 && dimGridy == 1)
+        detKernel_1Block << < dimGrid, dimBlock >> > (d_Matrix, d_det);
     else {
         // Kernel hívás esetén fontos, hogy <<<...>>> syntax helyett  
         // a cudaLaunchCooperativeKernel CUDA runtime launch API-t kell használni
@@ -237,23 +237,23 @@ void detCUDA(float (*Matrix)[N], int n, float* det) {
             throw std::runtime_error("Cooperative Launch is not supported on this machine configuration.");
 
         // launch
-        void* kernelArgs[2] = { &d_Matrix, &d_det}; // add kernel args 
+        void* kernelArgs[2] = { &d_Matrix, &d_det }; // add kernel args 
         printf("\nLefutott fuggveny: detKernel_multiBlock\n");
         cudaLaunchCooperativeKernel((void*)detKernel_multiBlock, dimGrid, dimBlock, kernelArgs);
 
-        
+
     }
-     
-    
+
+
     // Feldolgozott adat átvitele a GPU-ról
     cudaMemcpy(det, d_det, sizeof(float), cudaMemcpyDeviceToHost);
     //cudaMemcpy(Matrix, d_Matrix, bytes, cudaMemcpyDeviceToHost);
-    
+
 Error:
     // Ideiglenes adattárolók felszabadítása
     cudaFree(d_Matrix);
     cudaFree(d_det);
-    
+
     return;
 }
 
@@ -262,7 +262,7 @@ float determinant(float(*Matrix)[N], int n) {
         return Matrix[0][0];
     else if (n == 2)
         return Matrix[0][0] * Matrix[1][1] - Matrix[0][1] * Matrix[1][0];
-    
+
     float det;
     detCUDA(Matrix, n, &det);
     return det;
@@ -288,8 +288,8 @@ int main(void) {
         {5,6.2,-4.73,3.72,-2,0.4,-0.6,4.71,-2.67,3.1}
     };
     // */
-    std::cout << "Determinant: " << determinant(A,N) << std::endl;
+    std::cout << "Determinant: " << determinant(A, N) << std::endl;
     // Csak azért roncsolja az eredeti mátrixot, hogy láthatóak legyenek az esetleges hibák
     //print(A);
-    
+
 }

@@ -1,0 +1,4 @@
+- 1Block/ több block
+- float / double
+- 1D / 2D tömb
+- szomszédosségi mx / CRS
