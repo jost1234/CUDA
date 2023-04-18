@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
         goto End;
     bool found;
     printf("Travelling Salesman problem with Ant Colony Algorithm\n");
-    cudaError_t CUDAstate = AntCUDA(Dist, Route, Pheromone, &found, ants, size);
+    cudaError_t CUDAstate = TSP_Ant_CUDA(Dist, Route, Pheromone, &found, ants, size);
 
 End:
     free(Pheromone);
@@ -109,11 +109,11 @@ End:
 
 
 // Main CUDA function
-cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_FoundRoute, unsigned int antNum, size_t size) {
+cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_FoundRoute, unsigned int antNum, size_t size) {
 
     // size = 0,1 : invalid inputs
     if (size == 0 || size == 1 || antNum == 0 || antNum == 1) {
-        fprintf(stderr, "Incorrect size or antNum! Must be at least 2.");
+        fprintf(stderr, "Incorrect size or antNum! Must be at least 2.\n");
         return cudaError_t::cudaErrorInvalidConfiguration;
     }
 
@@ -129,23 +129,23 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
     // Choosing GPU, may be nessesary in a multi-GPU system
     cudaStatus = cudaSetDevice(0);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?\n");
         return cudaStatus;
     }
 
     // Device pointers
-    double* d_Dist;
-    bool* d_FoundRoute;
+    double* d_Dist = NULL;
+    bool* d_FoundRoute = NULL;
 
-    double* d_Pheromone;
-    int* antRoute, * d_Route;
-
+    double* d_Pheromone = NULL;
+    int* antRoute = NULL, * d_Route = NULL;
+    curandState* devStates = NULL;
     // We need global variables when executing numerous grid blocks
     // Alternate solution: giving status flag as function parameters
     
-    bool* d_invalidInput;   // Variable used to detecting invalid input
-    bool* d_isolatedVertex;  // Variable used to detecting isolated vertex (for optimization purposes)
-    double* d_averageDist;
+    bool* d_invalidInput = NULL;   // Variable used to detecting invalid input
+    bool* d_isolatedVertex = NULL;  // Variable used to detecting isolated vertex (for optimization purposes)
+    double* d_averageDist = NULL;
     // Size of device malloc
     size_t Dist_bytes = size * size * sizeof(double);
     size_t Route_bytes = size * sizeof(int);
@@ -158,123 +158,101 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
     // Dist
     cudaStatus = cudaMalloc((void**)&d_Dist, Dist_bytes);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "d_Dist cudaMalloc failed!");
-        cudaFree(d_Dist);
+        fprintf(stderr, "d_Dist cudaMalloc failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
         return cudaStatus;
     }
     // Pheromone
     cudaStatus = cudaMalloc((void**)&d_Pheromone, Dist_bytes);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "d_Pheromone cudaMalloc failed!");
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
+        fprintf(stderr, "d_Pheromone cudaMalloc failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
         
     }
     // Route
     cudaStatus = cudaMalloc((void**)&d_Route, Route_bytes);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "d_Route cudaMalloc failed!");
-        // Temporary device data structures
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
-        cudaFree(d_Route);
+        fprintf(stderr, "d_Route cudaMalloc failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
         
     }
     // FoundRoute : flag
     cudaStatus = cudaMalloc((void**)&d_FoundRoute, FoundRoute_bytes);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "d_Route cudaMalloc failed!");
+        fprintf(stderr, "d_Route cudaMalloc failed!\n");
         // Temporary device data structures
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
-        cudaFree(d_Route);
-        cudaFree(d_FoundRoute);
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
         
     }
     // antRoute : auxiliary array
     cudaStatus = cudaMalloc((void**)&antRoute, antRoute_bytes);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "antRoute cudaMalloc failed!");
+        fprintf(stderr, "antRoute cudaMalloc failed!\n");
         // Temporary device data structures
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
-        cudaFree(d_Route);
-        cudaFree(d_FoundRoute);
-        cudaFree(antRoute);
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
+    }
+
+    cudaStatus = cudaMalloc(&devStates, antNum * sizeof(curandState));
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
     }
 
     cudaStatus = cudaMalloc((void**)&d_invalidInput, sizeof(bool));
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
+        fprintf(stderr, "cudaMalloc failed!\n");
         // Temporary device data structures
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
-        cudaFree(d_Route);
-        cudaFree(d_FoundRoute);
-        cudaFree(antRoute);
-
-        // Incidental global variables
-        cudaFree(d_invalidInput);
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
         
     }
     cudaStatus = cudaMalloc((void**)&d_isolatedVertex, sizeof(bool));
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        // Temporary device data structures
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
-        cudaFree(d_Route);
-        cudaFree(d_FoundRoute);
-        cudaFree(antRoute);
-
-        // Incidental global variables
-        cudaFree(d_invalidInput);
-        cudaFree(d_isolatedVertex);
+        fprintf(stderr, "cudaMalloc failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
         
     }
     cudaStatus = cudaMalloc((void**)&d_averageDist, sizeof(double));
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        // Temporary device data structures
-        cudaFree(d_Dist);
-        cudaFree(d_Pheromone);
-        cudaFree(d_Route);
-        cudaFree(d_FoundRoute);
-        cudaFree(antRoute);
-
-        // Incidental global variables
-        cudaFree(d_invalidInput);
-        cudaFree(d_isolatedVertex);
-        cudaFree(d_averageDist);
+        fprintf(stderr, "cudaMalloc failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
     }
 
     // Copying data : Host -> Device
     cudaStatus = cudaMemcpy(d_Dist, h_Dist, Dist_bytes, cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "Dist cudaMemcpy failed!");
-        goto Error;
+        fprintf(stderr, "Dist cudaMemcpy failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
     }
 
     h_Route[0] = 0; // Route[0] = 0, means we are starting in vertex 0 
     cudaStatus = cudaMemcpy(d_Route, h_Route, Route_bytes, cudaMemcpyHostToDevice);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "Route cudaMemcpy failed!");
-        goto Error;
+        fprintf(stderr, "Route cudaMemcpy failed!\n");
+        Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+        return cudaStatus;
     }
 
 
-    printf("Called function %d Block:  \n", BlockNum);
+    printf("Called function with %d Block(s):  \n", BlockNum);
     int threadPerBlock = (antNum > BLOCK_SIZE) ? BLOCK_SIZE : antNum;
-    curandState* devStates;
-    cudaMalloc(&devStates, antNum * sizeof(curandState));
-
+    
+    
     // setup seeds
 
     setup_kernel <<< BlockNum, threadPerBlock >>> (devStates, time(NULL) * rand());
 
     // Kernel call
 
-    double min = 10000000.0;
+    double min = DBL_MAX;
     double sum = 0.0;
 
     for (int iter = 0; iter < SERIALMAXTRIES; iter++) {
@@ -294,6 +272,8 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
             cudaDeviceGetAttribute(&supportsCoopLaunch, cudaDevAttrCooperativeLaunch, dev);
             if (supportsCoopLaunch != 1) {
                 fprintf(stderr, "Cooperative Launch is not supported on this machine configuration.");
+                Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
+                return cudaStatus;
             }
 
 
@@ -314,7 +294,7 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "AntKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
             // Frees GPU device memory
-            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
             return cudaStatus;
         }
 
@@ -323,7 +303,7 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n", cudaStatus);
             // Frees GPU device memory
-            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
             return cudaStatus;
         }
 
@@ -332,21 +312,21 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Route dev->host cudaMemcpy failed!");
             // Frees GPU device memory
-            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
             return cudaStatus;
         }
         cudaStatus = cudaMemcpy(h_FoundRoute, d_FoundRoute, sizeof(bool), cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "FoundRoute flag dev->host cudaMemcpy failed!");
             // Frees GPU device memory
-            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
             return cudaStatus;
         }
         cudaStatus = cudaMemcpy(h_Pheromone, d_Pheromone, Dist_bytes, cudaMemcpyDeviceToHost);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Pheromone dev->host cudaMemcpy failed!");
             // Frees GPU device memory
-            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+            Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
             return cudaStatus;
         }
 
@@ -362,26 +342,28 @@ cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_F
             printf("Route not found!\n\n");
     }
 
-    printf("Average length: %.3f\n", sum / SERIALMAXTRIES);
+    printf("Average length0 %.3f\n", sum / SERIALMAXTRIES);
     printf("Minimal length: %.3f", min);
     // Frees GPU device memory
-Error:
-    Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist);
+    Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
     return cudaStatus;
 };
 
-void Free_device_memory(double* d_Dist,double* d_Pheromone,  int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist) {
+
+// KELL BELE DEVSTATES!!!
+void Free_device_memory(double* d_Dist,double* d_Pheromone,  int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist, curandState* devstate) {
     // Tempory device data structures
-    cudaFree(d_Dist);
-    cudaFree(d_Pheromone);
-    cudaFree(d_Route);
-    cudaFree(d_FoundRoute);
-    cudaFree(antRoute);
+    if (NULL != d_Dist) cudaFree(d_Dist);
+    if (NULL != d_Pheromone) cudaFree(d_Pheromone);
+    if (NULL != d_Route) cudaFree(d_Route);
+    if (NULL != d_FoundRoute) cudaFree(d_FoundRoute);
+    if (NULL != antRoute) cudaFree(antRoute);
+    if (NULL != devstate) cudaFree(devstate);
 
     // Incidental global variables
-    cudaFree(d_invalidInput);
-    cudaFree(d_isolatedVertex);
-    cudaFree(d_averageDist);
+    if (NULL != d_invalidInput) cudaFree(d_invalidInput);
+    if (NULL != d_isolatedVertex) cudaFree(d_isolatedVertex);
+    if (NULL != d_averageDist) cudaFree(d_averageDist);
 };
 
 __device__ __host__ double sequencePrint(int* Route, double* Dist, size_t size) {
@@ -752,6 +734,7 @@ __global__ void AntKernel_multiBlock(
 // Evaluates the given solution: modifies Pheromone matrix more if shorter path found
 __device__ void evaluateSolution(double* Dist, double* Pheromone, int* antRoute, int antIndex, size_t size, double multiplConstant, int repNumber) {
     double length = antRouteLength(Dist, antRoute, antIndex, size);
+    assert(length != 0);
     double additive = multiplConstant / length; // The longer the route is, the smaller amount we are adding
     if (length < minRes && length > 0) {    // Rewarding the ant with the best yet route
         //printf("New min found: %f\n", length);
@@ -774,7 +757,7 @@ __device__ void evaluateSolution(double* Dist, double* Pheromone, int* antRoute,
 // Inicializes a random seed for different threads
 __global__ void setup_kernel(curandState* state, unsigned long seed)
 {
-    int id = blockIdx.x * blockDim.x + threadIdx.x;;
+    int id = blockIdx.x * blockDim.x + threadIdx.x;
     curand_init(seed, id, id, &state[id]);
 }
 
@@ -821,7 +804,6 @@ __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex, int
     //if (antIndex == 0) {
     //    printf("Generated random sequence: ");
     //    sequencePrint(antRoute, Dist, size);
-    //
     //}
 }
 
@@ -839,13 +821,13 @@ __device__ bool alreadyListed(int* antRoute, int antIndex, size_t size, int idx,
 // Returns -1 if route has dead end
 __device__ double antRouteLength(double* Dist, int* antRoute, int antIndex, size_t size) {
     double length = 0;  // Return value
-    int source, dest;
+    int src, dst;
 
     for (int i = 0; i < size; ++i) {
-        source = antRoute[antIndex * size + i];
-        dest = antRoute[antIndex * size + (i + 1) % size];   // Next vertex
+        src = antRoute[antIndex * size + i];
+        dst = antRoute[antIndex * size + (i + 1) % size];   // Next vertex
 
-        double x = Dist[source * size + dest];  // Processing Dist(i,j) 
+        double x = Dist[src * size + dst];  // Processing Dist(i,j) 
         if (x < 0)  // No edge between them
             return -1;
         else        // Edge between them, adding its value
@@ -861,40 +843,41 @@ __device__ void followPheromones(const double* Pheromone, int* antRoute, int ant
     // Expected to start in vertex 0
     antRoute[antIndex * size + 0] = 0;
 
-    double sumPheromone = 0.0;  // Weighted Roulette wheel: firstly caltulating the sum of weights
+    double sumPheromone = 0.0;  // Weighted Roulette wheel: firstly calculating the sum of weights
     for (int i = 0; i < size; i++)
         sumPheromone += Pheromone[i];
 
     for (int i = 1; i < size; i++) {
         int source = antRoute[antIndex * size + i - 1];
-        int newparam, maxTryNumber = 4 * size;
-        bool foundVertexByRoulette;
-        for (int j = 0; j < maxTryNumber; j++) {
+        int newParam, maxTryNumber = 4 * size;
+        bool foundVertexByRoulette = false;
+        for (int j = 0; j < maxTryNumber && !foundVertexByRoulette; j++) {
             // RND Number between 0 and sumPheromone
             curandState* statePtr = &(state[antIndex]);
             double myranddbl = curand_uniform_double(statePtr) * sumPheromone;
             double temp = Pheromone[source * size + 0]; // Used to store the matrix values
 
-            for (newparam = 0; newparam < size - 1; newparam++) {   // If newparam = size-1 then no other vertex to choose
+            for (newParam = 0; newParam < size - 1; newParam++) {   // If newparam = size-1 then no other vertex to choose
                 if (myranddbl < temp)
                     break;
-                temp += Pheromone[source * size + newparam + 1];
+                temp += Pheromone[source * size + newParam + 1];
             }   // If not already listed then adding to the sequence
-            foundVertexByRoulette = !alreadyListed(antRoute, antIndex, size, i, newparam);
-
-            if (foundVertexByRoulette)
-                break;
+            foundVertexByRoulette = !alreadyListed(antRoute, antIndex, size, i, newParam);
+      
         }
+
+        
+
         if (!foundVertexByRoulette) {
             // Next vertex choosen by equal chances
             do {
                 float newfloat = curand_uniform(&state[antIndex]);  // RND Number between 0 and 1
                 newfloat *= (size - 1) + 0.999999;  // Transforming into the needed range
-                newparam = (int)truncf(newfloat);
-            } while (alreadyListed(antRoute, antIndex, size, i, newparam));
+                newParam = (int)truncf(newfloat);
+            } while (alreadyListed(antRoute, antIndex, size, i, newParam));
         }
         // At last the new vertex
-        antRoute[antIndex * size + i] = newparam;
+        antRoute[antIndex * size + i] = newParam;
     }
 }
 
@@ -902,13 +885,13 @@ __device__ void followPheromones(const double* Pheromone, int* antRoute, int ant
 // Auxilary function for greedy sequence
 // Return the highest vertex index not yet chosen
 __device__ int maxInIdxRow(const double* Pheromone, int row, size_t size, int idx, int* antRoute) {
-    int maxidx = idx;
+    int maxidx = idx;   // LEgyen már 0 0 inkább, buta Bence
     double max = Pheromone[row * size + idx];
 
     for (int i = 0; i < size; i++) {
-        double vizsgalt = Pheromone[row * size + i];
-        if (vizsgalt > max && !alreadyListed(antRoute, 0, size, idx, i)) {
-            max = vizsgalt;
+        double observed = Pheromone[row * size + i];
+        if (observed > max && !alreadyListed(antRoute, 0, size, idx, i)) {
+            max = observed;
             maxidx = i;
         }
     }

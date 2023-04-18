@@ -13,10 +13,10 @@
 ///
 
 // Number of threads = number of ants
-const int ants = 8192;
+const int ants = 1024;
 
 // Repetition constants
-#define REPETITIONS 10
+#define REPETITIONS 1
 #define RANDOM_GENERATIONS 20
 #define FOLLOWER_GENERATIONS 500
 
@@ -26,7 +26,7 @@ const int ants = 8192;
 #define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
 
 
-#define SERIALMAXTRIES 1    // Number of serial processes (for debug purposes)
+#define SERIALMAXTRIES 10    // Number of serial processes (for debug purposes)
 
 
 /// DIAGNOSTIC FUNCTIONS
@@ -53,7 +53,7 @@ __device__ __host__ int my_ceil(int osztando, int oszto) {
 /// CUDA LAUNCH AND KERNEL FUNCTIONS
 
 // Main CUDA function
-cudaError_t AntCUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_FoundRoute, unsigned int antNum, size_t size);
+cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool* h_FoundRoute, unsigned int antNum, size_t size);
 
 // Inicializes a random seed for different threads
 __global__ void setup_kernel(curandState* state, unsigned long seed);
@@ -88,7 +88,7 @@ __global__ void AntKernel_multiBlock(
 );
 
 // Frees device memory
-void Free_device_memory(double* d_Dist, double* d_Pheromone, int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist);
+void Free_device_memory(double* d_Dist, double* d_Pheromone, int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist, curandState* state);
 
 /// SEQUENCE GENERATING AND PROCESSING
 
