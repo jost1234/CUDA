@@ -4,8 +4,8 @@
 #include <iostream>
 
 // Thread block size
-#define BLOCK_SIZE 18
-const int N = 18;
+#define BLOCK_SIZE 5
+const int N = 10;
 
 // Hogy felismerje a precompiler
 #ifdef __INTELLISENSE__

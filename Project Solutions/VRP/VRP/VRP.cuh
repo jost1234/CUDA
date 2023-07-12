@@ -55,7 +55,9 @@ __global__ void VRP_AntKernel_multiBlock(
     VRP_AntKernel_Global_ParamTypedef globalParams);
 
 // Frees device memory
-void Free_device_memory(VRP_AntKernel_ParamTypedef params, VRP_AntKernel_Global_ParamTypedef globalParams);
+void Free_device_memory(
+    VRP_AntKernel_ParamTypedef params, 
+    VRP_AntKernel_Global_ParamTypedef globalParams);
 
 // Gets initial value of Route arrays
 __device__ void initAntRoute(
@@ -96,7 +98,7 @@ __device__ void evaluateSolution(
     VRP_AntKernel_ParamTypedef kernelParams,
     int antIndex,
     DATATYPE multiplConstant,
-    DATATYPE minRes,
+    DATATYPE* minRes,
     DATATYPE rewardMultiplier,
     int repNumber
 );

@@ -4,8 +4,10 @@
 #include <iostream>
 
 // Thread block size
-#define BLOCK_SIZE 10
-const int N = 10;
+#define BLOCK_SIZE 32
+
+
+#define DATATYPE double
 
 // Hogy felismerje a precompiler
 #ifdef __INTELLISENSE__

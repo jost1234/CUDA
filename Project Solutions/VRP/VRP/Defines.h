@@ -16,15 +16,15 @@
 ///
 
 // Number of threads = number of ants
-const unsigned int ants = 800;
+const unsigned int ants = 1024;
 
 // Repetition constants
 #define REPETITIONS 10
 #define RANDOM_GENERATIONS 20
-#define FOLLOWER_GENERATIONS 50
+#define FOLLOWER_GENERATIONS 500
 
 // Pheromone matrix constants
-#define ALPHA 0.75  // Reduction ratio of previous pheromon value
+#define ALPHA 0.75  // Reduction ratio of previous pheromone value
 #define REWARD_MULTIPLIER 100   // Rewart multiplier after finding a shortest path until then
 #define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
 

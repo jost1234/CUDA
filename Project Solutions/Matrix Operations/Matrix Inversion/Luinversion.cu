@@ -5,7 +5,7 @@
 #include <ctime>
 
 
-// Diagnosztika, paraméterek
+// Diagnosztika, parameterek
 //#include "Matrix_plusfunctions.cuh"
 
 // Thread block size
@@ -34,7 +34,7 @@ __device__ __host__ int my_ceil(int osztando, int oszto) {
     else return	osztando / oszto + 1;
 }
 
-// Megkeresi az "elsõ" nem nulla elemet az oszlopban
+// Megkeresi az "elsï¿½" nem nulla elemet az oszlopban
 __device__ bool firstNotZero(float(*Matrix)[N], int k, int* idx) {
     int i;
     for (i = k + 1; i < N; ++i) {
@@ -47,18 +47,18 @@ __device__ bool firstNotZero(float(*Matrix)[N], int k, int* idx) {
 }
 
 __global__ void detKernel(float(*Matrix)[N], float* det) {
-    int i = blockIdx.x * N + threadIdx.x;  // oszlopváltozó
-    int j = blockIdx.y * N + threadIdx.y;  // sorváltozó
+    int i = blockIdx.x * N + threadIdx.x;  // oszlopvï¿½ltozï¿½
+    int j = blockIdx.y * N + threadIdx.y;  // sorvï¿½ltozï¿½
     if (i >= N || j >= N)
         return;
     int k;
-    int idx;    // Sorcserénél használt változó
+    int idx;    // Sorcserï¿½nï¿½l hasznï¿½lt vï¿½ltozï¿½
     float temp;
 
 
-    // Számoljuk a sorcserék paritását: 
+    // Szï¿½moljuk a sorcserï¿½k paritï¿½sï¿½t: 
     __shared__ int sign;
-    // Ha bármikor csupa 0 oszlopot találunk, tudjuk, hogy 0 a determináns
+    // Ha bï¿½rmikor csupa 0 oszlopot talï¿½lunk, tudjuk, hogy 0 a determinï¿½ns
     __shared__ bool fullZeroColoumn;
     if (i == 0 && j == 0) {
         sign = 1;
@@ -68,21 +68,21 @@ __global__ void detKernel(float(*Matrix)[N], float* det) {
 
 
     for (k = 0; k < N - 1; ++k) {
-        //a már nem kellõ szálak kiléphetnek
+        //a mï¿½r nem kellï¿½ szï¿½lak kilï¿½phetnek
         if (i < k || j < k)
             return;
         __syncthreads();
-        // Mi van akkor, amikor a vezérelem 0?
-        // Keresünk másik sort, ahol nem 0 vezérelem van, különben det=0
-        // Mindig csak az egyik szálon teszteljük a vezérelem 0 voltát
+        // Mi van akkor, amikor a vezï¿½relem 0?
+        // Keresï¿½nk mï¿½sik sort, ahol nem 0 vezï¿½relem van, kï¿½lï¿½nben det=0
+        // Mindig csak az egyik szï¿½lon teszteljï¿½k a vezï¿½relem 0 voltï¿½t
         if (Matrix[k][k] == 0) {
-            // Függvényhívás csak 1 szálon
+            // Fï¿½ggvï¿½nyhï¿½vï¿½s csak 1 szï¿½lon
             if (i == k && j == k) {
 
                 fullZeroColoumn = !firstNotZero(Matrix, k, &idx);
 
                 if (fullZeroColoumn) {
-                    // Csupa 0 oszlopot találtunk
+                    // Csupa 0 oszlopot talï¿½ltunk
                     *det = 0;
                     return;
                 }
@@ -90,14 +90,14 @@ __global__ void detKernel(float(*Matrix)[N], float* det) {
             }
 
             __syncthreads();
-            // A többi threadet is értesítjük arról, ha kész vagyunk; értéket már nem kell állítaniuk
+            // A tï¿½bbi threadet is ï¿½rtesï¿½tjï¿½k arrï¿½l, ha kï¿½sz vagyunk; ï¿½rtï¿½ket mï¿½r nem kell ï¿½llï¿½taniuk
             if (fullZeroColoumn)
                 return;
 
-            // Kicseréltük a két sort: ilyenkor a determináns a -1 -szeresére változik
+            // Kicserï¿½ltï¿½k a kï¿½t sort: ilyenkor a determinï¿½ns a -1 -szeresï¿½re vï¿½ltozik
 
-            // 1 Dimenziós párhuzam, mert vektormûvelet
-            // !!! Helyett egy szálas mert valamiért nem akar mûködni a párhuzamos cserélés
+            // 1 Dimenziï¿½s pï¿½rhuzam, mert vektormï¿½velet
+            // !!! Helyett egy szï¿½las mert valamiï¿½rt nem akar mï¿½kï¿½dni a pï¿½rhuzamos cserï¿½lï¿½s
             __syncthreads();
             if (i == k && j == k) {
 
@@ -116,8 +116,8 @@ __global__ void detKernel(float(*Matrix)[N], float* det) {
         }
         __syncthreads();
 
-        // Nem nulla a vezérelem, kezdõdhet a Gauss elimináció, a k-adik oszlopot felesleges kinullázni, többet nem kellenek
-        if (i > k && j > k) // diagnosztika végett nem j>=k lehetséges
+        // Nem nulla a vezï¿½relem, kezdï¿½dhet a Gauss eliminï¿½ciï¿½, a k-adik oszlopot felesleges kinullï¿½zni, tï¿½bbet nem kellenek
+        if (i > k && j > k) // diagnosztika vï¿½gett nem j>=k lehetsï¿½ges
             Matrix[i][j] -= Matrix[i][k] / Matrix[k][k] * Matrix[k][j];
     }
     if (i == N - 1 && j == N - 1) {
@@ -128,35 +128,35 @@ __global__ void detKernel(float(*Matrix)[N], float* det) {
 }
 
 float detCUDA(float(*Matrix)[N], int n) {
-    // Ideiglenes változó
+    // Ideiglenes vï¿½ltozï¿½
     float(*d_Matrix)[N], * d_det;
     //float* d_temp;
 
-    // Adathalmaz mérete, amit lefoglalunk
+    // Adathalmaz mï¿½rete, amit lefoglalunk
     size_t bytes = N * N * sizeof(float);
 
-    // Adatfoglalás
+    // Adatfoglalï¿½s
     cudaMalloc((void**)&d_Matrix, bytes);
 
     cudaMalloc((void**)&d_det, sizeof(float));
     //cudaMalloc((void**)&d_temp, N * sizeof(float));
-    // Adatok másolása
+    // Adatok mï¿½solï¿½sa
     cudaMemcpy(d_Matrix, Matrix, bytes, cudaMemcpyHostToDevice);
 
 
-    // Kernel hívás
+    // Kernel hï¿½vï¿½s
     dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
     dim3 dimGrid(ceil(N / (float)dimBlock.x), ceil(N / (float)dimBlock.y));
     detKernel <<< dimGrid, dimBlock >>> (d_Matrix, d_det);
 
     // Kinyert adat
     float det;
-    // Feldolgozott adat átvitele a GPU-ról
+    // Feldolgozott adat ï¿½tvitele a GPU-rï¿½l
     cudaMemcpy(&det, d_det, sizeof(float), cudaMemcpyDeviceToHost);
     //cudaMemcpy(Matrix, d_Matrix, bytes, cudaMemcpyDeviceToHost);
 
 
-    // Ideiglenes adattárolók felszabadítása
+    // Ideiglenes adattï¿½rolï¿½k felszabadï¿½tï¿½sa
     cudaFree(d_Matrix);
     cudaFree(d_det);
 
@@ -175,13 +175,13 @@ float determinant(float(*Matrix)[N], int n) {
 
 __global__ void LUdecompKernel(float(*A)[N], float(*L)[N], float(*U)[N]) {
 
-    int i = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopváltozó
-    int j = blockIdx.y * blockDim.y + threadIdx.y;  // sorváltozó
+    int i = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopvï¿½ltozï¿½
+    int j = blockIdx.y * blockDim.y + threadIdx.y;  // sorvï¿½ltozï¿½
     //int k = blockIdx.z * blockDim.z + threadIdx.z;
     if (i >= N || j >= N)
         return;
 
-    // Elõformázás
+    // Elï¿½formï¿½zï¿½s
     U[i][j] = A[i][j];
     if (i < j)
         L[i][j] = 0;
@@ -190,16 +190,16 @@ __global__ void LUdecompKernel(float(*A)[N], float(*L)[N], float(*U)[N]) {
 
     __syncthreads();
     
-    //Gauss elimináció u mátrixban
+    //Gauss eliminï¿½ciï¿½ u mï¿½trixban
     for (int m = 0; m < N; m++) {
         if (U[m][m] == 0) {
             cudaError_t error = cudaErrorUnknown;
             //exit(error);
             return;
         }
-        float x = U[i][m] / U[m][m];    // Ez soronként ugyanaz
+        float x = U[i][m] / U[m][m];    // Ez soronkï¿½nt ugyanaz
         if (j == m && i > m) {
-            // Ha a nullázódó oszlopban vagyunk
+            // Ha a nullï¿½zï¿½dï¿½ oszlopban vagyunk
             U[i][j] = 0;
             L[i][j] = x;
 
@@ -213,8 +213,8 @@ __global__ void LUdecompKernel(float(*A)[N], float(*L)[N], float(*U)[N]) {
 }
 
 __global__ void inversionKernel(float(*A)[N], float(*A_inv)[N], float(*L)[N], float(*U)[N], float(*Z)[N]) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopváltozó
-    int j = blockIdx.y * blockDim.y + threadIdx.y;  // sorváltozó
+    int i = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopvï¿½ltozï¿½
+    int j = blockIdx.y * blockDim.y + threadIdx.y;  // sorvï¿½ltozï¿½
     if (i >=N || j >= N)
         return;
     int k = 0;
@@ -224,10 +224,10 @@ __global__ void inversionKernel(float(*A)[N], float(*A_inv)[N], float(*L)[N], fl
     __syncthreads();
     
 
-    // 1 dimenziós párhuzamosítás (szinkronizálások mindenkire vonatkoznak)
-    // N db teljesen független mûveletvégzés Matrix[][i] oszlopvektorokon
+    // 1 dimenziï¿½s pï¿½rhuzamosï¿½tï¿½s (szinkronizï¿½lï¿½sok mindenkire vonatkoznak)
+    // N db teljesen fï¿½ggetlen mï¿½veletvï¿½gzï¿½s Matrix[][i] oszlopvektorokon
     
-    // 1. lépés: Z (oszlopvektor!! azért van i j fordítva) meghatározása
+    // 1. lï¿½pï¿½s: Z (oszlopvektor!! azï¿½rt van i j fordï¿½tva) meghatï¿½rozï¿½sa
     if (j == 0) {
         Z[i][i] = 1;
     }
@@ -238,9 +238,9 @@ __global__ void inversionKernel(float(*A)[N], float(*A_inv)[N], float(*L)[N], fl
             Z[k][i] -= Z[l][i] * L[k][l];
     }
     __syncthreads();
-    // Elkészült Z
+    // Elkï¿½szï¿½lt Z
 
-    // 2. lépés: Ainv[][i] oszlopvektor meghatározása, módszer backpropagation
+    // 2. lï¿½pï¿½s: Ainv[][i] oszlopvektor meghatï¿½rozï¿½sa, mï¿½dszer backpropagation
     A_inv[j][i] = Z[j][i];
     __syncthreads();
     if (j == 0) {
@@ -253,31 +253,31 @@ __global__ void inversionKernel(float(*A)[N], float(*A_inv)[N], float(*L)[N], fl
     }
 }
 
-// Soros változat
+// Soros vï¿½ltozat
 __global__ void inversionKernel1(float(*A)[N], float(*A_inv)[N], float(*L)[N], float(*U)[N], float(*Z)[N]) {
-    int ii = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopváltozó
-    int jj = blockIdx.y * blockDim.y + threadIdx.y;  // sorváltozó
+    int ii = blockIdx.x * blockDim.x + threadIdx.x;  // oszlopvï¿½ltozï¿½
+    int jj = blockIdx.y * blockDim.y + threadIdx.y;  // sorvï¿½ltozï¿½
     //int k = blockIdx.z * blockDim.z + threadIdx.z;
-    if (ii > 0 || jj > 0)   // teszt egyszálon
+    if (ii > 0 || jj > 0)   // teszt egyszï¿½lon
         return;
     int i = 0; //oszlop
     int j = 0; //sor
     int k = 0;
-    //Adott L és U
-    // Kell Z: L*Z = (0 0 ... 0 1 0 0...), 1-es elõtt i db 0
-    // Ezután U*Ainv[i] = Z 
+    //Adott L ï¿½s U
+    // Kell Z: L*Z = (0 0 ... 0 1 0 0...), 1-es elï¿½tt i db 0
+    // Ezutï¿½n U*Ainv[i] = Z 
 
     for (i = 0; i < N; i++)
         for (j = 0; j < N; j++) 
-            Z[i][j] = 0;    // Miért ne, ez úgyis csak teszt
+            Z[i][j] = 0;    // Miï¿½rt ne, ez ï¿½gyis csak teszt
             
         
     
 
     for (i = 0; i < N; i++) {
-        // N db teljesen független mûveletvégzés Matrix[][i] oszlopvektorokon
+        // N db teljesen fï¿½ggetlen mï¿½veletvï¿½gzï¿½s Matrix[][i] oszlopvektorokon
         
-        // 1. lépés: Z (oszlopvektor!! azért van i j fordítva) meghatározása
+        // 1. lï¿½pï¿½s: Z (oszlopvektor!! azï¿½rt van i j fordï¿½tva) meghatï¿½rozï¿½sa
         for (j = 0; j < i; j++) 
             Z[j][i] = 0;
         
@@ -288,7 +288,7 @@ __global__ void inversionKernel1(float(*A)[N], float(*A_inv)[N], float(*L)[N], f
                 Z[j][i] -= Z[k][i] * L[j][k];
         }
 
-        // 2. lépés: Ainv[][i] oszlopvektor meghatározása, módszer backpropagation
+        // 2. lï¿½pï¿½s: Ainv[][i] oszlopvektor meghatï¿½rozï¿½sa, mï¿½dszer backpropagation
         for (j = N-1; j >= 0; j--) {
             A_inv[j][i] = Z[j][i];
             for (k = j+1; k < N; k++)
@@ -307,14 +307,14 @@ __host__ void inversionCUDA(float(*A)[N], float(*A_inv)[N]) {
         std::cout << "Non-invertable matrix!";
         return;
     }
-    // Dinamikus helyfoglalás a GPU-ra: használt pointerek
+    // Dinamikus helyfoglalï¿½s a GPU-ra: hasznï¿½lt pointerek
     float (*d_A)[N], (*d_A_inv)[N], (*d_L)[N], (*d_U)[N];
-    float(*d_Z)[N]; // InverseKernelbe szükséges segédmátrix, ott van kifejtve funkciója
+    float(*d_Z)[N]; // InverseKernelbe szï¿½ksï¿½ges segï¿½dmï¿½trix, ott van kifejtve funkciï¿½ja
     
-    // Adathalmaz mérete, amit lefoglalunk
+    // Adathalmaz mï¿½rete, amit lefoglalunk
     size_t bytes = N * N * sizeof(float);
     
-    // Adatfoglalás
+    // Adatfoglalï¿½s
     cudaMalloc((void**)&d_A, bytes);
     cudaMalloc((void**)&d_A_inv, bytes);
     cudaMalloc((void**)&d_L, bytes);
@@ -323,23 +323,23 @@ __host__ void inversionCUDA(float(*A)[N], float(*A_inv)[N]) {
     cudaMalloc((void**)&d_Z, bytes);
     
     
-    // Adatok másolása
+    // Adatok mï¿½solï¿½sa
     cudaMemcpy(d_A, A, bytes, cudaMemcpyHostToDevice);
     
-    // Kernel grid, blokk méret
+    // Kernel grid, blokk mï¿½ret
     dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
     dim3 dimGrid(my_ceil(N, dimBlock.x), my_ceil(N, dimBlock.y));
     
-    // LU faktorizáció kernel hívás (ideiglenes adattárolókon)
+    // LU faktorizï¿½ciï¿½ kernel hï¿½vï¿½s (ideiglenes adattï¿½rolï¿½kon)
     LUdecompKernel <<<dimGrid, dimBlock >>> (d_A, d_L, d_U);
     
-    // Inverzszámítás kernel (ideiglenes adattárolókon
+    // Inverzszï¿½mï¿½tï¿½s kernel (ideiglenes adattï¿½rolï¿½kon
     inversionKernel <<<dimGrid, dimBlock >>> (d_A, d_A_inv, d_L, d_U, d_Z);
     
 
-    // Feldolgozott adat átvitele a GPU-ról
+    // Feldolgozott adat ï¿½tvitele a GPU-rï¿½l
     cudaMemcpy(A_inv, d_A_inv, bytes, cudaMemcpyDeviceToHost);
-    // Ideiglenes adattárolók felszabadítása
+    // Ideiglenes adattï¿½rolï¿½k felszabadï¿½tï¿½sa
     
     cudaFree(d_A);
     cudaFree(d_A_inv);
@@ -360,12 +360,11 @@ int main() {
 
     std::cout << "Entry matrix values: " << std::endl;
     
-    // N=4 próba
+    // N=4 prï¿½ba
     //float A[N][N] = { {2,4,3,5},{-4,-7,-15,-8},{6,8,2,9},{4,9,-2,14} };
-    // N=10 próba
+    // N=10 prï¿½ba
     float A[N][N] = { 
-        {2,4,3,5,7.3,2.9,4,
-        -1.93,2,7},
+        {2,4,3,5,7.3,2.9,4,-1.93,2,7},
         {-4,-7,-15,-8,4.5,2.3,1.9,-13.5,0,3},
         {6,8,2,9,12,-2.8,5.6,1.9,-4.2,3},
         {4,9,-2,14,0.4,7.13,2.98,-5.73,9.81,6.3},

@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
     params.size = size;
     params.maxVehicles = maxVehicles;
     params.Dist = Dist;
-    params.Pheromone = (DATATYPE*)malloc(size * size * sizeof(DATATYPE));
+    params.Pheromone = (DATATYPE*)malloc(size * RouteSize(size, maxVehicles) * sizeof(DATATYPE));
     params.route = (int*)malloc( RouteSize(size,maxVehicles) * sizeof(int));
 
     printf("Vehicle Routing Problem with Ant Colony Algorithm\n");
@@ -127,8 +127,8 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
     int size = h_params.size;    // Number of graph vertices
     unsigned int antNum = h_params.antNum;    // Number of Ants (= threads)
 
-    // size = 0,1 : invalid inputs
-    if (size == 0 || size == 1 || antNum == 0 || antNum == 1|| maxVehicles == 0) {
+    // Invalid inputs
+    if (size < 2 || antNum < 2 || maxVehicles < 1) {
         fprintf(stderr, "Incorrect input values! Check antNum, size of maxVehicles!\n");
         return cudaError_t::cudaErrorInvalidConfiguration;
     }
@@ -179,6 +179,7 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
 
     // Size of device malloc
     size_t Dist_bytes = size * size * sizeof(DATATYPE);
+    size_t Pheromone_bytes = size * RouteSize(size, maxVehicles) * sizeof(DATATYPE);
         // We need memory for multiple Routes
     size_t Route_bytes = RouteSize(size, maxVehicles) * sizeof(int);  
     size_t FoundRoute_bytes = sizeof(bool); // May be optimized, only for better transparency
@@ -223,6 +224,13 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
     cudaStatus = cudaMalloc((void**)&d_kernelParams.antRoute, antRoute_bytes);
     if (cudaStatus != cudaSuccess) {
         fprintf(stderr, "antRoute cudaMalloc failed!\n");
+        Free_device_memory(d_kernelParams, d_globalParams);
+        return cudaStatus;
+    }
+    // state : random seeds for threads
+    cudaStatus = cudaMalloc((void**)&d_kernelParams.state, state_bytes);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!\n");
         Free_device_memory(d_kernelParams, d_globalParams);
         return cudaStatus;
     }
@@ -273,12 +281,7 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
     else
         printf("s: \n");
     int threadPerBlock = (antNum > BLOCK_SIZE) ? BLOCK_SIZE : antNum;
-    cudaStatus = cudaMalloc(&d_kernelParams.state, state_bytes);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!\n");
-        Free_device_memory(d_kernelParams,d_globalParams);
-        return cudaStatus;
-    }
+    
 
     // setup seeds
 
@@ -492,7 +495,8 @@ __global__ void VRP_AntKernel_1Block(
                 // Error handling 
                 // Check if there are invalid given elements 
                 // Valid input if: positive OR -1 OR 0 (only if i=j)
-                if (ii != jj && params.Dist[ii * size + jj] <= 0 && params.Dist[ii * size + jj] != -1) {
+                if (ii != jj && params.Dist[ii * size + jj] <= 0 && params.Dist[ii * size + jj] != -1) 
+                {
                     printf("Dist(%d,%d) incorrect!\n", ii, jj);
                     invalidInput = true;
                     break;
@@ -542,7 +546,8 @@ __global__ void VRP_AntKernel_1Block(
         for (int i = 0; i < size; i++)
             for (int j = 0; j < size; j++) {
                 DATATYPE edge = params.Dist[i * size + j];
-                if (edge > 0) {
+                if (edge > 0) 
+                {
                     sum += edge;
                     numPos++;
                 }
@@ -561,8 +566,6 @@ __global__ void VRP_AntKernel_1Block(
     // Ants travelling to all directions
     for (int repNumber = 0; repNumber < configParams.Repetitions; repNumber++) 
     {
-        
-
         // Numerous random guess
         for (int j = 0; j < configParams.Random_Generations; j++)
         {
@@ -571,7 +574,7 @@ __global__ void VRP_AntKernel_1Block(
             block.sync();
 
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-            evaluateSolution(params, antIndex, multiplConstant,minRes,configParams.Reward_Multiplier,repNumber);
+            evaluateSolution(params, antIndex, multiplConstant,&minRes,configParams.Reward_Multiplier,repNumber);
             block.sync();
         }
 
@@ -592,7 +595,7 @@ __global__ void VRP_AntKernel_1Block(
             block.sync();
             DATATYPE multiplConstant = averageDist / configParams.Alpha * 10;
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-            evaluateSolution(params, antIndex, multiplConstant, minRes, configParams.Reward_Multiplier, repNumber);
+            evaluateSolution(params, antIndex, multiplConstant, &minRes, configParams.Reward_Multiplier, repNumber);
             block.sync();
         }
 
@@ -628,7 +631,7 @@ __device__ void evaluateSolution(
     VRP_AntKernel_ParamTypedef kernelParams,
     int antIndex,
     DATATYPE multiplConstant, 
-    DATATYPE minRes, 
+    DATATYPE* minRes, 
     DATATYPE rewardMultiplier,
     int repNumber
 ) 
@@ -638,9 +641,8 @@ __device__ void evaluateSolution(
     assert(length != 0);
     additive = multiplConstant / length; // The longer the route is, the smaller amount we are adding
 
-    if (length < minRes && length > 0) {    // Rewarding the ant with the best yet route
-        //printf("New min found: %f\n", length);
-        minRes = length;
+    if (length < *minRes && length > 0) {    // Rewarding the ant with the best yet route
+        *minRes = length;
         additive *= rewardMultiplier * (repNumber + 1) * (repNumber + 1);
     }
 
@@ -648,17 +650,18 @@ __device__ void evaluateSolution(
     bool Dist_0_0_already_rewarded = false; // Bool variable to make sure Dist(0,0) only gets rewarded once
     DATATYPE* ptr;
     int routeSize = RouteSize(kernelParams.size, kernelParams.maxVehicles);
+    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optiminzing array addressing
     if (length > 0) {
-        for (int jj = 0; jj < routeSize; jj++) {
-            int source = kernelParams.antRoute[antIndex * routeSize + jj];
-            int dest = kernelParams.antRoute[antIndex * routeSize + (jj + 1) % routeSize];
-            if (0 == source && 0 == dest && !Dist_0_0_already_rewarded) {
+        for (int i = 0; i < routeSize; i++) {
+            int src = antRouteOffset[i];
+            int dst = antRouteOffset[(i + 1) % routeSize];
+            if (0 == src && 0 == dst && !Dist_0_0_already_rewarded) {
                 Dist_0_0_already_rewarded = true;
-                ptr = &(kernelParams.Pheromone[source * kernelParams.size + dest]);
+                ptr = &(kernelParams.Pheromone[src * kernelParams.size + dst]);
                 atomicAdd(ptr, additive);
             }
             else {
-                ptr = &(kernelParams.Pheromone[source * kernelParams.size + dest]);
+                ptr = &(kernelParams.Pheromone[src * kernelParams.size + dst]);
                 atomicAdd(ptr, additive);
             }
         }
@@ -698,14 +701,15 @@ __device__ void generateRandomSolution(
 )
 {
     int routeSize = RouteSize(kernelParams.size, kernelParams.maxVehicles);
-    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optiminzing array addressing
+    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optimizing array addressing
     // Expected to start in node 0 (in normal use this is already set)
     antRouteOffset[0] = 0;
     // Route init [0, 1, 2 ... size-1, 0, 0 ... 0]
     int min_rand_int = 1, max_rand_int = kernelParams.size + kernelParams.maxVehicles - 2;
 
     // n+k-2 times random swap in the sequence, to shuffle the edges
-    for (int idx3 = min_rand_int; idx3 < kernelParams.size; idx3++) {
+    for (int idx = min_rand_int; idx < routeSize; idx++) 
+    {
         float myrandf;
         int myrand;
 
@@ -717,8 +721,8 @@ __device__ void generateRandomSolution(
         assert(myrand <= max_rand_int);
         assert(myrand >= min_rand_int);
 
-        int temp = antRouteOffset[idx3];
-        antRouteOffset[idx3] = antRouteOffset[myrand];
+        int temp = antRouteOffset[idx];
+        antRouteOffset[idx] = antRouteOffset[myrand];
         antRouteOffset[myrand] = temp;
     }
     //if (antIndex == 0) {
@@ -742,12 +746,12 @@ __device__ bool alreadyListed(
     int routeSize = RouteSize(size, maxVehicles);
         
     if (idx >= routeSize)    
-        return true;    // Rather make infinite cicle than overaddressing
+        return true;    // Rather make infinite cycle than overaddressing
 
     // Count, how many vehicles are being used (0-s in the Route)
     int vehicleCntr = 0;
     int temp;
-    int* antRouteOffset = antRoute + antIndex * routeSize;   // Optiminzing array addressing
+    int* antRouteOffset = antRoute + antIndex * routeSize;   // Optimizing array addressing
     if (newParam == 0) {   // Need to handle separately, because there can be many 0-s in the route
         for (int i = 0; i < idx; ++i)
         {
@@ -777,7 +781,7 @@ __device__ DATATYPE antRouteLength(VRP_AntKernel_ParamTypedef kernelParams,int a
 
     for (int i = 0; i < routeSize; ++i) {
         src = antRouteOffset[i];
-        dst = antRouteOffset[(i + 1) % routeSize];   // Next vertex
+        dst = antRouteOffset[(i + 1) % routeSize];   // Next node
 
         DATATYPE edgeLength = kernelParams.Dist[src * kernelParams.size + dst];
         if (edgeLength < 0) {
@@ -789,25 +793,6 @@ __device__ DATATYPE antRouteLength(VRP_AntKernel_ParamTypedef kernelParams,int a
     }
     assert(length != 0);
     return length;
-}
-
-__device__ int generateRandomNode(
-    VRP_AntKernel_ParamTypedef kernelParams,
-    unsigned int antIndex,
-    int idx // Serial number in in sequence
-)
-{
-    int newParam;
-
-    // Next vertex choosen by equal chances
-    do {
-        float newfloat = curand_uniform(&kernelParams.state[antIndex]);  // RND Number between 0 and 1
-        newfloat *= (kernelParams.size - 1) + 0.999999;  // Transforming into the needed range
-        newParam = (int)truncf(newfloat);
-    } while (alreadyListed(kernelParams.antRoute,
-        kernelParams.size,
-        kernelParams.maxVehicles,
-        antIndex, idx, newParam));
 }
 
 
@@ -842,7 +827,8 @@ __device__ void followPheromones(
             DATATYPE* PheromoneOffset = &kernelParams.Pheromone[source * kernelParams.size];
             DATATYPE temp = PheromoneOffset[0]; // Used for storing the matrix values
         
-            for (newParam = 0; newParam < kernelParams.size - 1; newParam++) {
+            for (newParam = 0; newParam < kernelParams.size - 1; newParam++) 
+            {
                 if (myranddbl < temp)   // If newparam = size-1 then no other node to choose
                     break;
                 temp += kernelParams.Pheromone[source * kernelParams.size + newParam + 1];
@@ -858,13 +844,13 @@ __device__ void followPheromones(
                 float newfloat = curand_uniform(&kernelParams.state[antIndex]);  // RND Number between 0 and 1
                 newfloat *= (kernelParams.size - 1) + 0.999999;  // Transforming into the needed range
                 newParam = (int)truncf(newfloat);
-            } while (alreadyListed(kernelParams.antRoute,
-                kernelParams.size,
-                kernelParams.maxVehicles,
-                antIndex, i, newParam));
+            } while (alreadyListed( kernelParams.antRoute,
+                                    kernelParams.size,
+                                    kernelParams.maxVehicles,
+                                    antIndex, i, newParam));
         }
         // At last the new vertex
-        kernelParams.antRoute[antIndex * routeSize + i] = newParam;
+        antRouteOffset[i] = newParam;
     }
 
 }
@@ -887,7 +873,7 @@ __device__ int maxInIdxRow(VRP_AntKernel_ParamTypedef kernelParams, int row, int
             maxidx = i;
         }
     }
-    printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
+    //printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
 
     return maxidx;
 }

@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     printf("Given Dist matrix:\n");
     print(Dist, size);
 
-    printf("Average distance between vertexes: %.2f\n", sum / numpos); //////
+    printf("Average distance : %.2f\n", sum / numpos * size); //////
 
     // Host variables
     double* Pheromone = (double*)malloc(size * size * sizeof(double));
@@ -100,7 +100,9 @@ int main(int argc, char* argv[])
     printf("Travelling Salesman problem with Ant Colony Algorithm\n");
     cudaError_t CUDAstate = TSP_Ant_CUDA(Dist, Route, Pheromone, &found, ants, size);
 
+
 End:
+    getchar();
     free(Pheromone);
     free(Route);
 
@@ -276,16 +278,11 @@ cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool
                 return cudaStatus;
             }
 
-
-
-
             // Call arguments
             void* kernelArgs[] = { &d_Dist,&d_Pheromone, &d_Route, &d_FoundRoute, &size, &antRoute,&antNum, &devStates,
                 &d_invalidInput, &d_isolatedVertex, &d_averageDist };
 
             cudaLaunchCooperativeKernel((void*)AntKernel_multiBlock, BlockNum, threadPerBlock, kernelArgs);
-
-
         }
 
 
@@ -342,7 +339,7 @@ cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool
             printf("Route not found!\n\n");
     }
 
-    printf("Average length0 %.3f\n", sum / SERIALMAXTRIES);
+    printf("Average length: %.3f\n", sum / SERIALMAXTRIES);
     printf("Minimal length: %.3f", min);
     // Frees GPU device memory
     Free_device_memory(d_Dist, d_Pheromone, d_Route, d_FoundRoute, antRoute, d_invalidInput, d_isolatedVertex, d_averageDist, devStates);
@@ -350,7 +347,6 @@ cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool
 };
 
 
-// KELL BELE DEVSTATES!!!
 void Free_device_memory(double* d_Dist,double* d_Pheromone,  int* d_Route, bool* d_FoundRoute, int* antRoute, bool* d_invalidInput, bool* d_isolatedVertex, double* d_averageDist, curandState* devstate) {
     // Tempory device data structures
     if (NULL != d_Dist) cudaFree(d_Dist);
@@ -468,7 +464,7 @@ __global__ void AntKernel_1Block(
     // 2 csúcs esete : lekezeljük gyorsan 1 szálon
     if (size == 2) {
         if (tr == 0) {
-            if (Dist[0 * size + 1] > 0 && Dist[1 * size + 0] > 0) {    // Van kör
+            if (Dist[0 * size + 1] > 0 && Dist[1 * size + 0] > 0) {    // Route exists
                 *FoundRoute = true;
                 Route[0] = 0;
                 Route[1] = 1;
@@ -504,7 +500,7 @@ __global__ void AntKernel_1Block(
         // Trying for every possible second vertices
         for (int secondVertex = 1; secondVertex < size; secondVertex++) {
             generateRandomSolution(antRoute, antIndex, secondVertex, Dist, size, state);
-            double multiplicationConstant = averageDist / ALPHA * 5;
+            double multiplicationConstant = averageDist / RHO * 5;
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant,repNumber);
             block.sync();
@@ -514,7 +510,7 @@ __global__ void AntKernel_1Block(
         for (int j = 0; j < RANDOM_GENERATIONS; j++) {
             // Random second vertices
             generateRandomSolution(antRoute, antIndex, -1, Dist, size, state);
-            double multiplicationConstant = averageDist / ALPHA * (REPETITIONS + 1 - repNumber);
+            double multiplicationConstant = averageDist / RHO * (REPETITIONS + 1 - repNumber);
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             block.sync();
@@ -527,11 +523,11 @@ __global__ void AntKernel_1Block(
         // Lots of ants following pheromone of previous ants
         for (int gen = 0; gen < FOLLOWER_GENERATIONS; gen++) {
 
-            // Reducing previous pheromon values by value ALPHA (modifiable in the Control Panel)
+            // Reducing previous pheromon values by value RHO (modifiable in the Control Panel)
             if (tr == 0) {
                 for (int ii = 0; ii < size; ii++)
                     for (int jj = 0; jj < size; jj++)
-                        Pheromone[ii * size + jj] *= ALPHA;
+                        Pheromone[ii * size + jj] *= RHO;
             }
             block.sync();
 
@@ -539,7 +535,7 @@ __global__ void AntKernel_1Block(
             followPheromones(Pheromone, antRoute, antIndex, size, state);
             block.sync();
             
-            double multiplicationConstant = averageDist / ALPHA * 10;
+            double multiplicationConstant = averageDist / RHO * 10;
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             block.sync();
@@ -550,7 +546,7 @@ __global__ void AntKernel_1Block(
     if (tr != 0)
         return;
 
-
+    //print(Pheromone, size);
     // Choosing path with greedy algorithm
     greedySequence(Pheromone, Route, size);
     //sequencePrint(antRoute, Dist, size);
@@ -682,7 +678,7 @@ __global__ void AntKernel_multiBlock(
         for (int j = 1; j < size; j++) {
             generateRandomSolution(antRoute, antIndex, j, Dist, size, state);
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-            double multiplicationConstant = (*averageDist) / ALPHA * 5;
+            double multiplicationConstant = (*averageDist) / RHO * 5;
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             grid.sync();
         }
@@ -692,7 +688,7 @@ __global__ void AntKernel_multiBlock(
             // Random second vertices
             generateRandomSolution(antRoute, antIndex, -1, Dist, size, state);
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-            double multiplicationConstant = (*averageDist) / ALPHA * (REPETITIONS + 1 - i);
+            double multiplicationConstant = (*averageDist) / RHO * (REPETITIONS + 1 - i);
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             grid.sync();
         }
@@ -700,11 +696,11 @@ __global__ void AntKernel_multiBlock(
         // Lots of ants following pheromone of previous ants
         for (int gen = 0; gen < FOLLOWER_GENERATIONS; gen++) {
 
-            // Reducing previous pheromon values by value ALPHA (modifiable in the Control Panel)
+            // Reducing previous pheromon values by value RHO (modifiable in the Control Panel)
             if (tr == 0) {
                 for (int ii = 0; ii < size; ii++)
                     for (int jj = 0; jj < size; jj++)
-                        Pheromone[ii * size + jj] *= ALPHA;
+                        Pheromone[ii * size + jj] *= RHO;
             }
             grid.sync();
 
@@ -712,7 +708,7 @@ __global__ void AntKernel_multiBlock(
             followPheromones(Pheromone, antRoute, antIndex, size, state);
             grid.sync();
             // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-            double multiplicationConstant = (*averageDist) / ALPHA * 10;
+            double multiplicationConstant = (*averageDist) / RHO * 10;
             evaluateSolution(Dist, Pheromone, antRoute, antIndex, size, multiplicationConstant);
             grid.sync();
         }
@@ -732,18 +728,21 @@ __global__ void AntKernel_multiBlock(
 };
 
 // Evaluates the given solution: modifies Pheromone matrix more if shorter path found
-__device__ void evaluateSolution(double* Dist, double* Pheromone, int* antRoute, int antIndex, size_t size, double multiplConstant, int repNumber) {
+__device__ void evaluateSolution(double* Dist, double* Pheromone, int* antRoute, int antIndex, 
+    size_t size, double multiplConstant, int repNumber) 
+{
     double length = antRouteLength(Dist, antRoute, antIndex, size);
     assert(length != 0);
     double additive = multiplConstant / length; // The longer the route is, the smaller amount we are adding
     if (length < minRes && length > 0) {    // Rewarding the ant with the best yet route
-        //printf("New min found: %f\n", length);
+        printf("New min found: %f\n", length);
         minRes = length;
         additive *= REWARD_MULTIPLIER * (repNumber + 1) * (repNumber + 1);
     }
     
     // Route valid if length > 0
     if (length > 0) {
+
         for (int jj = 0; jj < size; jj++) {
             int source = antRoute[antIndex * size + jj];
             int dest = antRoute[antIndex * size + (jj + 1) % size];
@@ -769,7 +768,7 @@ __global__ void setup_kernel(curandState* state, unsigned long seed)
 //      else: invalid input, no mandatory second vertex (condition = 0) 
 __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex, int secondVertex, double* Dist, size_t size, curandState* state) {
     // Expected to start in vertex 0
-    for (int idx = 0; idx < size; idx++) {    // Tömb [0, 1, 2 ... size-1]
+    for (int idx = 0; idx < size; idx++) {    // Array: [0, 1, 2 ... size-1]
         antRoute[antIndex * size + idx] = idx;
     }
     int min_rand_int, max_rand_int = size - 1;
@@ -781,7 +780,7 @@ __device__ void generateRandomSolution(int* antRoute, unsigned int antIndex, int
         antRoute[antIndex * size + secondVertex] = 1;
     }
 
-    // n db random cserét hajtunk végre a sorrendben, ezzel megkeverve a csúcsokat
+    // n db random swap in the sequence, to shuffle the edges
     // executing [size] times random swaps
     // min_rand_int means the lower limit for the swap range
     // -> if there is an exact 2.vertex, then only the (3. - size.) vertex sequence needs to be changed
@@ -840,6 +839,7 @@ __device__ double antRouteLength(double* Dist, int* antRoute, int antIndex, size
 // Represents az ant who follows other ants' pheromones
 // Generates a route with Roulette wheel method given the values of the Pheromone matrix
 __device__ void followPheromones(const double* Pheromone, int* antRoute, int antIndex, size_t size, curandState* state) {
+    curandState* statePtr = &(state[antIndex]);
     // Expected to start in vertex 0
     antRoute[antIndex * size + 0] = 0;
 
@@ -853,11 +853,11 @@ __device__ void followPheromones(const double* Pheromone, int* antRoute, int ant
         bool foundVertexByRoulette = false;
         for (int j = 0; j < maxTryNumber && !foundVertexByRoulette; j++) {
             // RND Number between 0 and sumPheromone
-            curandState* statePtr = &(state[antIndex]);
+            
             double myranddbl = curand_uniform_double(statePtr) * sumPheromone;
             double temp = Pheromone[source * size + 0]; // Used to store the matrix values
 
-            for (newParam = 0; newParam < size - 1; newParam++) {   // If newparam = size-1 then no other vertex to choose
+            for (newParam = 0; newParam < size - 1; newParam++) {   // If newparam == size-1 then no other vertex to choose
                 if (myranddbl < temp)
                     break;
                 temp += Pheromone[source * size + newParam + 1];
@@ -865,13 +865,10 @@ __device__ void followPheromones(const double* Pheromone, int* antRoute, int ant
             foundVertexByRoulette = !alreadyListed(antRoute, antIndex, size, i, newParam);
       
         }
-
-        
-
         if (!foundVertexByRoulette) {
             // Next vertex choosen by equal chances
             do {
-                float newfloat = curand_uniform(&state[antIndex]);  // RND Number between 0 and 1
+                float newfloat = curand_uniform(statePtr);  // RND Number between 0 and 1
                 newfloat *= (size - 1) + 0.999999;  // Transforming into the needed range
                 newParam = (int)truncf(newfloat);
             } while (alreadyListed(antRoute, antIndex, size, i, newParam));
@@ -885,8 +882,8 @@ __device__ void followPheromones(const double* Pheromone, int* antRoute, int ant
 // Auxilary function for greedy sequence
 // Return the highest vertex index not yet chosen
 __device__ int maxInIdxRow(const double* Pheromone, int row, size_t size, int idx, int* antRoute) {
-    int maxidx = idx;   // LEgyen már 0 0 inkább, buta Bence
-    double max = Pheromone[row * size + idx];
+    int maxidx = -1;
+    double max = 0;
 
     for (int i = 0; i < size; i++) {
         double observed = Pheromone[row * size + i];
