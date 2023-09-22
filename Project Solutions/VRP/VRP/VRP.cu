@@ -23,7 +23,7 @@ using namespace cooperative_groups;
 int main(int argc, char* argv[])
 {
     // Variables used for reading from txt file
-    FILE* Dist_file;    // File pointer
+    FILE* pfile;    // File pointer
     int Dist_filename_Idx;
     bool foundDistMatrix = false;   // Error handling
     bool foundRoute;
@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
     for (i = 1; i < argc; ++i)  // Processing command line arguments
         // Command Line Syntax: ... --dist [file_name]
         if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0)) {
-            Dist_file = fopen(argv[++i], "r");
-            if (Dist_file == NULL) {
+            pfile = fopen(argv[++i], "r");
+            if (pfile == NULL) {
                 fprintf(stderr, "Unable to open file \"%s\"", argv[i]);
                 return -1;
             }
@@ -54,10 +54,10 @@ int main(int argc, char* argv[])
 
     // File syntax : 1st row must contain graph size in decimal => compatible with TSP
     // Following rows: graph edge values separated with comma (,)
-    if (fscanf_s(Dist_file, "%d \n", &size) == 0) {
+    if (fscanf_s(pfile, "%d \n", &size) == 0) {
         fprintf(stderr, "Unable to read Size!\n Make sure you have the right file syntax!\n");
         fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \n");
-        fclose(Dist_file);
+        fclose(pfile);
         return -1;
     }
     // Distance matrix
@@ -69,33 +69,33 @@ int main(int argc, char* argv[])
         DATATYPE temp;
 
         for (int jj = 0; jj < size; ++jj) {
-            if (fscanf_s(Dist_file, "%lf", &temp) == 0) {
+            if (fscanf_s(pfile, "%lf", &temp) == 0) {
                 fprintf(stderr, "Error reading file \"%s\" distance(%d,%d)\n", argv[Dist_filename_Idx], ii, jj);
-                fclose(Dist_file);
+                fclose(pfile);
                 return -1;
             }
             Dist[ii * size + jj] = temp;
         }
-        fscanf_s(Dist_file, "\n");
+        fscanf_s(pfile, "\n");
     }
 
     // File syntax : row after dist values must contain maximum vehicle count in decimal
-    if (fscanf_s(Dist_file, "%d \n", &maxVehicles) == 0) {
+    if (fscanf_s(pfile, "%d \n", &maxVehicles) == 0) {
         fprintf(stderr, "Unable to read Maximum Vehicle Number!\n Make sure you have the right file syntax!\n");
         fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \n");
-        fclose(Dist_file);
+        fclose(pfile);
         return -1;
     }
 
     // Closing data file
     printf("Closing file \"%s\"!\n", argv[Dist_filename_Idx]);
-    if (fclose(Dist_file) != 0) {
+    if (fclose(pfile) != 0) {
         fprintf(stderr, "Unable to close file \"%s\"!\n", argv[Dist_filename_Idx]);
         return -1;
     }
 
     // Printing Matrix
-    printf("Maximum number of vehicles: %zu\n",maxVehicles);
+    printf("Maximum number of vehicles: %d\n",maxVehicles);
     printf("Given Dist matrix:\n");
     print(Dist, size);
 
@@ -132,6 +132,13 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
         fprintf(stderr, "Incorrect input values! Check antNum, size of maxVehicles!\n");
         return cudaError_t::cudaErrorInvalidConfiguration;
     }
+    
+    // Choosing GPU, may be nessesary in a multi-GPU system
+    cudaStatus = cudaSetDevice(0);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?\n");
+        return cudaStatus;
+    }
 
     // Calculates the number of Grid blocks to execute
     // Number of threads = number of ants
@@ -139,14 +146,6 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
     if (antNum > BLOCK_SIZE) {
         BlockNum = my_ceil(antNum, BLOCK_SIZE);
         antNum = BlockNum * BLOCK_SIZE; // For better usage of parallel threads
-    }
-
-    
-    // Choosing GPU, may be nessesary in a multi-GPU system
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?\n");
-        return cudaStatus;
     }
 
     // Device pointers
@@ -159,7 +158,6 @@ cudaError_t VRP_Ant_CUDA(VRP_AntCUDA_ParamTypedef h_params) {
     d_kernelParams.antNum = antNum;
     d_kernelParams.size = size;
     d_kernelParams.maxVehicles = maxVehicles;
-    d_kernelParams.state = NULL;
 
     // Config parameters
     VRP_AntKernel_Config_ParamTypedef d_configParams;
@@ -412,7 +410,7 @@ __device__ __host__ double sequencePrint(int* Route, DATATYPE* Dist, int size, i
         int src = Route[i];
         int dst = Route[(i + 1) % routeSize];
         
-        // Egy út vége
+        // End of route for a vehicle
         if (dst == 0) {
             if (src == 0)
                 printf("Unused\nVehicle #%d : ", ++vehicleCntr);
@@ -650,7 +648,7 @@ __device__ void evaluateSolution(
     bool Dist_0_0_already_rewarded = false; // Bool variable to make sure Dist(0,0) only gets rewarded once
     DATATYPE* ptr;
     int routeSize = RouteSize(kernelParams.size, kernelParams.maxVehicles);
-    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optiminzing array addressing
+    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optimizing array addressing
     if (length > 0) {
         for (int i = 0; i < routeSize; i++) {
             int src = antRouteOffset[i];
@@ -683,7 +681,7 @@ __device__ void initAntRoute(
     // Route init [0, 1, 2 ... size-1, 0, 0 ... 0]
 
     int routeSize = RouteSize(kernelParams.size, kernelParams.maxVehicles);
-    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optiminzing array addressing
+    int* antRouteOffset = kernelParams.antRoute + antIndex * routeSize;   // Optimizing array addressing
 
     for (int idx1 = 0; idx1 < kernelParams.size; ++idx1) {
         antRouteOffset[idx1] = idx1;

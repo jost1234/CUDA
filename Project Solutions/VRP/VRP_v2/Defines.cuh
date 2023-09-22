@@ -1,9 +1,9 @@
 #pragma once
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include <cooperative_groups.h>
 #include <curand_kernel.h>
 #include <iostream>
-
 
 // Thread block size
 #define BLOCK_SIZE 1024
@@ -14,7 +14,7 @@
 
 // Number of threads = number of ants
 // Default value: 1024
-int ants = 1024*4;
+int ants = 1024;
 
 // Repetition constants
 #define REPETITIONS 10
@@ -28,7 +28,7 @@ int ants = 1024*4;
 
 #define SERIALMAXTRIES 10 // Number of serial processes (for debug purposes)
 
-namespace TSP {
+namespace VRP {
 
 	/// Struct definitions
 	/// 
@@ -38,8 +38,11 @@ namespace TSP {
 	// Struct for Main CUDA function call
 	typedef struct {
 		int antNum;
+		bool capacityActive;
+		int* capacities;
 		float* Dist;
 		bool* foundRoute;
+		int maxVehicles;
 		float* Pheromone;
 		int* route;
 		int size;
@@ -52,9 +55,11 @@ namespace TSP {
 		int* antRoute;      // Temp array
 		float* Dist;     // Cost function input
 		bool* foundRoute;   // Existence output
+		int maxVehicles; // Maximum Number of Routes
 		float* Pheromone;
 		int* route;         // Sequence output
 		int size;        // Number of graph vertices
+		int routeSize;	// Redundant, just not save stack usage (= size + maxVehicles - 1)
 		curandState* state; // CURAND random state
 	} Kernel_ParamTypedef;
 
@@ -78,5 +83,4 @@ namespace TSP {
 		float averageDist;
 		float minRes;    // Minimal found Route distance
 	} Kernel_GlobalParamTypedef;
-
 }

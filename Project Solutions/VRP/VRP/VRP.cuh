@@ -24,8 +24,6 @@ __host__ __device__ void print(DATATYPE* A, size_t size) {
     printf("\n");
 }
 
-
-
 // Diagnostic function for printing given sequence
 __device__ __host__ double sequencePrint(int* Route, DATATYPE* Dist, int size, int routeSize);
 

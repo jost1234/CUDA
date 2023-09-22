@@ -131,7 +131,7 @@ cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool
     // Choosing GPU, may be nessesary in a multi-GPU system
     cudaStatus = cudaSetDevice(0);
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?\n");
+        fprintf(stderr, "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?\n");
         return cudaStatus;
     }
 
@@ -295,7 +295,7 @@ cudaError_t TSP_Ant_CUDA(double* h_Dist, int* h_Route, double* h_Pheromone, bool
             return cudaStatus;
         }
 
-        // cudaDeviceSynchronize vár arra, hogy befejeződjön a kernel, utána visszatér
+        // cudaDeviceSynchronize waits for the kernel to finish
         cudaStatus = cudaDeviceSynchronize();
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n", cudaStatus);
@@ -401,7 +401,7 @@ __global__ void AntKernel_1Block(
     if (antIndex >= antNum)     // Itt megtehető ez az egyszerűsítés
         return;                 // Segít elkerülni a túlcimzést
 
-    // Shared variables betwenn threads in the same block
+    // Shared variables between threads in the same block
     __shared__ bool invalidInput;   // Variable used to detecting invalid input
     __shared__ bool isolatedVertex; // Variable used to detecting isolated vertex (for optimization purposes)
     __shared__ double averageDist;  // Average edge distance
@@ -480,7 +480,7 @@ __global__ void AntKernel_1Block(
     if (tr == 0) {
         double sum = 0.0;   // Sum of edge values
         int numPos = 0;     // Number of edges
-        for(int i=0;i<size;i++)
+        for(int i = 0; i < size; i++)
             for (int j = 0; j < size; j++) {
                 double edge = Dist[i * size + j];
                 if (edge > 0) {
@@ -506,7 +506,7 @@ __global__ void AntKernel_1Block(
             block.sync();
         }
 
-        // Numerous random guess
+        // Numerous random guesses
         for (int j = 0; j < RANDOM_GENERATIONS; j++) {
             // Random second vertices
             generateRandomSolution(antRoute, antIndex, -1, Dist, size, state);

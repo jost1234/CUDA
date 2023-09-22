@@ -147,7 +147,7 @@ namespace TSP {
         // Choosing GPU, may be nessesary in a multi-GPU system
         cudaStatus = cudaSetDevice(0);
         if (cudaStatus != cudaSuccess) {
-            fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?\n");
+            fprintf(stderr, "cudaSetDevice failed! Do you have a CUDA-capable GPU installed?\n");
             return cudaStatus;
         }
 
@@ -179,7 +179,7 @@ namespace TSP {
         d_globalParams.isolatedVertex = false;
 
         // Size of device malloc
-        size_t Dist_bytes = size * size * sizeof(double);
+        size_t Dist_bytes = size * size * sizeof(DATATYPE);
         size_t route_bytes = size * sizeof(int);
         size_t foundRoute_bytes = sizeof(bool); // May be optimized, only for better transparency
         size_t antRoute_bytes = antNum * size * sizeof(int);
@@ -266,7 +266,7 @@ namespace TSP {
         {
             printf("Attempt #%d ||\n", iter);
 
-            if (1)
+            if (BlockNum == 1)
             {
                 TSP_AntKernel_1Block << < BlockNum, threadPerBlock >> > (d_kernelParams, d_configParams);
             }
@@ -300,7 +300,7 @@ namespace TSP {
                 return cudaStatus;
             }
 
-            // cudaDeviceSynchronize vár arra, hogy befejeződjön a kernel, utána visszatér
+            // cudaDeviceSynchronize waits for the kernel to finish
             cudaStatus = cudaDeviceSynchronize();
             if (cudaStatus != cudaSuccess) {
                 fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n", cudaStatus);
@@ -641,7 +641,7 @@ namespace TSP {
             2 > params.size))
         {
             if (antIndex == 0)
-                printf("Invalid Input\n");
+                printf("Invalid Input values!\n");
             return;
         }
 

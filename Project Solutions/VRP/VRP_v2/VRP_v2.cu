@@ -7,7 +7,7 @@
 #include "curand_kernel.h"
 
 // Custom header containing Control Panel
-#include "TSP_v3.cuh"
+#include "VRP_v2.cuh"
 
 // General purpose headers
 #include <iostream>
@@ -28,15 +28,16 @@ int main(int argc, char* argv[])
     bool foundDistFile = false;   // Error handling
     bool foundRoute;
     int size;    // Number of graph vertices
+    int maxVehicles; // Maximum number of vehicles in warehouse
     int i;  // Iterator
     srand(time(0)); // Need seeds for random solutions
-    
+
     // Processing command line arguments
-    for (i = 1; i < argc; ++i) 
-    {  
+    for (i = 1; i < argc; ++i)
+    {
         /// Distance file: REQUIRED
         // Command Line Syntax: ... --dist [file_name]
-        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0)) 
+        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0))
         {
             pfile = fopen(argv[++i], "r");
             if (pfile == NULL) {
@@ -62,7 +63,7 @@ int main(int argc, char* argv[])
     }
 
     // Checking required elements
-    if (!foundDistFile) 
+    if (!foundDistFile)
     {
         fprintf(stderr, "Please give a file in command line arguments to set the Distance Matrix!\n");
         fprintf(stderr, "Command Line Syntax:\n\t--dist [data_file].txt\n");
@@ -98,7 +99,15 @@ int main(int argc, char* argv[])
         fscanf_s(pfile, "\n");
     }
 
-    // Closing dist file
+    // File syntax : row after dist values must contain maximum vehicle count in decimal
+    if (fscanf_s(pfile, "%d \n", &maxVehicles) == 0) {
+        fprintf(stderr, "Unable to read Maximum Vehicle Number!\n Make sure you have the right file syntax!\n");
+        fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \n");
+        fclose(pfile);
+        return -1;
+    }
+
+    // Closing data file
     printf("Closing file \"%s\"!\n", argv[fileNameIdx]);
     if (fclose(pfile) != 0) {
         fprintf(stderr, "Unable to close file \"%s\"!\n", argv[fileNameIdx]);
@@ -106,40 +115,46 @@ int main(int argc, char* argv[])
     }
 
     // Printing Matrix
+    printf("Maximum number of vehicles: %d\n", maxVehicles);
     printf("Given Dist matrix:\n");
     print(Dist, size);
 
     // Host Variables
 
-    TSP::CUDA_Main_ParamTypedef params;
+    // Route: [0 ... 1st Route ... 0 ... 2nd Route ... ... Last Route ... ( Last 0 not stored)]
+
+    VRP::CUDA_Main_ParamTypedef params;
     params.foundRoute = &foundRoute;
     params.antNum = ants;
     params.size = size;
+    params.maxVehicles = maxVehicles;
     params.Dist = Dist;
-    params.Pheromone = (float*)malloc(size * size * sizeof(float));
-    params.route = (int*)malloc(size * sizeof(int));
+    params.Pheromone = (float*)malloc(size * VRP::RouteSize(size, maxVehicles) * sizeof(float));
+    params.route = (int*)malloc(VRP::RouteSize(size, maxVehicles) * sizeof(int));
 
-    printf("Traveling Salesman Problem with Ant Colony Algorithm\n");
-    TSP::CUDA_main(params);
+    printf("Vehicle Route Problem with Ant Colony Algorithm\n");
+    VRP::CUDA_main(params);
 
     free(params.Dist);
     free(params.route);
     return 0;
 }
 
-namespace TSP {
+namespace VRP {
 
     // Global variables for multi grid Kernel
     __device__ Kernel_GlobalParamTypedef globalParams;
 
     // Host function for CUDA
-    cudaError_t CUDA_main(CUDA_Main_ParamTypedef h_params) 
+    cudaError_t CUDA_main(CUDA_Main_ParamTypedef h_params)
     {
         cudaError_t cudaStatus;
         // Local variables
+        int maxVehicles = h_params.maxVehicles; // Maximum number of vehicles in warehouse
         int size = h_params.size;    // Number of graph vertices
-        int antNum = h_params.antNum;    // Number of Ants (= threads) 
+        int antNum = h_params.antNum;    // Number of Ants (= threads)
 
+        // Invalid inputs
         if (!inputGood(&h_params)) {
             fprintf(stderr, "Invalid Input values!\n");
             return cudaError_t::cudaErrorInvalidConfiguration;
@@ -169,25 +184,28 @@ namespace TSP {
         d_kernelParams.state = NULL;
         d_kernelParams.antNum = antNum;
         d_kernelParams.size = size;
-        d_kernelParams.state = NULL;
+        d_kernelParams.maxVehicles = maxVehicles;
+        d_kernelParams.routeSize = RouteSize(size, maxVehicles);
 
         // Config parameters
         Kernel_ConfigParamTypedef d_configParams;
         d_configParams.Rho = RHO;
         d_configParams.Follower_Generations = FOLLOWER_GENERATIONS;
         d_configParams.Initial_Pheromone_Value = INITIAL_PHEROMONE_VALUE;
-        d_configParams.maxTryNumber = size;
+        d_configParams.maxTryNumber = RouteSize(size, maxVehicles);
         d_configParams.Random_Generations = RANDOM_GENERATIONS;
         d_configParams.Repetitions = REPETITIONS;
         d_configParams.Reward_Multiplier = REWARD_MULTIPLIER;
 
         // Size of device malloc
         size_t Dist_bytes = size * size * sizeof(float);
-        size_t route_bytes = size * sizeof(int);
+        size_t Pheromone_bytes = size * RouteSize(size, maxVehicles) * sizeof(float);
+        // We need memory for multiple Routes
+        size_t route_bytes = RouteSize(size, maxVehicles) * sizeof(int);
         size_t foundRoute_bytes = sizeof(bool); // May be optimized, only for better transparency
-        size_t antRoute_bytes = antNum * size * sizeof(int);
+
+        size_t antRoute_bytes = antNum * route_bytes;   // Allocating working memory for all threads
         size_t state_bytes = antNum * sizeof(curandState);
-        // CUDA Malloc
 
         // Dist
         cudaStatus = cudaMalloc((void**)&d_kernelParams.Dist, Dist_bytes);
@@ -255,7 +273,7 @@ namespace TSP {
 
         float min = FLT_MAX;
         float sum = 0.0f;
-        
+
         for (int iter = 0; iter < SERIALMAXTRIES; iter++)
         {
             printf("\nAttempt #%d ||\n", iter);
@@ -273,7 +291,7 @@ namespace TSP {
                 int dev = 0;
                 int supportsCoopLaunch = 0;
                 cudaDeviceGetAttribute(&supportsCoopLaunch, cudaDevAttrCooperativeLaunch, dev);
-                if (supportsCoopLaunch != 1) 
+                if (supportsCoopLaunch != 1)
                 {
                     fprintf(stderr, "Cooperative Launch is not supported on this machine configuration.");
                     Free_device_memory(d_kernelParams);
@@ -319,7 +337,8 @@ namespace TSP {
             }
 
             if (*(h_params.foundRoute)) {
-                float _length = sequencePrint(h_params.route, h_params.Dist, size);
+                float _length = sequencePrint(h_params.route, h_params.Dist, size, RouteSize(size, maxVehicles));
+                assert(_length != -1);
                 sum += _length;
                 if (_length < min)
                     min = _length;
@@ -334,33 +353,27 @@ namespace TSP {
         // Frees GPU device memory
         Free_device_memory(d_kernelParams);
         return cudaStatus;
-
     }
 
     // Testing input for main CUDA function
     // Returns true if input data syntax is good
     // Disclaimer: Only tests NULL property of pointers, does not 100% guarantee perfect data
-    __host__ __device__ inline bool inputGood(CUDA_Main_ParamTypedef* params) {
+    __host__ inline bool inputGood(CUDA_Main_ParamTypedef* params) {
         return (
-            32 <= params->antNum &&    // At least 32 threads (for GPU usage)
-            2 <= params->size &&      // At least 2 nodes
+            32 <= params->antNum &&        // At least 32 threads (for GPU usage)
+            2 <= params->size &&          // At least 2 nodes
+            1 <= params->maxVehicles &&   // At least 1 vehicle
             NULL != params->Dist &&
             NULL != params->foundRoute &&
             NULL != params->Pheromone &&
             NULL != params->route);
     }
 
-    // Testing input for main CUDA function
-    // Returns true if input data syntax is good
-    // Disclaimer: Only tests NULL property of pointers, does not 100% guarantee perfect data
-    __device__ inline bool inputGood(Kernel_ParamTypedef* params) {
-        return (
-            32 <= params->antNum &&    // At least 32 threads (for GPU usage)
-            2 <= params->size &&      // At least 2 nodes
-            NULL != params->Dist &&
-            NULL != params->foundRoute &&
-            NULL != params->Pheromone &&
-            NULL != params->route);
+    // Inicializes a random seed for each different threads
+    __global__ void setup_kernel(curandState* state, unsigned long seed)
+    {
+        int id = blockIdx.x * blockDim.x + threadIdx.x;
+        curand_init(seed, id, id, &state[id]);
     }
 
     // Frees device memory with cudaFree if pointer is not NULL
@@ -374,46 +387,74 @@ namespace TSP {
         if (NULL != params.state) cudaFree(params.state);
     }
 
-    __device__ __host__ float sequencePrint(int* route, float* Dist, int size) {
-        if (NULL == route || NULL == Dist || 2 > size) {
-            printf("Invalid input of sequencePrint!\n");
+    // Testing input for main CUDA function
+    // Returns true if input data syntax is good
+    // Disclaimer: Only tests NULL property of pointers, does not 100% guarantee perfect data
+    __device__ inline bool inputGood(Kernel_ParamTypedef* params) {
+        return (
+            32 <= params->antNum &&    // At least 32 threads (for GPU usage)
+            2 <= params->size &&      // At least 2 nodes
+            1 <= params->maxVehicles &&   // At least 1 vehicle
+            NULL != params->Dist &&
+            NULL != params->foundRoute &&
+            NULL != params->Pheromone &&
+            NULL != params->route);
+    }
+
+    // Diagnostic function for printing given sequence
+    __device__ __host__ float sequencePrint(int* Route, float* Dist, int size, int routeSize) {
+        if (
+            2 > size ||
+            2 > routeSize ||
+            NULL == Route ||
+            NULL == Dist) {
+            printf("Invalid input!\n");
             return -1;
         }
 
+        float l = 0;
+        int vehicleCntr = 0, i = 0;
+
         // Check for dead end
-        for (int i = 0; i < size; ++i) 
+        while (i < routeSize)
         {
-            int src = route[i];
-            int dst = route[(i + 1) % size];
-            if (Dist[src * size + dst] < 0) 
+            int src = Route[i];
+            int dst = Route[(i + 1) % routeSize];
+            if (Dist[src * size + dst] < 0)
             {
                 printf("Route not possible!\n");
                 return -1;
             }
+            i++;
         }
-        
-        printf("Sequence : ");
-        float l = 0;
-        for (int i = 0; i < size; ++i) 
-        {
-            int src = route[i];
-            int dst = route[(i + 1) % size];
-            printf("%d ", src);
+
+        i = 0;
+        printf("Vehicle #0 : ");
+        while (i < routeSize) {
+            int src = Route[i];
+            int dst = Route[(i + 1) % routeSize];
+
+            // End of route for a vehicle
+            if (dst == 0) {
+                if (src == 0)
+                    printf("Unused\nVehicle #%d : ", ++vehicleCntr);
+                else if (routeSize - 1 != i) {
+                    printf("%d (%.0f) 0\nVehicle #%d : ", src, Dist[src * size + dst], ++vehicleCntr);
+                }
+                else {
+                    printf("%d (%.0f) 0\n", src, Dist[src * size + dst]);
+                }
+            }
+            else {
+                // Next element of Route 
+                printf("%d (%.0f) ", src, Dist[src * size + dst]);
+            }
             l += Dist[src * size + dst];
+            i++;
         }
-        printf("%d\n", route[0]);
         printf(" Total length : %.2f\n ", l);
         return l;
     }
-
-    // Initializes a random seed for each different threads
-    __global__ void setup_kernel(curandState* state, unsigned long seed)
-    {
-        int id = blockIdx.x * blockDim.x + threadIdx.x;
-        curand_init(seed, id, id, &state[id]);
-    }
-
-    
 
     // 1 block sized kernel
     __global__ void Kernel_1Block(
@@ -421,11 +462,13 @@ namespace TSP {
         Kernel_ConfigParamTypedef configParams
     ) 
     {
-        // Dist (i,j) means the distance from vertex i to vertex j
+        // Dist (i,j) means the distance from node i to node j
         // If no edge drawn between them: Dist(i,j) = -1 (expected syntax)
         thread_block block = this_thread_block();
 
-        int antIndex = threadIdx.x;  // Ant index 0 - (antNum-1)
+        int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // Ant index 0 - (antNum-1)
+        int tr = block.thread_rank();   // elvileg ugyanaz mint az előző sor
+        // Ott használom, ahol ez az átláthatóságot segíti
 
         if (antIndex >= params.antNum || blockIdx.x > 0)     // Defense against overaddressing
             return;
@@ -436,21 +479,21 @@ namespace TSP {
         __shared__ float averageDist;    // Average edge distance
         __shared__ float multiplicationConst;
         __shared__ int size;                // Local Copy of argument parameter
+        __shared__ int maxVehicles;
+        
+        invalidInput = false;
+        isolatedVertex = false;
+        averageDist = 0.0f;
+        multiplicationConst = 0.0f;
+        size = params.size; // Need to be written too many times
+        maxVehicles = params.maxVehicles;
+        params.routeSize = RouteSize(size, maxVehicles);
+        *params.foundRoute = false;
+        globalParams.minRes = FLT_MAX;
 
-        // Initialization with thread 0
-        //if (antIndex == 0) {
-            invalidInput = false;
-            isolatedVertex = false;
-            averageDist = 0.0f;
-            multiplicationConst = 0.0f;
-            size = params.size; // Needs to be written too many times
-            *params.foundRoute = false;
-            globalParams.minRes = FLT_MAX;
-
-            // Invalidate route vector
-            for (int i = 0; i < size; i++)
-                params.route[i] = 0;
-        //}
+        // Invalidate route vector
+        for (int i = 0; i < size; i++)
+            params.route[i] = 0;
 
         // Input check
         if (antIndex == 0 && !inputGood(&params)) {
@@ -458,6 +501,8 @@ namespace TSP {
             printf("Invalid Input\n");
         }
         block.sync();
+
+        
 
         // Pheromone matrix initialization
         if (antIndex == 0)
@@ -469,7 +514,7 @@ namespace TSP {
                     // Initializing Pheromone graph (anti - unitmatrix, all main diagonal elements are 0)
                     // 0 Pheromone value if no edge drawn
                     // Initial Pheromone value is of consideration in the Control panel
-                    if ((i == j) || (params.Dist[i * size + j] < 0))
+                    if (i < size &&( (i == j) || (params.Dist[i * size + j] < 0)))
                         params.Pheromone[i * size + j] = 0.0f;
                     else
                         params.Pheromone[i * size + j] = configParams.Initial_Pheromone_Value;
@@ -494,28 +539,39 @@ namespace TSP {
                     isolatedVertex = true;
                 }
             }
+            /// The warehouse is simulated
+            /// as k nodes in the same spot ==> TSP Reduction
+            for (; i < params.routeSize; i++) 
+            {
+                for (j = 0; j < size; j++) 
+                {
+                    params.Pheromone[i * size + j] = configParams.Initial_Pheromone_Value;
+                }
+            }
         }
 
         block.sync();
 
-        if (invalidInput || isolatedVertex) {   // Invalid input, so no point of continuing
-            return;                             // Case of isolated node means no route exists
-        }
 
+        if (invalidInput || isolatedVertex)   // Invalid input, so no point of continuing
+            return;                           // Case of isolated node means no route exists
+        
         // Case of only 2 nodes: handle quickly in 1 thread
         if (size == 2) {
-            if (antIndex == 0) {
+            if (tr == 0) {
                 if (params.Dist[0 * size + 1] > 0 && params.Dist[1 * size + 0] > 0) {    // Route exists
                     *params.foundRoute = true;
-                    params.route[0] = 0;    // Route = [0 1]
+                    params.route[0] = 0;    // Route = [0 1 0...0]
                     params.route[1] = 1;
+                    for (int ii = 0; ii < params.maxVehicles - 1; ++ii)
+                        params.route[size + ii] = 0; // Only one vehicle needed
                 }
             }
             block.sync();
             return;
         }
+        
 
-        // Left: Connected(?) graph with at least 3 vertices
 
         // Calculating average distance
         if (antIndex == 0) {
@@ -537,6 +593,7 @@ namespace TSP {
         }
         block.sync();
 
+        
         // Default values for routes
         initAntRoute(&params, antIndex);
         block.sync();
@@ -544,23 +601,24 @@ namespace TSP {
         // Ants travelling to all directions
         for (int repNumber = 0; repNumber < configParams.Repetitions; repNumber++)
         {
+            
             if (antIndex == 0)
                 multiplicationConst = averageDist / configParams.Rho * 5;
             block.sync();
-
-            // Trying for every possible second vertices
-            for (int secondVertex = 1; secondVertex < size; secondVertex++)
+            /*block.sync();
+            if (antIndex == 0)
             {
-                generateRandomSolution(&params, antIndex, secondVertex);
-                // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-                evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
-                block.sync();
+                printf("\nPh2:\n");
+                print(params.Pheromone, params.size, params.routeSize);
+                printf("\nDist2:\n");
+                print(params.Dist, size);
             }
-
+            block.sync();*/
             // Numerous random guesses
-            for (int j = 0; j < configParams.Random_Generations; j++) {
-                // Random second vertices
-                generateRandomSolution(&params, antIndex, -1);
+            for (int j = 0; j < configParams.Random_Generations; j++) 
+            {
+                
+                generateRandomSolution(&params, antIndex);
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 block.sync();
             }
@@ -574,7 +632,7 @@ namespace TSP {
 
                 // Reducing previous pheromon values by value RHO (modifiable in the Control Panel)
                 if (antIndex == 0) {
-                    for (int i = 0; i < size; i++) {
+                    for (int i = 0; i < params.routeSize; i++) {
                         for (int j = 0; j < size; j++)
                             params.Pheromone[i * size + j] *= configParams.Rho;
                     }
@@ -588,7 +646,6 @@ namespace TSP {
                 block.sync();
             }
         }
-
         // Removing unwanted threads
         if (antIndex != 0)
             return;
@@ -599,14 +656,16 @@ namespace TSP {
             printf("Need to find route in greedy mode!\n");
             greedySequence(&params);
         }
+
         // We found a route if given length is greater than zero
         *params.foundRoute = (antRouteLength(&params, 0) > 0);
+
     }
 
     // Multiblock sized kernel
     __global__ void Kernel_multiBlock(
         Kernel_ParamTypedef params,
-        Kernel_ConfigParamTypedef configParams) 
+        Kernel_ConfigParamTypedef configParams)
     {
         // Dist (i,j) means the distance from vertex i to vertex j
         // If no edge drawn between them: Dist(i,j) = -1 (expected syntax)
@@ -618,19 +677,24 @@ namespace TSP {
 
         grid.sync();
 
+        // Optimizable in space complexity to one shared variable per thread block
         float multiplicationConst = 0.0f;
 
-        // Initialization
-        globalParams.invalidInput = false;
-        globalParams.isolatedVertex = false;
-        globalParams.averageDist = 0.0f;
+        // Initialization with thread 0
+        if (antIndex == 0) {
+            globalParams.invalidInput = false;
+            globalParams.isolatedVertex = false;
+            globalParams.averageDist = 0.0f;
+            params.routeSize = RouteSize(params.size, params.maxVehicles);
 
-        *params.foundRoute = false;
-        globalParams.minRes = FLT_MAX;
+            *params.foundRoute = false;
+            globalParams.minRes = FLT_MAX;
 
-        // Invalidate route vector
-        for (int i = 0; i < params.size; i++)
-            params.route[i] = 0;
+            // Invalidate route vector
+            for (int i = 0; i < params.size; i++)
+                params.route[i] = 0;
+
+        }
 
         // Input check
         if (antIndex == 0 && !inputGood(&params)) {
@@ -674,6 +738,15 @@ namespace TSP {
                     globalParams.isolatedVertex = true;
                 }
             }
+            /// The warehouse is simulated
+            /// as k nodes in the same spot ==> TSP Reduction
+            for (; i < params.routeSize; i++)
+            {
+                for (j = 0; j < params.size; j++)
+                {
+                    params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
+                } 
+            }
         }
         grid.sync();
 
@@ -684,38 +757,18 @@ namespace TSP {
         // Case of only 2 nodes: handle quickly in 1 thread
         if (params.size == 2) {
             if (antIndex == 0) {
-                if (params.Dist[0 * params.size + 1] > 0 && params.Dist[1 * params.size + 0] > 0)
-                {    // Route exists
+                if (params.Dist[0 * params.size + 1] > 0 && params.Dist[1 * params.size + 0] > 0) {    // Route exists
                     *params.foundRoute = true;
-                    params.route[0] = 0;    // Route = [0 1]
+                    params.route[0] = 0;    // Route = [0 1 0...0]
                     params.route[1] = 1;
+                    for (int ii = 0; ii < params.maxVehicles - 1; ++ii)
+                        params.route[params.size + ii] = 0; // Only one vehicle needed
                 }
             }
             grid.sync();
             return;
         }
-
-        // Left: Connected graph with at least 3 nodes
-        // Calculating average distance
-        if (antIndex == 0)
-        {
-            float sum = 0.0f;   // Sum of edge values
-            int numPos = 0;     // Number of edges
-            for (int i = 0; i < params.size; i++) {
-                for (int j = 0; j < params.size; j++)
-                {
-                    float edge = params.Dist[i * params.size + j];
-                    if (edge > 0)
-                    {
-                        sum += edge;
-                        numPos++;
-                    }
-                }
-            }
-            globalParams.averageDist = sum / numPos * params.size;
-        }
-        grid.sync();
-
+        
         // Initializing ant Routes 
         initAntRoute(&params, antIndex);
         grid.sync();
@@ -724,21 +777,11 @@ namespace TSP {
         for (int repNumber = 0; repNumber < configParams.Repetitions; repNumber++)
         {
             multiplicationConst = globalParams.averageDist / configParams.Rho * 5.0f;
-       
-            // Trying for every possible second vertices
-            for (int secondVertex = 1; secondVertex < params.size; secondVertex++)
-            {
-                generateRandomSolution(&params, antIndex, secondVertex);
-                // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
-                evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
-                grid.sync();
-            }
 
             // Numerous random guess
             for (int j = 0; j < configParams.Random_Generations; j++)
             {
-                // Seconvertex = -1 means no prescribed second vertex
-                generateRandomSolution(&params, antIndex, -1);
+                generateRandomSolution(&params, antIndex);
                 grid.sync();
 
                 // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
@@ -754,7 +797,7 @@ namespace TSP {
             {
                 // Reducing previous pheromon values by value RHO (modifiable in the Control Panel)
                 if (antIndex == 0) {
-                    for (int i = 0; i < params.size; i++) {
+                    for (int i = 0; i < params.routeSize; i++) {
                         for (int j = 0; j < params.size; j++)
                             params.Pheromone[i * params.size + j] *= configParams.Rho;
                     }
@@ -777,7 +820,6 @@ namespace TSP {
             }
         }
 
-
         grid.sync();   // We found a route if given length is greater than zero
 
         *params.foundRoute = (antRouteLength(&params, 0) > 0);
@@ -787,18 +829,20 @@ namespace TSP {
     __device__ void initAntRoute(
         Kernel_ParamTypedef* pkernelParams,
         int antIndex
-    )
+    ) 
     {
-        // Route init [0, 1, 2 ... size-1]
-        int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->size;   // Optimizing array addressing
-        for (int idx = 0; idx < pkernelParams->size; idx++) {
-            antRouteOffset[idx] = idx;
+        // Route init [0, 1, 2 ... size-1, 0, 0 ... 0]
+        // Optimizing array addressing
+        int* antRouteOffset = pkernelParams->antRoute + 
+            antIndex * pkernelParams->size;   
+
+
+        for (int idx1 = 0; idx1 < pkernelParams->size; ++idx1) {
+            antRouteOffset[idx1] = idx1;
         }
-    }
-
-
-    inline __device__ bool isValidSecondVertex(int secondVertex, int size) {
-        return (secondVertex > 0 && secondVertex < size);
+        for (int idx2 = 0; idx2 < pkernelParams->maxVehicles - 1; ++idx2) {
+            antRouteOffset[pkernelParams->size + idx2] = 0;
+        }
     }
 
     // Generates a random sequence of numbers between 0 and (size - 1) starting with 0
@@ -807,43 +851,18 @@ namespace TSP {
     //      else: invalid input, no mandatory second vertex (condition = 0)
     __device__ void generateRandomSolution(
         Kernel_ParamTypedef* pkernelParams,
-        int antIndex,
-        int secondVertex
-    )
+        int antIndex
+    ) 
     {
-        int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->size;   // Optimizing array addressing
-        // Expected to start in node 0 (in normal use this is already set, but for safety it's here)
+        int* antRouteOffset = pkernelParams->antRoute 
+            + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
+        // Expected to start in node 0 (in normal use this is already set)
         antRouteOffset[0] = 0;
+        // Route init [0, 1, 2 ... size-1, 0, 0 ... 0]
+        int min_rand_int = 1, max_rand_int = pkernelParams->routeSize - 1;
 
-        int min_rand_int = 1, max_rand_int = pkernelParams->size - 1;
-        if (isValidSecondVertex(secondVertex, pkernelParams->size)) {
-            min_rand_int = 2;
-            int secVertexidx;
-            // Find secondvertex in route
-            for (secVertexidx = 0; secVertexidx < pkernelParams->size && antRouteOffset[secVertexidx] != secondVertex; ++secVertexidx);
-            if (secVertexidx == pkernelParams->size)   // Could not find it, something went wrong, so we must order back the sequence
-            {
-                // If everything is correct, we may never enter here,
-                // but in case so, we reconfigure the antRoute to default
-                printf("Error occured while generating random sequence: second vertex (%d) lost!\n", secondVertex);
-                for (int idx = 2; idx < pkernelParams->size; idx++)
-                    antRouteOffset[idx] = idx;
-
-                antRouteOffset[1] = secondVertex;
-                antRouteOffset[secondVertex] = 1;
-            }
-            else   // Second vertex found
-            {
-                antRouteOffset[secVertexidx] = antRouteOffset[1];
-                antRouteOffset[1] = secondVertex;
-            }
-        }
-
-        // n db random swap in the sequence, to shuffle the edges
-        // executing [size] times random swaps
-        // min_rand_int means the lower limit for the swap range
-        // -> if there is an exact 2.vertex, then only the (3. - size.) vertex sequence needs to be changed
-        for (int idx = min_rand_int; idx < pkernelParams->size; idx++)
+        // routeSize-1 times random swap in the sequence, to shuffle the edges
+        for (int idx = min_rand_int; idx < pkernelParams->routeSize; idx++)
         {
             float myrandf;
             int myrand;
@@ -860,6 +879,10 @@ namespace TSP {
             antRouteOffset[idx] = antRouteOffset[myrand];
             antRouteOffset[myrand] = temp;
         }
+        /*if (antIndex == 0) {
+            printf("Generated random sequence:\n ");
+            sequencePrint(pkernelParams->antRoute, pkernelParams->Dist, pkernelParams->size, pkernelParams->routeSize);
+        }*/
     }
 
     // Returns bool value of whether newParam is already listed in the route
@@ -872,38 +895,52 @@ namespace TSP {
         int newParam
     )
     {
-        assert(idx < pkernelParams->size);
-        if (idx >= pkernelParams->size)
+        assert(idx < pkernelParams->routeSize);
+        if (idx >= pkernelParams->routeSize)
             return true;    // Rather make infinite cycle than overaddressing
+        // Count, how many vehicles are being used (0-s in the Route)
+        int vehicleCntr = 0;
+        int temp;
+        int* antRouteOffset = pkernelParams->antRoute 
+            + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
 
         // Special care for -1: watching route vector
         if (antIndex == -1)
+            antRouteOffset = pkernelParams->route;
+        
+
+        if (newParam == 0)
         {
             for (int i = 0; i < idx; ++i)
-                if (newParam == pkernelParams->route[i])
-                    return true;
-            return false;
+            {
+                temp = antRouteOffset[i];
+                if (temp == 0)
+                    vehicleCntr++;
+            }
+            return vehicleCntr >= pkernelParams->maxVehicles;
+            // Already listed only if max amount of vehicles are still used
         }
-
-
-        for (int i = 0; i < idx; ++i)
-            if (newParam == pkernelParams->antRoute[antIndex * pkernelParams->size + i])
-                return true;
+        // Regular node
+        for (int i = 0; i < idx; ++i)   // Compare with all previous route nodes
+            if (newParam == antRouteOffset[i])
+                return true;    // Matching previous node
+        // No match found
         return false;
-    }
+        
+    } 
 
-    // Returns the length of the given route
+    // Returns the sum length of the given route of trucks
     // Returns -1 if route not possible (for example has dead end)
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex)
     {
-        int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->size;   // Optimizing array addressing
+        int* antRouteOffset = pkernelParams->antRoute 
+            + antIndex * pkernelParams->routeSize;   // Optiminzing array addressing
         float length = 0;  // Return value
         int src, dst;
 
-        for (int i = 0; i < pkernelParams->size; ++i)
-        {
+        for (int i = 0; i < pkernelParams->routeSize; ++i) {
             src = antRouteOffset[i];
-            dst = antRouteOffset[(i + 1) % pkernelParams->size];   // Next node
+            dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];   // Next node
 
             float edgeLength = pkernelParams->Dist[src * pkernelParams->size + dst];
             if (edgeLength < 0) {
@@ -917,57 +954,82 @@ namespace TSP {
         return length;
     }
 
-
     // Represents az ant who follows other ants' pheromones
     // Generates a route with Roulette wheel method given the values of the Pheromone matrix
     __device__ void followPheromones(
         Kernel_ParamTypedef* pkernelParams,
         int antIndex,
         int maxTryNumber
-    )
+    ) 
     {
-        int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->size;   // Optimizing array addressing
+        int* antRouteOffset = pkernelParams->antRoute
+            + antIndex * pkernelParams->routeSize;   // Optiminzing array addressing
+        
         curandState* statePtr = &(pkernelParams->state[antIndex]);
-        // Expected to start in vertex 0
-        pkernelParams->antRoute[antIndex * pkernelParams->size + 0] = 0;
+        // Expected to start in node 0
+        antRouteOffset[0] = 0;
 
+        // Somewhat more difficult than TSP
+        int vehicleIdx = 0;
+        int workingRow; // when the last node was 0, we have to watch the correct row in Pheromone matrix
         float sumPheromone = 0.0f;  // Weighted Roulette wheel: first we calculate the sum of weights
         for (int i = 0; i < pkernelParams->size; i++)
             sumPheromone += pkernelParams->Pheromone[i];
 
+
         // Starting from 2nd element of the Route
-        for (int i = 1; i < pkernelParams->size; ++i)
-        {
+        for (int i = 1; i < pkernelParams->routeSize; ++i) {
             int source = antRouteOffset[i - 1];   // Previous node
             int newParam;   // Variable for new route element
             bool foundVertexByRoulette = false;
+
+            if (source == 0) 
+            {
+                workingRow = correctRow(pkernelParams->size, vehicleIdx++);
+                assert(vehicleIdx <= pkernelParams->maxVehicles);
+                assert(workingRow < pkernelParams->routeSize);
+            }
+            else 
+            {
+                workingRow = source;
+            }
             for (int j = 0; j < maxTryNumber && !foundVertexByRoulette; j++)
             {
                 // RND Number between 0 and sumPheromone
                 float myrandflt = curand_uniform(statePtr) * sumPheromone;
-                float temp = pkernelParams->Pheromone[source * pkernelParams->size + 0]; // Used to store the matrix values
-
+                float temp = pkernelParams->Pheromone[workingRow * pkernelParams->size + 0]; // Used to store the matrix values
+            
                 for (newParam = 0; newParam < pkernelParams->size - 1; newParam++)
                 {
                     if (myrandflt < temp)   // If newparam == size-1 then no other node to choose
                         break;
-                    temp += pkernelParams->Pheromone[source * pkernelParams->size + newParam + 1];
-                }   // If not already listed then adding to the sequence
-                foundVertexByRoulette = !alreadyListed(pkernelParams,antIndex, i, newParam);
+                    temp += pkernelParams->Pheromone[workingRow * pkernelParams->size + newParam + 1];
+                } // If not already listed then adding to the sequence
+                foundVertexByRoulette = !alreadyListed(pkernelParams, antIndex, i, newParam);
             }
-            if (!foundVertexByRoulette)
+            if (!foundVertexByRoulette) 
             {
                 // Next vertex choosen by equal chances
                 do {
-                    float newfloat = curand_uniform(statePtr);      // RND Number between 0 and 1
-                    newfloat *= (pkernelParams->size - 1) + 0.999999f;  // Transforming into the needed range
+                    float newfloat = curand_uniform(&pkernelParams->state[antIndex]);  // RND Number between 0 and 1
+                    newfloat *= (pkernelParams->size - 1) + 0.999999;  // Transforming into the needed range
                     newParam = (int)truncf(newfloat);
                 } while (alreadyListed(pkernelParams, antIndex, i, newParam));
             }
-            // At last the new vertex
+            // last the new vertex
             antRouteOffset[i] = newParam;
         }
     }
+
+    // If the last node was 0 in route, we have to calculate the row index
+    // we need
+    __device__ inline int correctRow(int size, int vehicleIdx)
+    {
+        if (vehicleIdx == 0)
+            return 0;
+        return size + vehicleIdx - 1;
+    }
+
 
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
@@ -992,13 +1054,26 @@ namespace TSP {
         }
 
         // Route valid if length > 0
-        if (length > 0) {
-            int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->size;   // Optimizing array addressing
-            for (int i = 0; i < pkernelParams->size; i++)
+        if (length > 0)
+        {
+            int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
+            int vehicleIdx = 0;
+            for (int i = 0; i < pkernelParams->routeSize; i++)
             {
                 int src = antRouteOffset[i];
-                int dst = antRouteOffset[(i + 1) % pkernelParams->size];
-                float* ptr = &(pkernelParams->Pheromone[src * pkernelParams->size + dst]);
+                int workingRow; // when the last node was 0, we have to watch the correct row in Pheromone matrix
+                if (src == 0)
+                {
+                    workingRow = correctRow(pkernelParams->size, vehicleIdx++);
+                    assert(vehicleIdx <= pkernelParams->maxVehicles);
+                    assert(workingRow < pkernelParams->routeSize);
+                }
+                else
+                {
+                    workingRow = src;
+                }
+                int dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];
+                float* ptr = &(pkernelParams->Pheromone[workingRow * pkernelParams->size + dst]);
 
                 atomicAdd(ptr, additive);
             }
@@ -1006,17 +1081,15 @@ namespace TSP {
     }
 
     // Auxilary function for greedy sequence
-    // Return the highest vertex index not yet chosen
+    // Returns the highest vertex index not yet chosen
     /// row : row of previous route element (decides, which row to watch in the function)
     __device__ int maxInIdxRow(Kernel_ParamTypedef* pkernelParams, int row, int idx) {
         int maxidx = -1;
-        float max = 0.0f;
-        for (int i = 0; i < pkernelParams->size; i++) 
+        float max = 0;
+        for (int i = 0; i < pkernelParams->routeSize; i++)
         {
             // Go through the row elements to find the highest
             float observed = pkernelParams->Pheromone[row * pkernelParams->size + i];
-            //if(row == 2 && idx)
-
             if (observed > max && !alreadyListed(pkernelParams, -1, idx, i))
             {
                 max = observed;
@@ -1024,18 +1097,20 @@ namespace TSP {
             }
         }
         //printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
-
-        return maxidx;
     }
 
     // Generates a sequnce using greedy algorithm
     // Always chooses the highest possible value for the next vertex
     __device__ void greedySequence(Kernel_ParamTypedef* pkernelParams)
     {
+        // Need to count which vehicle is active
+        int vehicleIdx = 0;
         pkernelParams->route[0] = 0;
         for (int i = 1; i < pkernelParams->size; i++)
         {
-            int node = pkernelParams->route[i] = maxInIdxRow(pkernelParams, pkernelParams->route[i - 1], i);
+            int node = pkernelParams->route[i] = maxInIdxRow(pkernelParams, correctRow(pkernelParams->size,vehicleIdx),i);
+            if (node == 0)
+                vehicleIdx++;
             assert(node != -1);
         }
     }
@@ -1043,18 +1118,9 @@ namespace TSP {
     // Copies a route into the answer vector
     __device__ void copyAntRoute(Kernel_ParamTypedef* pkernelParams, int antIndex) {
         // Optimizing array addressing
-        int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->size;
-        for (int i = 1; i < pkernelParams->size; i++)
+        int* antRouteOffset = pkernelParams->antRoute + antIndex * pkernelParams->routeSize;
+        for (int i = 1; i < pkernelParams->routeSize; i++)
             pkernelParams->route[i] = antRouteOffset[i];
-    }
-
-    // Finds a value in the route vector
-    __device__ bool routeContain(Kernel_ParamTypedef* pkernelParams, int value)
-    {
-        for (int i = 1; i < pkernelParams->size; i++)
-            if (pkernelParams->route[i] == value)
-                return true;
-        return false;
     }
 
     // Validates the output vector
@@ -1063,15 +1129,35 @@ namespace TSP {
         {
             return false;
         }
-
-        for (int i = 1; i < pkernelParams->size; i++)
-        {
+        // 0 must be maxVehicles times
+        if (pkernelParams->maxVehicles != nodeCount(pkernelParams, 0))
+            return false;
+        for (int i = 1; i < pkernelParams->size; i++) {
             if (!routeContain(pkernelParams, i))
             {
                 return false;
             }
         }
-
         return true;
+    }
+
+    // How many times does the given node appear in the sequence 
+    __device__ int nodeCount(Kernel_ParamTypedef* pkernelParams, int node) {
+        int count = 0;
+        for (int i = 0; i < pkernelParams->routeSize; i++) 
+        {
+            if (pkernelParams->route[i] == node)
+                count++;
+        }
+        return count;
+    }
+
+    // Finds a value in the route vector
+    __device__ bool routeContain(Kernel_ParamTypedef* pkernelParams, int value)
+    {
+        for (int i = 1; i < pkernelParams->routeSize; i++)
+            if (pkernelParams->route[i] == value)
+                return true;
+        return false;
     }
 }
