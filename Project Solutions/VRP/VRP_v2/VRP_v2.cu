@@ -633,8 +633,6 @@ namespace VRP {
             printf("Need to find route in greedy mode!\n");
             greedySequence(&params);
         }
-        else
-        greedySequence(&params);
     }
 
     // Multiblock sized kernel
@@ -1070,7 +1068,7 @@ namespace VRP {
                 maxidx = i;
             }
         }
-        printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
+        //printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
         return maxidx;
     }
 
