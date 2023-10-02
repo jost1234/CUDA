@@ -14,7 +14,7 @@
 
 // Number of threads = number of ants
 // Default value: 1024
-int ants = 1024;
+int ants = 1024*8;
 
 // Repetition constants
 #define REPETITIONS 10

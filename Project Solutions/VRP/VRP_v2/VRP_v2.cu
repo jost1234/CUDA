@@ -211,7 +211,7 @@ namespace VRP {
             return cudaStatus;
         }
         // Pheromone
-        cudaStatus = cudaMalloc((void**)&d_kernelParams.Pheromone, Dist_bytes);
+        cudaStatus = cudaMalloc((void**)&d_kernelParams.Pheromone, Pheromone_bytes);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "d_Pheromone cudaMalloc failed!\n");
             Free_device_memory(d_kernelParams);
@@ -239,7 +239,7 @@ namespace VRP {
             return cudaStatus;
         }
 
-        // Copying data : Host -> Device
+        // Copying Dist data : Host -> Device
         cudaStatus = cudaMemcpy(d_kernelParams.Dist, h_params.Dist, Dist_bytes, cudaMemcpyHostToDevice);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Dist cudaMemcpy failed!\n");
@@ -305,12 +305,12 @@ namespace VRP {
             // cudaDeviceSynchronize waits for the kernel to finish
             cudaStatus = cudaDeviceSynchronize();
             if (cudaStatus != cudaSuccess) {
-                fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n", cudaStatus);
+                fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching antKernel!\n%s\n", cudaStatus, cudaGetErrorString(cudaStatus));
                 Free_device_memory(d_kernelParams);
                 return cudaStatus;
             }
 
-            // Copying processed data from GPU device
+            // Copying processed route data : Device -> Host
             cudaStatus = cudaMemcpy(h_params.route, d_kernelParams.route, route_bytes, cudaMemcpyDeviceToHost);
             if (cudaStatus != cudaSuccess) {
                 fprintf(stderr, "route dev->host cudaMemcpy failed!");
@@ -318,7 +318,6 @@ namespace VRP {
                 Free_device_memory(d_kernelParams);
                 return cudaStatus;
             }
-            
 
             float _length = sequencePrint(h_params.route, h_params.Dist, size, RouteSize(size, maxVehicles));
             if (_length > 0) {
@@ -327,6 +326,8 @@ namespace VRP {
                 if (_length < min)
                     min = _length;
             }
+
+
         }
         printf("\nSummary:\nAverage length: %.2f\n", sum / foundCount);
         printf("Minimal length: %.2f\n", min);
@@ -381,11 +382,11 @@ namespace VRP {
     }
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* Route, float* Dist, int size, int routeSize) {
+    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
         if (
             2 > size ||
             2 > routeSize ||
-            NULL == Route ||
+            NULL == route ||
             NULL == Dist) {
             printf("Invalid input!\n");
             return -1;
@@ -397,11 +398,12 @@ namespace VRP {
         // Check for dead end
         while (i < routeSize)
         {
-            int src = Route[i];
-            int dst = Route[(i + 1) % routeSize];
+            int src = route[i];
+            int dst = route[(i + 1) % routeSize];
+            assert(src > -1 && src < size&& dst > -1 && dst < size);
             if (Dist[src * size + dst] < 0)
             {
-                printf("Route not possible!\n");
+                printf("Route not found!\n");
                 return -1;
             }
             i++;
@@ -410,8 +412,8 @@ namespace VRP {
         i = 0;
         printf("Vehicle #0 : ");
         while (i < routeSize) {
-            int src = Route[i];
-            int dst = Route[(i + 1) % routeSize];
+            int src = route[i];
+            int dst = route[(i + 1) % routeSize];
 
             // End of route for a vehicle
             if (dst == 0) {
@@ -460,6 +462,7 @@ namespace VRP {
         __shared__ int size;                // Local Copy of argument parameter
         __shared__ int maxVehicles;
 
+        // Initialization of temporary variables
         invalidInput = false;
         isolatedVertex = false;
         averageDist = 0.0f;
@@ -647,25 +650,23 @@ namespace VRP {
             return;
         grid.sync();
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
-
         grid.sync();
 
-        // Optimizable in space complexity to one shared variable per thread block
-        float multiplicationConst = 0.0f;
+        __shared__ int size;                // Local Copy of argument parameter
 
-        // Initialization with thread 0
-        if (antIndex == 0) {
-            globalParams.invalidInput = false;
-            globalParams.isolatedVertex = false;
-            globalParams.averageDist = 0.0f;
-            params.routeSize = RouteSize(params.size, params.maxVehicles);
-            globalParams.minRes = FLT_MAX;
+        // Initialization of temporary variables
+        __shared__ float multiplicationConst;
+        multiplicationConst = 0.0f;
+        globalParams.invalidInput = false;
+        globalParams.isolatedVertex = false;
+        globalParams.averageDist = 0.0f;
+        size = params.size; // Need to be written too many times
+        params.routeSize = RouteSize(params.size, params.maxVehicles);
+        globalParams.minRes = FLT_MAX;
 
-            // Invalidate route vector
-            for (int i = 0; i < params.size; i++)
-                params.route[i] = 0;
-
-        }
+        // Invalidate route vector
+        for (int i = 0; i < params.size; i++)
+            params.route[i] = 0;
 
         // Input check
         if (antIndex == 0 && !inputGood(&params)) {
@@ -675,50 +676,50 @@ namespace VRP {
         grid.sync();
 
         // Pheromone matrix initialization
-        if (antIndex == 0)
-        {
-            bool foundNeighboor = false;    // Checking if any of the nodes are isolated
-            int i, j;
-            for (i = 0; i < params.size; i++) {
-                for (j = 0; j < params.size; j++) {
-                    // Initializing Pheromone graph (anti - unitmatrix, all main diagonal elements are 0)
-                    // 0 Pheromone value if no edge drawn
-                    // Initial Pheromone value is of consideration in the Control panel
-                    if ((i == j) || (params.Dist[i * params.size + j] < 0))
-                        params.Pheromone[i * params.size + j] = 0;
-                    else
-                        params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
+        /*if (threadIdx.x == 0)
+        {*/
+        bool foundNeighboor = false;    // Checking if any of the nodes are isolated
+        int i, j;
+        for (i = 0; i < params.size; i++) {
+            for (j = 0; j < params.size; j++) {
+                // Initializing Pheromone graph (anti - unitmatrix, all main diagonal elements are 0)
+                // 0 Pheromone value if no edge drawn
+                // Initial Pheromone value is of consideration in the Control panel
+                if ((i == j) || (params.Dist[i * params.size + j] < 0))
+                    params.Pheromone[i * params.size + j] = 0.0f;
+                else
+                    params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
 
-                    // Error handling 
-                    // Check if there are invalid given elements 
-                    // Valid input if: positive OR -1 OR 0 (only if i=j)
-                    if (i != j && params.Dist[i * params.size + j] <= 0
-                        && params.Dist[i * params.size + j] != -1)
-                    {
-                        printf("Dist(%d,%d) incorrect!\n", i, j);
-                        globalParams.invalidInput = true;
-                        break;
-                    }
-                    if (!foundNeighboor && params.Dist[i * params.size + j] > 0) {
-                        // Has neighboor therefore not isolated
-                        foundNeighboor = true;
-                    }
+                // Error handling 
+                // Check if there are invalid given elements 
+                // Valid input if: positive OR -1 OR 0 (only if i=j)
+                if (i != j && params.Dist[i * params.size + j] <= 0
+                    && params.Dist[i * params.size + j] != -1)
+                {
+                    printf("Dist(%d,%d) incorrect!\n", i, j);
+                    globalParams.invalidInput = true;
+                    break;
                 }
-                if (!foundNeighboor) { // Did not have any neighboors => wrong model of TSP
-                    printf("Vertex %d isolated!\n", i);
-                    globalParams.isolatedVertex = true;
+                if (!foundNeighboor && params.Dist[i * params.size + j] > 0) {
+                    // Has neighboor therefore not isolated
+                    foundNeighboor = true;
                 }
             }
-            /// The warehouse is simulated
-            /// as k nodes in the same spot ==> TSP Reduction
-            for (; i < params.routeSize; i++)
-            {
-                for (j = 0; j < params.size; j++)
-                {
-                    params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
-                }
+            if (!foundNeighboor) { // Did not have any neighboors => wrong model of TSP
+                printf("Vertex %d isolated!\n", i);
+                globalParams.isolatedVertex = true;
             }
         }
+        /// The warehouse is simulated
+        /// as k nodes in the same spot ==> TSP Reduction
+        for (; i < params.routeSize; i++)
+        {
+            for (j = 0; j < params.size; j++)
+            {
+                params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
+            }
+        }
+        //}
         grid.sync();
 
         if (globalParams.invalidInput || globalParams.isolatedVertex) {   // Invalid input, so no point of continuing
@@ -739,6 +740,29 @@ namespace VRP {
             return;
         }
 
+        // Left: Connected(?) graph with at least 3 nodes
+        // Calculating average distance
+
+        if (antIndex == 0)
+        {
+            float sum = 0.0f;   // sum of edge values
+            int numpos = 0;  // number of edges
+            float edge;  // temp variable
+            for (int i = 0; i < params.size; i++) {
+                for (int j = 0; j < params.size; j++)
+                {
+                    edge = params.Dist[i * params.size + j];
+                    if (edge > 0)
+                    {
+                        sum += edge;
+                        numpos++;
+                    }
+                }
+            }
+            globalParams.averageDist = sum / numpos * params.routeSize;
+        }
+        grid.sync();
+
         // Initializing ant Routes 
         initAntRoute(&params, antIndex);
         grid.sync();
@@ -746,18 +770,20 @@ namespace VRP {
         // Ants travelling to all directions
         for (int repNumber = 0; repNumber < configParams.Repetitions; repNumber++)
         {
+            grid.sync();
             multiplicationConst = globalParams.averageDist / configParams.Rho * 5.0f;
+            grid.sync();
 
             // Numerous random guess
             for (int j = 0; j < configParams.Random_Generations; j++)
             {
                 generateRandomSolution(&params, antIndex);
                 grid.sync();
-
                 // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 grid.sync();
             }
+            
 
             multiplicationConst *= 2;
             grid.sync();
@@ -765,7 +791,7 @@ namespace VRP {
             // Lots of ants following pheromone of previous ants
             for (int gen = 0; gen < configParams.Follower_Generations; gen++)
             {
-                // Reducing previous pheromon values by value RHO (modifiable in the Control Panel)
+                // Reducing previous pheromone values by value RHO (modifiable in the Control Panel)
                 if (antIndex == 0) {
                     for (int i = 0; i < params.routeSize; i++) {
                         for (int j = 0; j < params.size; j++)
@@ -834,7 +860,7 @@ namespace VRP {
             int myrand;
 
             myrandf = curand_uniform(&pkernelParams->state[antIndex]);  // RND Number between 0 and 1
-            myrandf *= (max_rand_int - min_rand_int + 0.999999);
+            myrandf *= (max_rand_int - min_rand_int + 0.999999f);
             myrandf += min_rand_int;
             myrand = (int)truncf(myrandf);
 
@@ -900,13 +926,22 @@ namespace VRP {
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex)
     {
         int* antRouteOffset = pkernelParams->antRoute
-            + antIndex * pkernelParams->routeSize;   // Optiminzing array addressing
+            + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
+
+        // Special care for -1: watching route vector
+        if (antIndex == -1)
+            antRouteOffset = pkernelParams->route;
+
         float length = 0;  // Return value
         int src, dst;
+
+        int vehicleIdx = 0;
 
         for (int i = 0; i < pkernelParams->routeSize; ++i) {
             src = antRouteOffset[i];
             dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];   // Next node
+            if (src == 0)
+                vehicleIdx++;
 
             float edgeLength = pkernelParams->Dist[src * pkernelParams->size + dst];
             if (edgeLength < 0) {
@@ -916,6 +951,12 @@ namespace VRP {
                 length += edgeLength;
             }
         }
+
+        if (length == 0)    // Defending other functions from faulty solutions
+            return -1;
+        if (vehicleIdx != pkernelParams->maxVehicles)
+            return -1;
+        
         assert(length != 0);
         return length;
     }
@@ -929,7 +970,7 @@ namespace VRP {
     )
     {
         int* antRouteOffset = pkernelParams->antRoute
-            + antIndex * pkernelParams->routeSize;   // Optiminzing array addressing
+            + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
 
         curandState* statePtr = &(pkernelParams->state[antIndex]);
         // Expected to start in node 0
@@ -949,16 +990,11 @@ namespace VRP {
             int newParam;   // Variable for new route element
             bool foundVertexByRoulette = false;
 
+            workingRow = correctRow(pkernelParams->size, vehicleIdx, source);
             if (source == 0)
-            {
-                workingRow = correctRow(pkernelParams->size, vehicleIdx++);
-                assert(vehicleIdx <= pkernelParams->maxVehicles);
-                assert(workingRow < pkernelParams->routeSize);
-            }
-            else
-            {
-                workingRow = source;
-            }
+                vehicleIdx++;
+            assert(vehicleIdx <= pkernelParams->maxVehicles);
+            assert(workingRow < pkernelParams->routeSize);
             for (int j = 0; j < maxTryNumber && !foundVertexByRoulette; j++)
             {
                 // RND Number between 0 and sumPheromone
@@ -978,7 +1014,7 @@ namespace VRP {
                 // Next vertex choosen by equal chances
                 do {
                     float newfloat = curand_uniform(&pkernelParams->state[antIndex]);  // RND Number between 0 and 1
-                    newfloat *= (pkernelParams->size - 1) + 0.999999;  // Transforming into the needed range
+                    newfloat *= (pkernelParams->size - 1) + 0.999999f;  // Transforming into the needed range
                     newParam = (int)truncf(newfloat);
                 } while (alreadyListed(pkernelParams, antIndex, i, newParam));
             }
@@ -1022,6 +1058,9 @@ namespace VRP {
             if (repNumber > 2)
                 additive *= rewardMultiplier * (repNumber + 1) * (repNumber + 1);
         }
+        /*if (antIndex == 0) {
+            printf("kukucsfv\n");
+        }*/
 
         // Route valid if length > 0
         if (length > 0)
@@ -1043,6 +1082,10 @@ namespace VRP {
                     workingRow = src;
                 }
                 int dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];
+                
+                if (workingRow > pkernelParams->routeSize)
+                    printf("ujjujj %d_%d_%d\n",workingRow,dst,vehicleIdx);
+                
                 float* ptr = &(pkernelParams->Pheromone[workingRow * pkernelParams->size + dst]);
 
                 atomicAdd(ptr, additive);
@@ -1097,7 +1140,18 @@ namespace VRP {
     }
 
     // Validates the output vector
-    __device__ bool validRoute(Kernel_ParamTypedef* pkernelParams) {
+    // return true if route syntax is correct and possible
+    __device__ bool validRoute(Kernel_ParamTypedef* pkernelParams) 
+    {
+        // Last minute correction
+        pkernelParams->route[0] = 0;
+
+        printf("Raw data: \n");
+        for (int iter = 0; iter < pkernelParams->routeSize; iter++) {
+            printf("%d ", pkernelParams->route[iter]);
+        }
+        printf("\n");
+
         if (pkernelParams->route[0] != 0)
         {
             return false;
@@ -1111,7 +1165,9 @@ namespace VRP {
                 return false;
             }
         }
-        return true;
+
+        // Testing length
+        return (antRouteLength(pkernelParams, -1) > 0);
     }
 
     // How many times does the given node appear in the sequence 
