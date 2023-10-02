@@ -991,15 +991,6 @@ namespace VRP {
 
     // If the last node was 0 in route, we have to calculate the row index
     // we need
-    __device__ inline int correctRow(int size, int vehicleIdx)
-    {
-        if (vehicleIdx == 0)
-            return 0;
-        return size + vehicleIdx - 1;
-    }
-
-    // If the last node was 0 in route, we have to calculate the row index
-    // we need
     // Else we need the row of the sourceNode
     __device__ inline int correctRow(int size, int vehicleIdx, int sourceNode)
     {
@@ -1090,7 +1081,7 @@ namespace VRP {
         // Need to count which vehicle is active
         int vehicleIdx = 0;
         pkernelParams->route[0] = 0;
-        for (int i = 1; i < pkernelParams->size; i++)
+        for (int i = 1; i < pkernelParams->routeSize; i++)
         {
             int node = pkernelParams->route[i] = maxInIdxRow(pkernelParams, correctRow(pkernelParams->size, vehicleIdx, pkernelParams->route[i - 1]), i);
             if (node == 0)
