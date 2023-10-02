@@ -46,7 +46,7 @@ namespace TSP {
     __global__ void setup_kernel(curandState* state, unsigned long seed);
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* Route, float* Dist, int size);
+    __device__ __host__ float sequencePrint(int* route, float* Dist, int size);
 
     // 1 block sized kernel
     __global__ void Kernel_1Block(

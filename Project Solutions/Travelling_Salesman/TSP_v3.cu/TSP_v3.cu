@@ -255,6 +255,7 @@ namespace TSP {
 
         float min = FLT_MAX;
         float sum = 0.0f;
+        int foundCount = 0;
         
         for (int iter = 0; iter < SERIALMAXTRIES; iter++)
         {
@@ -318,17 +319,15 @@ namespace TSP {
                 return cudaStatus;
             }
 
-            if (*(h_params.foundRoute)) {
-                float _length = sequencePrint(h_params.route, h_params.Dist, size);
+            float _length = sequencePrint(h_params.route, h_params.Dist, size);
+            if (_length > 0) {
+                foundCount++;
                 sum += _length;
                 if (_length < min)
                     min = _length;
             }
-            else {
-                printf("Route not found!\n\n");
-            }
         }
-        printf("\nSummary:\nAverage length: %.2f\n", sum / SERIALMAXTRIES);
+        printf("\nSummary:\nAverage length: %.2f\n", sum / foundCount);
         printf("Minimal length: %.2f\n", min);
 
         // Frees GPU device memory
@@ -385,6 +384,7 @@ namespace TSP {
         {
             int src = route[i];
             int dst = route[(i + 1) % size];
+            assert(src > -1 && src < size&& dst > -1 && dst < size);
             if (Dist[src * size + dst] < 0) 
             {
                 printf("Route not possible!\n");
@@ -413,7 +413,6 @@ namespace TSP {
         curand_init(seed, id, id, &state[id]);
     }
 
-    
 
     // 1 block sized kernel
     __global__ void Kernel_1Block(
@@ -436,21 +435,19 @@ namespace TSP {
         __shared__ float averageDist;    // Average edge distance
         __shared__ float multiplicationConst;
         __shared__ int size;                // Local Copy of argument parameter
+        
+        // Initialization of temporary variables
+        invalidInput = false;
+        isolatedVertex = false;
+        averageDist = 0.0f;
+        multiplicationConst = 0.0f;
+        size = params.size; // Needs to be written too many times
+        *params.foundRoute = false;
+        globalParams.minRes = FLT_MAX;
 
-        // Initialization with thread 0
-        //if (antIndex == 0) {
-            invalidInput = false;
-            isolatedVertex = false;
-            averageDist = 0.0f;
-            multiplicationConst = 0.0f;
-            size = params.size; // Needs to be written too many times
-            *params.foundRoute = false;
-            globalParams.minRes = FLT_MAX;
-
-            // Invalidate route vector
-            for (int i = 0; i < size; i++)
-                params.route[i] = 0;
-        //}
+        // Invalidate route vector
+        for (int i = 0; i < size; i++)
+            params.route[i] = 0;
 
         // Input check
         if (antIndex == 0 && !inputGood(&params)) {
@@ -615,16 +612,15 @@ namespace TSP {
             return;
         grid.sync();
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
-
         grid.sync();
 
-        float multiplicationConst = 0.0f;
+        __shared__ float multiplicationConst;
 
         // Initialization
         globalParams.invalidInput = false;
         globalParams.isolatedVertex = false;
         globalParams.averageDist = 0.0f;
-
+        multiplicationConst = 0.0f;
         *params.foundRoute = false;
         globalParams.minRes = FLT_MAX;
 
@@ -695,16 +691,20 @@ namespace TSP {
             return;
         }
 
-        // Left: Connected graph with at least 3 nodes
+        // Left: Connected(?) graph with at least 3 nodes
         // Calculating average distance
-        if (antIndex == 0)
+        __shared__ float sum;   // Sum of edge values
+        sum = 0.0f;
+        __shared__ int numPos;  // Number of edges
+        numPos = 0;
+        __shared__ float edge;  // Temp variable
+        grid.sync();
+        if (antIndex == 0) 
         {
-            float sum = 0.0f;   // Sum of edge values
-            int numPos = 0;     // Number of edges
             for (int i = 0; i < params.size; i++) {
                 for (int j = 0; j < params.size; j++)
                 {
-                    float edge = params.Dist[i * params.size + j];
+                    edge = params.Dist[i * params.size + j];
                     if (edge > 0)
                     {
                         sum += edge;
@@ -849,7 +849,7 @@ namespace TSP {
             int myrand;
 
             myrandf = curand_uniform(&pkernelParams->state[antIndex]);  // RND Number between 0 and 1
-            myrandf *= (max_rand_int - min_rand_int + 0.999999);
+            myrandf *= (max_rand_int - min_rand_int + 0.999999f);
             myrandf += min_rand_int;
             myrand = (int)truncf(myrandf);
 

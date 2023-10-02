@@ -41,7 +41,6 @@ namespace VRP {
 		bool capacityActive;
 		int* capacities;
 		float* Dist;
-		bool* foundRoute;
 		int maxVehicles;
 		float* Pheromone;
 		int* route;
@@ -54,7 +53,6 @@ namespace VRP {
 		int antNum;         // Number of ants
 		int* antRoute;      // Temp array
 		float* Dist;     // Cost function input
-		bool* foundRoute;   // Existence output
 		int maxVehicles; // Maximum Number of Routes
 		float* Pheromone;
 		int* route;         // Sequence output

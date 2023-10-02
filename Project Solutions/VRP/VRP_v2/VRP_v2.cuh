@@ -75,7 +75,7 @@ namespace VRP {
         Kernel_ParamTypedef params,
         Kernel_ConfigParamTypedef configParams);
 
-    
+
 
     // Gets initial value of Route arrays
     __device__ void initAntRoute(
@@ -116,6 +116,8 @@ namespace VRP {
     // If the last node was 0 in route, we have to calculate the row index
     // we need
     __device__ int correctRow(int size, int vehicleIdx);
+
+    __device__ inline int correctRow(int size, int vehicleIdx, int sourceNode);
 
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
