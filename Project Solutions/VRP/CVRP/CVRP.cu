@@ -970,6 +970,35 @@ namespace CVRP {
 
     }
 
+    /// Scans that the given solution is suitable for the capacity condition
+    // Returns a bool value of the condition evaluation
+    // FUNCTION USED BY: antRouteLength
+    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex)
+    {
+        int* antRouteOffset = pkernelParams->antRoute
+            + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
+
+        // Special care for -1: watching route vector
+        if (antIndex == -1)
+            antRouteOffset = pkernelParams->route;
+
+        // Capacity condition means that no truck should carry more goods than its capacity
+        int currentLoad = 0;
+        for (int i = 1; i < pkernelParams->routeSize; i++) {
+            int dst = antRouteOffset[i];
+            if (dst == 0)     // 0 node means it's a new, empty truck
+                currentLoad = 0;
+            else if (dst > 0 && dst < pkernelParams->size)   // it is a customer
+                currentLoad += pkernelParams->capacities[dst];
+            else    // it is an invalid value, solution must not be taken into account
+                return false;
+
+            if (currentLoad > pkernelParams->truckCapacity) // truck overloaded
+                return false;
+        }
+        return true;
+    }
+
     // Returns the sum length of the given route of trucks
     // Returns -1 if route not possible (for example has dead end)
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex)
@@ -1087,14 +1116,6 @@ namespace CVRP {
         if (vehicleIdx == 0)
             return 0;
         return size + vehicleIdx - 1;
-    }
-
-    /// Scans that the given solution is suitable for the capacity condition
-    // Returns a bool value of the condition evaluation
-    // FUNCTION USED BY: evaluateSolution
-    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex) {
-        // Capacity condition means that no truck should carry more goods than its capacity
-        return true;
     }
 
     // Manipulating the pheromone values according to the given solution
