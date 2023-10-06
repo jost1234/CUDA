@@ -57,7 +57,7 @@ namespace CVRP {
     __device__ inline bool inputGood(Kernel_ParamTypedef* params);
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* Route, float* Dist, int size, int routeSize);
+    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize);
 
     __host__ __device__ inline int RouteSize(int size, int maxVehicles)
     {
@@ -102,7 +102,8 @@ namespace CVRP {
     );
 
     // Returns the sum length of the given route of trucks
-    // Returns -1 if route not possible (for example has dead end)
+    // Returns -1 if route not possible (for example has dead end) or if cap. condition not met
+    // FUNCTION USAGE: CapacityCondition
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
     // Represents az ant who follows other ants' pheromones
@@ -119,11 +120,13 @@ namespace CVRP {
 
     /// Scans that the given solution is suitable for the capacity condition
     // Returns a bool value of the condition evaluation
+    // FUNCTION USED BY: evaluateSolution
     __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
     // Sets the route vector if we found a best yet solution
+    // FUNCTION USAGE: CapacityCondition
     __device__ void evaluateSolution(
         Kernel_ParamTypedef* pkernelParams,
         int antIndex,

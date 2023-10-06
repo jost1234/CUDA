@@ -586,19 +586,9 @@ namespace VRP {
             if (antIndex == 0)
                 multiplicationConst = averageDist / configParams.Rho * 5;
             block.sync();
-            /*block.sync();
-            if (antIndex == 0)
-            {
-                printf("\nPh2:\n");
-                print(params.Pheromone, params.size, params.routeSize);
-                printf("\nDist2:\n");
-                print(params.Dist, size);
-            }
-            block.sync();*/
             // Numerous random guesses
             for (int j = 0; j < configParams.Random_Generations; j++)
             {
-
                 generateRandomSolution(&params, antIndex);
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 block.sync();
@@ -677,8 +667,6 @@ namespace VRP {
         grid.sync();
 
         // Pheromone matrix initialization
-        /*if (threadIdx.x == 0)
-        {*/
         bool foundNeighboor = false;    // Checking if any of the nodes are isolated
         int i, j;
         for (i = 0; i < params.size; i++) {
@@ -720,7 +708,6 @@ namespace VRP {
                 params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
             }
         }
-        //}
         grid.sync();
 
         if (globalParams.invalidInput || globalParams.isolatedVertex) {   // Invalid input, so no point of continuing
@@ -785,8 +772,8 @@ namespace VRP {
                 grid.sync();
             }
             
-
-            multiplicationConst *= 2;
+            if(threadIdx.x == 0)
+                multiplicationConst *= 2;
             grid.sync();
 
             // Lots of ants following pheromone of previous ants

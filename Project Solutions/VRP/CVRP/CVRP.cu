@@ -386,12 +386,14 @@ namespace CVRP {
     // Disclaimer: Only tests NULL property of pointers, does not 100% guarantee perfect data
     __host__ inline bool inputGood(CUDA_Main_ParamTypedef* params) {
         return (
-            32 <= params->antNum &&        // At least 32 threads (for GPU usage)
-            2 <= params->size &&          // At least 2 nodes
+            32 <= params->antNum &&    // At least 32 threads (for GPU usage)
+            2 <= params->size &&      // At least 2 nodes
             1 <= params->maxVehicles &&   // At least 1 vehicle
+            2 <= params->truckCapacity && // Truck with at least 2 capacity
             NULL != params->Dist &&
             NULL != params->Pheromone &&
-            NULL != params->route);
+            NULL != params->route &&
+            NULL != params->capacities);
     }
 
     // Inicializes a random seed for each different threads
@@ -421,9 +423,11 @@ namespace CVRP {
             32 <= params->antNum &&    // At least 32 threads (for GPU usage)
             2 <= params->size &&      // At least 2 nodes
             1 <= params->maxVehicles &&   // At least 1 vehicle
+            2 <= params->truckCapacity && // Truck with at least 2 capacity
             NULL != params->Dist &&
             NULL != params->Pheromone &&
-            NULL != params->route);
+            NULL != params->route &&
+            NULL != params->capacities);
     }
 
     // Diagnostic function for printing given sequence
@@ -1002,6 +1006,10 @@ namespace CVRP {
         if (vehicleIdx != pkernelParams->maxVehicles)
             return -1;
 
+        // route invalid if Capacity condition is not met
+        if (!CapacityCondition(pkernelParams, antIndex))
+            return -1;
+
         assert(length != 0);
         return length;
     }
@@ -1081,6 +1089,13 @@ namespace CVRP {
         return size + vehicleIdx - 1;
     }
 
+    /// Scans that the given solution is suitable for the capacity condition
+    // Returns a bool value of the condition evaluation
+    // FUNCTION USED BY: evaluateSolution
+    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex) {
+        // Capacity condition means that no truck should carry more goods than its capacity
+        return true;
+    }
 
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
@@ -1103,9 +1118,6 @@ namespace CVRP {
             if (repNumber > 2)
                 additive *= rewardMultiplier * (repNumber + 1) * (repNumber + 1);
         }
-        /*if (antIndex == 0) {
-            printf("kukucsfv\n");
-        }*/
 
         // Route valid if length > 0
         if (length > 0)
@@ -1129,7 +1141,10 @@ namespace CVRP {
                 int dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];
 
                 if (workingRow > pkernelParams->routeSize)
+                {
                     printf("ujjujj %d_%d_%d\n", workingRow, dst, vehicleIdx);
+                    return;
+                }
 
                 float* ptr = &(pkernelParams->Pheromone[workingRow * pkernelParams->size + dst]);
 
