@@ -41,10 +41,11 @@ namespace CVRP {
 		int* capacities;
 		float* Dist;
 		int maxVehicles;
+		int optimalValue;
 		float* Pheromone;
 		int* route;
 		int size;
-		int optimalValue;
+		int truckCapacity;
 	} CUDA_Main_ParamTypedef;
 
 
@@ -52,6 +53,7 @@ namespace CVRP {
 	typedef struct {
 		int antNum;         // Number of ants
 		int* antRoute;      // Temp array
+		int* capacities;
 		float* Dist;     // Cost function input
 		int maxVehicles; // Maximum Number of Routes
 		float* Pheromone;
@@ -59,6 +61,7 @@ namespace CVRP {
 		int size;        // Number of graph vertices
 		int routeSize;	// Redundant, just not save stack usage (= size + maxVehicles - 1)
 		curandState* state; // CURAND random state
+		int truckCapacity;
 	} Kernel_ParamTypedef;
 
 	typedef struct {

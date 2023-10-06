@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
     VRP::CUDA_main(params);
 
     free(params.Dist);
+    free(params.Pheromone);
     free(params.route);
     return 0;
 }
@@ -234,7 +235,7 @@ namespace VRP {
         // state : CUDA supported random seeds for threads
         cudaStatus = cudaMalloc(&d_kernelParams.state, state_bytes);
         if (cudaStatus != cudaSuccess) {
-            fprintf(stderr, "cudaMalloc failed!\n");
+            fprintf(stderr, "state cudaMalloc failed!\n");
             Free_device_memory(d_kernelParams);
             return cudaStatus;
         }

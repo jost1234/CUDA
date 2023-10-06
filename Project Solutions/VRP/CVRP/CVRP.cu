@@ -145,16 +145,21 @@ int main(int argc, char* argv[])
 
     CVRP::CUDA_Main_ParamTypedef params;
     params.antNum = ants;
-    params.size = size;
-    params.maxVehicles = maxVehicles;
+    params.capacities = capacities;
     params.Dist = Dist;
+    params.maxVehicles = maxVehicles;
+    params.optimalValue = optimalValue;
     params.Pheromone = (float*)malloc(size * CVRP::RouteSize(size, maxVehicles) * sizeof(float));
     params.route = (int*)malloc(CVRP::RouteSize(size, maxVehicles) * sizeof(int));
+    params.size = size;
+    params.truckCapacity = truckCapacity;
 
-    printf("Vehicle Route Problem with Ant Colony Algorithm\n");
+    printf("Capacitated Vehicle Route Problem with Ant Colony Algorithm\n");
     CVRP::CUDA_main(params);
 
+    free(params.capacities);
     free(params.Dist);
+    free(params.Pheromone);
     free(params.route);
     return 0;
 }
@@ -171,6 +176,7 @@ namespace CVRP {
         // Local variables
         int maxVehicles = h_params.maxVehicles; // Maximum number of vehicles in warehouse
         int size = h_params.size;    // Number of graph vertices
+        int routeSize = RouteSize(size, maxVehicles);
         int antNum = h_params.antNum;    // Number of Ants (= threads)
 
         // Invalid inputs
@@ -196,6 +202,7 @@ namespace CVRP {
 
         // Device pointers
         Kernel_ParamTypedef d_kernelParams;
+        d_kernelParams.capacities = NULL;   // CVRP specific
         d_kernelParams.Dist = NULL;
         d_kernelParams.Pheromone = NULL;
         d_kernelParams.route = NULL;
@@ -203,26 +210,28 @@ namespace CVRP {
         d_kernelParams.antNum = antNum;
         d_kernelParams.size = size;
         d_kernelParams.maxVehicles = maxVehicles;
-        d_kernelParams.routeSize = RouteSize(size, maxVehicles);
+        d_kernelParams.routeSize = routeSize;
+        d_kernelParams.truckCapacity = h_params.truckCapacity;  // CVRP specific
 
         // Config parameters
         Kernel_ConfigParamTypedef d_configParams;
         d_configParams.Rho = RHO;
         d_configParams.Follower_Generations = FOLLOWER_GENERATIONS;
         d_configParams.Initial_Pheromone_Value = INITIAL_PHEROMONE_VALUE;
-        d_configParams.maxTryNumber = RouteSize(size, maxVehicles);
+        d_configParams.maxTryNumber = routeSize;
         d_configParams.Random_Generations = RANDOM_GENERATIONS;
         d_configParams.Repetitions = REPETITIONS;
         d_configParams.Reward_Multiplier = REWARD_MULTIPLIER;
 
         // Size of device malloc
         size_t Dist_bytes = size * size * sizeof(float);
-        size_t Pheromone_bytes = size * RouteSize(size, maxVehicles) * sizeof(float);
+        size_t Pheromone_bytes = size * routeSize * sizeof(float);
         // We need memory for multiple Routes
-        size_t route_bytes = RouteSize(size, maxVehicles) * sizeof(int);
+        size_t route_bytes = routeSize * sizeof(int);
 
         size_t antRoute_bytes = antNum * route_bytes;   // Allocating working memory for all threads
         size_t state_bytes = antNum * sizeof(curandState);
+        size_t capacities_bytes = size * sizeof(int);   // CVRP specific
 
         // Dist
         cudaStatus = cudaMalloc((void**)&d_kernelParams.Dist, Dist_bytes);
@@ -255,7 +264,14 @@ namespace CVRP {
         // state : CUDA supported random seeds for threads
         cudaStatus = cudaMalloc(&d_kernelParams.state, state_bytes);
         if (cudaStatus != cudaSuccess) {
-            fprintf(stderr, "cudaMalloc failed!\n");
+            fprintf(stderr, "state cudaMalloc failed!\n");
+            Free_device_memory(d_kernelParams);
+            return cudaStatus;
+        }
+        // capacities : Demands of individual nodes
+        cudaStatus = cudaMalloc(&d_kernelParams.capacities, capacities_bytes);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "capacities cudaMalloc failed!\n");
             Free_device_memory(d_kernelParams);
             return cudaStatus;
         }
@@ -264,6 +280,13 @@ namespace CVRP {
         cudaStatus = cudaMemcpy(d_kernelParams.Dist, h_params.Dist, Dist_bytes, cudaMemcpyHostToDevice);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "Dist cudaMemcpy failed!\n");
+            Free_device_memory(d_kernelParams);
+            return cudaStatus;
+        }
+        // Copying capacities data : Host -> Device
+        cudaStatus = cudaMemcpy(d_kernelParams.capacities, h_params.capacities, capacities_bytes, cudaMemcpyHostToDevice);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "capacities cudaMemcpy failed!\n");
             Free_device_memory(d_kernelParams);
             return cudaStatus;
         }
@@ -387,6 +410,7 @@ namespace CVRP {
         if (NULL != params.Pheromone) cudaFree(params.Pheromone);
         if (NULL != params.route) cudaFree(params.route);
         if (NULL != params.state) cudaFree(params.state);
+        if (NULL != params.capacities) cudaFree(params.capacities);
     }
 
     // Testing input for main CUDA function

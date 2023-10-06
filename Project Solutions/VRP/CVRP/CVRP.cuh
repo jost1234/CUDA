@@ -117,6 +117,10 @@ namespace CVRP {
     // we need
     __device__ inline int correctRow(int size, int vehicleIdx, int sourceNode = 0);
 
+    /// Scans that the given solution is suitable for the capacity condition
+    // Returns a bool value of the condition evaluation
+    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
+
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
     // Sets the route vector if we found a best yet solution

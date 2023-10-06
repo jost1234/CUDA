@@ -114,15 +114,16 @@ int main(int argc, char* argv[])
     TSP::CUDA_Main_ParamTypedef params;
     params.foundRoute = &foundRoute;
     params.antNum = ants;
-    params.size = size;
     params.Dist = Dist;
     params.Pheromone = (float*)malloc(size * size * sizeof(float));
     params.route = (int*)malloc(size * sizeof(int));
+    params.size = size;
 
     printf("Traveling Salesman Problem with Ant Colony Algorithm\n");
     TSP::CUDA_main(params);
 
     free(params.Dist);
+    free(params.Pheromone);
     free(params.route);
     return 0;
 }
