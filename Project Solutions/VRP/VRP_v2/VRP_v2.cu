@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     }
 
     // File syntax : row after dist values must contain maximum vehicle count in decimal
-    if (fscanf_s(pfile, "%d \n", &maxVehicles) == 0) {
+    if (fscanf_s(pfile, "No of trucks: %d", &maxVehicles) == 0) {
         fprintf(stderr, "Unable to read Maximum Vehicle Number!\n Make sure you have the right file syntax!\n");
         fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \n");
         fclose(pfile);

@@ -14,10 +14,10 @@
 
 // Number of threads = number of ants
 // Default value: 1024
-int ants = 1024*8;
+int ants = 1024 * 8;
 
 // Repetition constants
-#define REPETITIONS 10
+#define REPETITIONS 30
 #define RANDOM_GENERATIONS 20
 #define FOLLOWER_GENERATIONS 500
 
@@ -28,7 +28,7 @@ int ants = 1024*8;
 
 #define SERIALMAXTRIES 10 // Number of serial processes (for debug purposes)
 
-namespace VRP {
+namespace CVRP {
 
 	/// Struct definitions
 	/// 
@@ -38,6 +38,7 @@ namespace VRP {
 	// Struct for Main CUDA function call
 	typedef struct {
 		int antNum;
+		int* capacities;
 		float* Dist;
 		int maxVehicles;
 		float* Pheromone;
