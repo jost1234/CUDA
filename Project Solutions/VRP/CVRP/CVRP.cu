@@ -373,8 +373,8 @@ namespace CVRP {
 
 
         }
-        printf("\nSummary:\nAverage length: %.2f\n", sum / foundCount);
-        printf("Minimal length: %.2f\n", min);
+        printf("\nSummary:\nAverage length: %.2f (+%.2f%%)\n", sum / foundCount, (float)(sum / foundCount - h_params.optimalValue)/h_params.optimalValue * 100.0f);
+        printf("Minimal length: %.2f (+%.2f%%)\n", min, (float)(min - h_params.optimalValue) / h_params.optimalValue * 100.0f);
 
         // Frees GPU device memory
         Free_device_memory(d_kernelParams);
