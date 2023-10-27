@@ -27,9 +27,7 @@ int main(int argc, char* argv[])
     int fileNameIdx;
     bool foundDistFile = false;   // Error handling
     int size;    // Number of graph vertices
-    int maxVehicles; // Maximum number of vehicles in warehouse
-    int truckCapacity = -1;
-    int optimalValue = -1;
+    
     int i;  // Iterator
     srand(time(0)); // Need seeds for random solutions
 
@@ -52,13 +50,26 @@ int main(int argc, char* argv[])
 
         /// Number of threads: OPTIONAL (default: 1024)
         // Command Line Syntax: ... --ants [number of ants]
-        else if ((strcmp(argv[i], "--a") == 0) || (strcmp(argv[i], "--ants") == 0))
+        else if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
         {
             if (sscanf(argv[++i], "%d", &ants) != 1) {
                 fprintf(stderr, "Unable to read ant number!\n");
             }
             else {
                 printf("Given ant number : %d\n", ants);
+            }
+        }
+
+        /// Number of full thread blocks: OPTIONAL
+        // Command Line Syntax: ... --blocks [number of ants]
+        else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--blocks") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &ants) != 1) {
+                fprintf(stderr, "Unable to read ant number!\n");
+            }
+            else {
+                printf("Given block number : %d\n", ants);
+                ants *= BLOCK_SIZE;
             }
         }
     }
@@ -72,95 +83,61 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    // File syntax : 1st row must contain graph size in decimal
-    // Following rows: graph edge values separated with comma (,)
-    if (fscanf_s(pfile, "%d \n", &size) == 0) {
-        fprintf(stderr, "Unable to read Size!\n Make sure you have the right file syntax!\n");
-        fprintf(stderr, "File Syntax:\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \n");
-        fclose(pfile);
-        return -1;
-    }
-
-    // Distance matrix
-    // Store type: adjacency matrix format
-    float* Dist = (float*)calloc(size * size, sizeof(float));
-
-    // Reading distance values from dist file
-    for (int ii = 0; ii < size; ++ii) {
-        float temp;
-
-        for (int jj = 0; jj < size; ++jj) {
-            if (fscanf_s(pfile, "%f", &temp) == 0) {
-                fprintf(stderr, "Error reading file \"%s\" distance(%d,%d)\n", argv[fileNameIdx], ii, jj);
-                fclose(pfile);
-                return -1;
-            }
-            Dist[ii * size + jj] = temp;
-        }
-        fscanf_s(pfile, "\n");
-    }
-
-    // File syntax : row after dist values must contain maximum vehicle count in decimal
-    if (fscanf_s(pfile, "No of trucks: %d, Optimal value: %d \nCAPACITY: %d \n", &maxVehicles, &optimalValue, &truckCapacity) < 3) {
-        fprintf(stderr, "Incorrect read of MaxVehicles, OptimalValue or TruckCapacity!\n Make sure you have the right file syntax!\n");
-        fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \nNo of trucks: [int], Optimal value: [int] \n");
-        fclose(pfile);
-        return -1;
-    }
-
-    /// Capacity vector
-    int* capacities = (int*)calloc(size, sizeof(int));
-
-    int temp1, temp2;
-    fscanf_s(pfile, "DEMAND_SECTION\n");
-    for (int ii = 0; ii < size; ii++) 
+    ///
+    /// The first 3 rows must be in the given struct:
+    ///
+    
+    // File syntax : 1st row must contain VRP type
+    char vrpType[20] = { 0 };
+    if (fscanf_s(pfile, "TYPE: %s\n", vrpType) == 0)
     {
-        if (fscanf_s(pfile, "%d %d", &temp1, &temp2) < 2) {
-            fprintf(stderr, "Unable to read Capacity values!\n Make sure you have the right file syntax!\n");
-            fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \nNo of trucks: [int], Optimal value: [int] \n");
-            fclose(pfile);
-            return -1;
-        }
-        capacities[ii] = temp2;
-    }
-
-    // Closing data file
-    printf("Closing file \"%s\"!\n", argv[fileNameIdx]);
-    if (fclose(pfile) != 0) {
-        fprintf(stderr, "Unable to close file \"%s\"!\n", argv[fileNameIdx]);
+        fprintf(stderr, "Missing VRP type!\n");
         return -1;
     }
 
-    // Printing Matrix
-    printf("Maximum number of vehicles: %d\nTruck capacity : %d\nCapacities: ", maxVehicles, truckCapacity);
-    for (int ii = 0; ii < size; ii++)
-        printf("%d ", capacities[ii]);
-    printf("\n");
-    printf("Given Dist matrix:\n");
-    print(Dist, size);
+    // File syntax : 2nd row must contain graph size in decimal
+    if (fscanf_s(pfile, "DIMENSION: %d \n", &size) != 1) {
+        fprintf(stderr, "Unable to read Size!\n Make sure you have the right file syntax!\n");
+        fclose(pfile);
+        return -1;
+    }
+    if (size < 2) {
+        fprintf(stderr, "Invalid size!\n");
+        return -1;
+    }
 
-    // Host Variables
+    // File syntax : 3rd row must contain graph weight type info: 
+    // Possibilities: 2D (x,y) or EXPLICIT (direct node distances)
+    char weightType[20] = { 0 };
+    if (fscanf_s(pfile, "EDGE_WEIGHT_TYPE: %20s \n", weightType) == 0) {
+        fprintf(stderr, "Unable to read weight type info!\n Make sure you have the right file syntax!\n");
+        fclose(pfile);
+        return -1;
+    } // Checking syntax in Host main function
 
-    // Route: [0 ... 1st Route ... 0 ... 2nd Route ... ... Last Route ... ( Last 0 not stored)]
+    // VRP types
+    if (strcmp(vrpType, "TSP") == 0)
+    {
 
-    CVRP::CUDA_Main_ParamTypedef params;
-    params.antNum = ants;
-    params.capacities = capacities;
-    params.Dist = Dist;
-    params.maxVehicles = maxVehicles;
-    params.optimalValue = optimalValue;
-    params.Pheromone = (float*)malloc(size * CVRP::RouteSize(size, maxVehicles) * sizeof(float));
-    params.route = (int*)malloc(CVRP::RouteSize(size, maxVehicles) * sizeof(int));
-    params.size = size;
-    params.truckCapacity = truckCapacity;
+    }
+    else if (strcmp(vrpType, "VRP") == 0)
+    {
 
-    printf("Capacitated Vehicle Route Problem with Ant Colony Algorithm\n");
-    CVRP::CUDA_main(params);
+    }
+    else if (strcmp(vrpType, "CVRP") == 0)
+    {
+        CVRP::Host_main(pfile, size, weightType);
+    }
+    else if (strcmp(vrpType, "VRPTW") == 0)
+    {
+        
+    }
+    else
+    {
+        fprintf(stderr, "Invalid VRP type!\n");
+        return -1;
+    }
 
-    free(params.capacities);
-    free(params.Dist);
-    free(params.Pheromone);
-    free(params.route);
     return 0;
 }
 
@@ -168,6 +145,170 @@ namespace CVRP {
 
     // Global variables for multi grid Kernel
     __device__ Kernel_GlobalParamTypedef globalParams;
+
+    // Host function for File Handling and Memory allocation
+    int Host_main(FILE* pfile, int size, char* weightType)
+    {
+        if (strcmp(weightType, "EXPLICIT") != 0 && 
+            strcmp(weightType, "EXPLICIT_DIAG_LOW") != 0 &&
+            //strcmp(weightType, "EXPLICIT_DIAG_UP") != 0 &&
+            strcmp(weightType, "EUC_2D") != 0)
+        {
+            fprintf(stderr, "Invalid weight type!\nAccepted types: EXPLICIT, EXPLICIT_DIAG_LOW, EXPLICIT_DIAG_UP, EUC_2D\n");
+            fclose(pfile);
+            return -1;
+        }
+
+        int maxVehicles; // Maximum number of vehicles in warehouse
+        int truckCapacity = -1;
+        float optimalValue = -1.0f;
+        // File syntax : row after dist values must contain maximum vehicle count in decimal
+        if (fscanf_s(pfile, "No of trucks: %d, Capacity: %d, Optimal value: %f\n", &maxVehicles, &truckCapacity, &optimalValue) < 3) {
+            fprintf(stderr, "Incorrect read of MaxVehicles, OptimalValue or TruckCapacity!\n");
+            fclose(pfile);
+            return -1;
+        }
+
+        // Distance matrix
+        // Store type: adjacency matrix format
+        float* Dist = (float*)calloc(size * size, sizeof(float));
+
+        // Reading distance values from dist file
+
+        if (strcmp(weightType, "EXPLICIT") == 0)
+        {
+            for (int ii = 0; ii < size; ++ii) {
+                float temp;
+
+                for (int jj = 0; jj < size; ++jj) {
+                    if (fscanf_s(pfile, "%f", &temp) == 0) {
+                        fprintf(stderr, "Error reading distance(%d,%d)\n", ii, jj);
+                        fclose(pfile);
+                        return -1;
+                    }
+                    Dist[ii * size + jj] = temp;
+                }
+                fscanf_s(pfile, "\n");
+            }
+        }
+        else if (strcmp(weightType, "EXPLICIT_DIAG_LOW") == 0)
+        {
+            // The existing values
+            for (int ii = 0; ii < size; ++ii) {
+                float temp;
+
+                for (int jj = 0; jj <= ii; ++jj) {
+                    if (fscanf_s(pfile, "%f", &temp) == 0) {
+                        fprintf(stderr, "Error reading distance(%d,%d)\n", ii, jj);
+                        fclose(pfile);
+                        return -1;
+                    }
+                    Dist[ii * size + jj] = temp;
+                }
+                fscanf_s(pfile, "\n");
+            }
+            // Mirroring
+            for (int ii = 0; ii < size; ++ii) 
+                for (int jj = ii+1; jj < size; ++jj)         
+                    Dist[ii * size + jj] = Dist[jj * size + ii];
+        }
+        else if (strcmp(weightType, "EUC_2D") == 0)
+        {
+            // Temporary array for 2D values
+            int2* _2dvalues = (int2*)malloc(size * sizeof(int2));
+            int temp1;
+            for (int i = 0; i < size; i++)  // Scanning file
+            {
+                if (fscanf_s(pfile, "%d %d %d\n",
+                    &temp1,
+                    &_2dvalues[i].x, &_2dvalues[i].y
+                ) != 3)
+                {
+                    fprintf(stderr, "Incorrect read in row %d!\n", i);
+                    free(_2dvalues);
+                    fclose(pfile);
+                    return -1;
+                }
+            }
+            // Converting 2D values into distances
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    if (i != j)
+                    {
+                        float diffX = _2dvalues[i].x - _2dvalues[j].x;
+                        float diffY = _2dvalues[i].y - _2dvalues[j].y;
+                        Dist[i * size + j] = sqrt(diffX * diffX + diffY * diffY);
+                    }
+                }
+            }
+            free(_2dvalues);    // No need after
+        }
+
+        /// Capacity vector
+        int* capacities = (int*)calloc(size, sizeof(int));
+
+        int temp1, temp2;
+        fscanf_s(pfile, "DEMAND_SECTION\n");
+        for (int ii = 0; ii < size; ii++)
+        {
+            if (fscanf_s(pfile, "%d %d", &temp1, &temp2) < 2) {
+                fprintf(stderr, "Unable to read Capacity values!\n Make sure you have the right file syntax!\n");
+                fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \nNo of trucks: [int], Optimal value: [int] \n");
+                fclose(pfile);
+                return -1;
+            }
+            capacities[ii] = temp2;
+        }
+
+        // Closing data file
+        printf("Closing file!\n");
+        if (fclose(pfile) != 0) {
+            fprintf(stderr, "Unable to close file!\n");
+            return -1;
+        }
+
+        // Printing Matrix
+        printf("Maximum number of vehicles: %d\nTruck capacity : %d\nCapacities: ", maxVehicles, truckCapacity);
+        for (int ii = 0; ii < size; ii++)
+            printf("%d ", capacities[ii]);
+        printf("\n");
+        printf("Given Dist matrix:\n");
+        print(Dist, size);
+
+        // Host Variables
+
+        // Route: [0 ... 1st Route ... 0 ... 2nd Route ... ... Last Route ... ( Last 0 not stored)]
+
+        CVRP::CUDA_Main_ParamTypedef params;
+        params.antNum = ants;
+        params.capacities = capacities;
+        params.Dist = Dist;
+        params.maxVehicles = maxVehicles;
+        params.optimalValue = optimalValue;
+        params.Pheromone = (float*)malloc(size * CVRP::RouteSize(size, maxVehicles) * sizeof(float));
+        params.route = (int*)malloc(CVRP::RouteSize(size, maxVehicles) * sizeof(int));
+        params.size = size;
+        params.truckCapacity = truckCapacity;
+
+        printf("Capacitated Vehicle Route Problem with Ant Colony Algorithm\n");
+
+        printf("\n\nR=10\n\n");
+        CVRP::CUDA_main(params);
+        REPETITIONS = 30;
+        printf("\n\nR=30\n\n");
+        CVRP::CUDA_main(params);
+        REPETITIONS = 50;
+        printf("\n\nR=50\n\n");
+        CVRP::CUDA_main(params);
+
+        free(params.capacities);
+        free(params.Dist);
+        free(params.Pheromone);
+        free(params.route);
+        return 0;
+    }
 
     // Host function for CUDA
     cudaError_t CUDA_main(CUDA_Main_ParamTypedef h_params)
@@ -551,8 +692,8 @@ namespace CVRP {
 
                     // Error handling 
                     // Check if there are invalid given elements 
-                    // Valid input if: positive OR -1 OR 0 (only if i=j)
-                    if (i != j && params.Dist[i * size + j] <= 0
+                    // Valid input if: non-negative OR -1 OR 0 (only if i=j)
+                    if (i != j && params.Dist[i * size + j] < 0
                         && params.Dist[i * size + j] != -1)
                     {
                         printf("Dist(%d,%d) incorrect!\n", i, j);
@@ -701,15 +842,12 @@ namespace CVRP {
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
         grid.sync();
 
-        __shared__ int size;                // Local Copy of argument parameter
-
         // Initialization of temporary variables
         __shared__ float multiplicationConst;
         multiplicationConst = 0.0f;
         globalParams.invalidInput = false;
         globalParams.isolatedVertex = false;
         globalParams.averageDist = 0.0f;
-        size = params.size; // Need to be written too many times
         params.routeSize = RouteSize(params.size, params.maxVehicles);
         globalParams.minRes = FLT_MAX;
 
@@ -741,8 +879,8 @@ namespace CVRP {
 
                 // Error handling 
                 // Check if there are invalid given elements 
-                // Valid input if: positive OR -1 OR 0 (only if i=j)
-                if (i != j && params.Dist[i * params.size + j] <= 0
+                // Valid input if: non-negative OR -1 OR 0 (only if i=j)
+                if (i != j && params.Dist[i * params.size + j] < 0
                     && params.Dist[i * params.size + j] != -1)
                 {
                     printf("Dist(%d,%d) incorrect!\n", i, j);

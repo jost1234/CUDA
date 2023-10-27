@@ -14,10 +14,10 @@
 
 // Number of threads = number of ants
 // Default value: 1024
-int ants = 1024 * 8;
+int ants = 1024;
 
 // Repetition constants
-#define REPETITIONS 30
+int REPETITIONS = 10;
 #define RANDOM_GENERATIONS 20
 #define FOLLOWER_GENERATIONS 500
 
@@ -26,7 +26,7 @@ int ants = 1024 * 8;
 #define REWARD_MULTIPLIER 10   // Reward multiplier after finding a shortest path until then
 #define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
 
-#define SERIALMAXTRIES 10 // Number of serial processes (for debug purposes)
+#define SERIALMAXTRIES 1 // Number of serial processes (for debug purposes)
 
 namespace CVRP {
 

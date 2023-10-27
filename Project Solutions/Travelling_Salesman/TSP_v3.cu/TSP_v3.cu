@@ -50,13 +50,26 @@ int main(int argc, char* argv[])
 
         /// Number of threads: OPTIONAL (default: 1024)
         // Command Line Syntax: ... --ants [number of ants]
-        else if ((strcmp(argv[i], "--a") == 0) || (strcmp(argv[i], "--ants") == 0))
+        else if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
         {
             if (sscanf(argv[++i], "%d", &ants) != 1) {
                 fprintf(stderr, "Unable to read ant number!\n");
             }
             else {
                 printf("Given ant number : %d\n", ants);
+            }
+        }
+
+        /// Number of full thread blocks: OPTIONAL
+        // Command Line Syntax: ... --blocks [number of ants]
+        else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--blocks") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &ants) != 1) {
+                fprintf(stderr, "Unable to read ant number!\n");
+            }
+            else {
+                printf("Given block number : %d\n", ants);
+                ants *= BLOCK_SIZE;
             }
         }
     }
@@ -125,6 +138,8 @@ int main(int argc, char* argv[])
     free(params.Dist);
     free(params.Pheromone);
     free(params.route);
+
+    //getchar();
     return 0;
 }
 
@@ -597,6 +612,11 @@ namespace TSP {
             printf("Need to find route in greedy mode!\n");
             greedySequence(&params);
         }
+        else {
+            // We already found a solution but check the pheromones just in case
+            greedySequence(&params,0);
+            evaluateSolution(&params, 0, 1.0f, 1.0f, 1);
+        }
         // We found a route if given length is greater than zero
         *params.foundRoute = (antRouteLength(&params, 0) > 0);
     }
@@ -615,7 +635,7 @@ namespace TSP {
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
         grid.sync();
 
-        __shared__ float multiplicationConst;
+        float multiplicationConst;
 
         // Initialization
         globalParams.invalidInput = false;
@@ -773,8 +793,13 @@ namespace TSP {
         if (antIndex == 0) {
             // Choosing path with greedy algorithm if we dont have a valid answer
             if (!validRoute(&params)) {
-                //printf("Need to find route in greedy mode!\n");
+                printf("Need to find route in greedy mode!\n");
                 greedySequence(&params);
+            }
+            else {
+                // We already found a solution but check the pheromones just in case
+                greedySequence(&params, 0);
+                evaluateSolution(&params, 0, 1.0f, 1.0f, 1);
             }
         }
 
@@ -826,7 +851,7 @@ namespace TSP {
             {
                 // If everything is correct, we may never enter here,
                 // but in case so, we reconfigure the antRoute to default
-                printf("Error occured while generating random sequence: second vertex (%d) lost!\n", secondVertex);
+                //printf("Error occured while generating random sequence: second vertex (%d) lost!\n", secondVertex);
                 for (int idx = 2; idx < pkernelParams->size; idx++)
                     antRouteOffset[idx] = idx;
 
@@ -1012,7 +1037,7 @@ namespace TSP {
     // Auxilary function for greedy sequence
     // Return the highest vertex index not yet chosen
     /// row : row of previous route element (decides, which row to watch in the function)
-    __device__ int maxInIdxRow(Kernel_ParamTypedef* pkernelParams, int row, int idx) {
+    __device__ int maxInIdxRow(Kernel_ParamTypedef* pkernelParams, int row, int idx, int antIndex) {
         int maxidx = -1;
         float max = 0.0f;
         for (int i = 0; i < pkernelParams->size; i++) 
@@ -1021,7 +1046,7 @@ namespace TSP {
             float observed = pkernelParams->Pheromone[row * pkernelParams->size + i];
             //if(row == 2 && idx)
 
-            if (observed > max && !alreadyListed(pkernelParams, -1, idx, i))
+            if (observed > max && !alreadyListed(pkernelParams, antIndex, idx, i))
             {
                 max = observed;
                 maxidx = i;
@@ -1034,12 +1059,18 @@ namespace TSP {
 
     // Generates a sequnce using greedy algorithm
     // Always chooses the highest possible value for the next vertex
-    __device__ void greedySequence(Kernel_ParamTypedef* pkernelParams)
+    __device__ void greedySequence(Kernel_ParamTypedef* pkernelParams, int antIndex)
     {
-        pkernelParams->route[0] = 0;
+        int* antRouteOffset = pkernelParams->antRoute
+            + antIndex * pkernelParams->size;   // Optimizing array addressing
+        // Special care for -1: watching route vector
+        if (antIndex == -1)
+            antRouteOffset = pkernelParams->route;
+
+        antRouteOffset[0] = 0;
         for (int i = 1; i < pkernelParams->size; i++)
         {
-            int node = pkernelParams->route[i] = maxInIdxRow(pkernelParams, pkernelParams->route[i - 1], i);
+            int node = antRouteOffset[i] = maxInIdxRow(pkernelParams, antRouteOffset[i - 1], i,antIndex);
             assert(node != -1);
         }
     }

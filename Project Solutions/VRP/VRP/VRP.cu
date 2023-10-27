@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
     int i;  // Iterator
     srand(time(0));
     for (i = 1; i < argc; ++i)  // Processing command line arguments
+    {
         // Command Line Syntax: ... --dist [file_name]
         if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0)) {
             pfile = fopen(argv[++i], "r");
@@ -44,6 +45,31 @@ int main(int argc, char* argv[])
             printf("Opening file \"%s\"!\n", argv[Dist_filename_Idx]);
             foundDistMatrix = true;
         }
+        /// Number of threads: OPTIONAL (default: 1024)
+        // Command Line Syntax: ... --ants [number of ants]
+        else if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &ants) != 1) {
+                fprintf(stderr, "Unable to read ant number!\n");
+            }
+            else {
+                printf("Given ant number : %d\n", ants);
+            }
+        }
+
+        /// Number of full thread blocks: OPTIONAL
+        // Command Line Syntax: ... --blocks [number of ants]
+        else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--blocks") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &ants) != 1) {
+                fprintf(stderr, "Unable to read ant number!\n");
+            }
+            else {
+                printf("Given block number : %d\n", ants);
+                ants *= BLOCK_SIZE;
+            }
+        }
+    }
     if (!foundDistMatrix) {
         fprintf(stderr, "Please give a file in command line arguments to set the Distance Matrix!\n");
         fprintf(stderr, "Command Line Syntax:\n\t--dist [data_file].txt\n");

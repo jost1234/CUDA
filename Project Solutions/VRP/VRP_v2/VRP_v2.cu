@@ -503,8 +503,8 @@ namespace VRP {
 
                     // Error handling 
                     // Check if there are invalid given elements 
-                    // Valid input if: positive OR -1 OR 0 (only if i=j)
-                    if (i != j && params.Dist[i * size + j] <= 0
+                    // Valid input if: non-negative OR -1
+                    if (i != j && params.Dist[i * size + j] < 0
                         && params.Dist[i * size + j] != -1)
                     {
                         printf("Dist(%d,%d) incorrect!\n", i, j);
@@ -681,8 +681,8 @@ namespace VRP {
 
                 // Error handling 
                 // Check if there are invalid given elements 
-                // Valid input if: positive OR -1 OR 0 (only if i=j)
-                if (i != j && params.Dist[i * params.size + j] <= 0
+                // Valid input if: non-negative OR -1
+                if (i != j && params.Dist[i * params.size + j] < 0
                     && params.Dist[i * params.size + j] != -1)
                 {
                     printf("Dist(%d,%d) incorrect!\n", i, j);
@@ -1046,9 +1046,6 @@ namespace VRP {
             if (repNumber > 2)
                 additive *= rewardMultiplier * (repNumber + 1) * (repNumber + 1);
         }
-        /*if (antIndex == 0) {
-            printf("kukucsfv\n");
-        }*/
 
         // Route valid if length > 0
         if (length > 0)

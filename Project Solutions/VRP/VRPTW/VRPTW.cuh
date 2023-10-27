@@ -106,7 +106,7 @@ namespace VRPTW {
 
     // Returns the sum length of the given route of trucks
     // Returns -1 if route not possible (for example has dead end) or if cap. condition not met
-    // FUNCTION USAGE: CapacityCondition
+    // FUNCTION USAGE: capacityCondition
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
     // Represents az ant who follows other ants' pheromones
@@ -123,13 +123,18 @@ namespace VRPTW {
 
     /// Scans that the given solution is suitable for the capacity condition
     // Returns a bool value of the condition evaluation
-    // FUNCTION USED BY: evaluateSolution
-    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
+    // FUNCTION USED BY: antRouteLength
+    __device__ bool capacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
+
+    /// Scans that the given solution is suitable for the time window condition
+    // Returns a bool value of the condition evaluation
+    // FUNCTION USED BY: antRouteLength
+    __device__ bool timeWindowCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
     // Sets the route vector if we found a best yet solution
-    // FUNCTION USAGE: CapacityCondition
+    // FUNCTION USAGE: capacityCondition
     __device__ void evaluateSolution(
         Kernel_ParamTypedef* pkernelParams,
         int antIndex,

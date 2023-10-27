@@ -50,13 +50,26 @@ int main(int argc, char* argv[])
 
         /// Number of threads: OPTIONAL (default: 1024)
         // Command Line Syntax: ... --ants [number of ants]
-        else if ((strcmp(argv[i], "--a") == 0) || (strcmp(argv[i], "--ants") == 0))
+        else if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
         {
             if (sscanf(argv[++i], "%d", &ants) != 1) {
                 fprintf(stderr, "Unable to read ant number!\n");
             }
             else {
                 printf("Given ant number : %d\n", ants);
+            }
+        }
+
+        /// Number of full thread blocks: OPTIONAL
+        // Command Line Syntax: ... --blocks [number of ants]
+        else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--blocks") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &ants) != 1) {
+                fprintf(stderr, "Unable to read ant number!\n");
+            }
+            else {
+                printf("Given block number : %d\n", ants);
+                ants *= BLOCK_SIZE;
             }
         }
     }
@@ -82,7 +95,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    // File syntax : 2nd row must contain graph size in decimal ()
+    // File syntax : 2nd row must contain graph size in decimal
     if (fscanf_s(pfile, "DIMENSION: %d \n", &size) == 0) {
         fprintf(stderr, "Unable to read Size!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
@@ -94,7 +107,7 @@ int main(int argc, char* argv[])
     }
 
     // File syntax : 3rd row must contain graph weight type info: 
-    // Possibilities: 2D (x,y) or EXPLICIT (direct node distances)
+    // Possibilities: EUC_2D (x,y) or EXPLICIT (direct node distances)
     char weightType[9] = { 0 };
     if (fscanf_s(pfile, "EDGE_WEIGHT_TYPE: %8s \n", weightType) == 0) {
         fprintf(stderr, "Unable to read weight type info!\n Make sure you have the right file syntax!\n");
@@ -136,9 +149,9 @@ namespace VRPTW {
     // Host function for File Handling and Memory allocation
     int Host_main(FILE* pfile, int size, char* weightType)
     {
-        if (strcmp(weightType, "2D") != 0) // I only work with 2D weight type
+        if (strcmp(weightType, "EUC_2D") != 0) // I only work with 2D weight type
         {
-            fprintf(stderr, "Invalid weight type!\nAccepted types: 2D\n");
+            fprintf(stderr, "Invalid weight type!\nAccepted types: EUC_2D\n");
             fclose(pfile);
             return -1;
         }
@@ -217,7 +230,8 @@ namespace VRPTW {
         printf("\n");
         printf("Given Dist matrix:\n");
         print(Dist, size);
-
+        for (int ii = 0; ii < size; ii++)
+            printf("%d %d %d\n", times[ii].readyTime, times[ii].dueTime, times[ii].serviceTime);
         // Host Variables
 
         // Route: [0 ... 1st Route ... 0 ... 2nd Route ... ... Last Route ... ( Last 0 not stored)]
@@ -231,6 +245,7 @@ namespace VRPTW {
         params.Pheromone = (float*)malloc(size * VRPTW::RouteSize(size, maxVehicles) * sizeof(float));
         params.route = (int*)malloc(VRPTW::RouteSize(size, maxVehicles) * sizeof(int));
         params.size = size;
+        params.timeWindows = times;
         params.truckCapacity = truckCapacity;
 
         printf("Capacitated Vehicle Route with Time Window Problem with Ant Colony Algorithm\n");
@@ -240,6 +255,7 @@ namespace VRPTW {
         free(params.Dist);
         free(params.Pheromone);
         free(params.route);
+        free(params.timeWindows);
     }
 
     // Host function for CUDA
@@ -275,7 +291,7 @@ namespace VRPTW {
 
         // Device pointers
         Kernel_ParamTypedef d_kernelParams;
-        d_kernelParams.capacities = NULL;   // CVRP specific
+        d_kernelParams.capacities = NULL;   
         d_kernelParams.Dist = NULL;
         d_kernelParams.Pheromone = NULL;
         d_kernelParams.route = NULL;
@@ -284,7 +300,8 @@ namespace VRPTW {
         d_kernelParams.size = size;
         d_kernelParams.maxVehicles = maxVehicles;
         d_kernelParams.routeSize = routeSize;
-        d_kernelParams.truckCapacity = h_params.truckCapacity;  // CVRP specific
+        d_kernelParams.timeWindows = NULL;              // VRPTW specific
+        d_kernelParams.truckCapacity = h_params.truckCapacity;  
 
         // Config parameters
         Kernel_ConfigParamTypedef d_configParams;
@@ -304,7 +321,8 @@ namespace VRPTW {
 
         size_t antRoute_bytes = antNum * route_bytes;   // Allocating working memory for all threads
         size_t state_bytes = antNum * sizeof(curandState);
-        size_t capacities_bytes = size * sizeof(int);   // CVRP specific
+        size_t capacities_bytes = size * sizeof(int);
+        size_t timeWindows_bytes = size * sizeof(TimeWindow_ParamTypedef);  // VRPTW specific
 
         // Dist
         cudaStatus = cudaMalloc((void**)&d_kernelParams.Dist, Dist_bytes);
@@ -348,6 +366,13 @@ namespace VRPTW {
             Free_device_memory(d_kernelParams);
             return cudaStatus;
         }
+        // timeWindows : when the truck needs to be in the given location
+        cudaStatus = cudaMalloc(&d_kernelParams.timeWindows, timeWindows_bytes);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "timeWindows cudaMalloc failed!\n");
+            Free_device_memory(d_kernelParams);
+            return cudaStatus;
+        }
 
         // Copying Dist data : Host -> Device
         cudaStatus = cudaMemcpy(d_kernelParams.Dist, h_params.Dist, Dist_bytes, cudaMemcpyHostToDevice);
@@ -360,6 +385,13 @@ namespace VRPTW {
         cudaStatus = cudaMemcpy(d_kernelParams.capacities, h_params.capacities, capacities_bytes, cudaMemcpyHostToDevice);
         if (cudaStatus != cudaSuccess) {
             fprintf(stderr, "capacities cudaMemcpy failed!\n");
+            Free_device_memory(d_kernelParams);
+            return cudaStatus;
+        }
+        // Copying timeWindow data : Host -> Device
+        cudaStatus = cudaMemcpy(d_kernelParams.timeWindows, h_params.timeWindows, timeWindows_bytes, cudaMemcpyHostToDevice);
+        if (cudaStatus != cudaSuccess) {
+            fprintf(stderr, "timeWindows cudaMemcpy failed!\n");
             Free_device_memory(d_kernelParams);
             return cudaStatus;
         }
@@ -503,13 +535,32 @@ namespace VRPTW {
             NULL != params->capacities);
     }
 
+    // Function to format the solution for sequencePrint
+    __device__ __host__ void formatSequence(int* route, float* Dist, int size, int routeSize)
+    {
+        // The point is to put the unused vehicles to the back of the enumeration
+        
+        int i, src, dst;
+        for (i = 0; i < routeSize-1; i++) 
+        {
+            src = route[i]; dst = route[i + 1];
+            if (src != 0 || dst != 0)   // Not new truck or not empty truck
+                continue;
+
+            // Found an empty truck, but maybe there are more
+            int emptyCount = 1;
+            //while()
+        }
+    }
+
     // Diagnostic function for printing given sequence
     __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
         if (
             2 > size ||
             2 > routeSize ||
             NULL == route ||
-            NULL == Dist) {
+            NULL == Dist) 
+        {
             printf("Invalid input!\n");
             return -1;
         }
@@ -545,12 +596,12 @@ namespace VRPTW {
                     printf("%d (%.0f) 0\nVehicle #%d : ", src, Dist[src * size + dst], ++vehicleCntr);
                 }
                 else {
-                    printf("%d (%.0f) 0\n", src, Dist[src * size + dst]);
+                    printf("%d (%.2f) 0\n", src, Dist[src * size + dst]);
                 }
             }
             else {
                 // Next element of Route 
-                printf("%d (%.0f) ", src, Dist[src * size + dst]);
+                printf("%d (%.2f) ", src, Dist[src * size + dst]);
             }
             l += Dist[src * size + dst];
             i++;
@@ -624,8 +675,8 @@ namespace VRPTW {
 
                     // Error handling 
                     // Check if there are invalid given elements 
-                    // Valid input if: positive OR -1 OR 0 (only if i=j)
-                    if (i != j && params.Dist[i * size + j] <= 0
+                    // Valid input if: non-negative OR -1
+                    if (i != j && params.Dist[i * size + j] < 0
                         && params.Dist[i * size + j] != -1)
                     {
                         printf("Dist(%d,%d) incorrect!\n", i, j);
@@ -814,8 +865,8 @@ namespace VRPTW {
 
                 // Error handling 
                 // Check if there are invalid given elements 
-                // Valid input if: positive OR -1 OR 0 (only if i=j)
-                if (i != j && params.Dist[i * params.size + j] <= 0
+                // Valid input if: non-negative OR -1
+                if (i != j && params.Dist[i * params.size + j] < 0
                     && params.Dist[i * params.size + j] != -1)
                 {
                     printf("Dist(%d,%d) incorrect!\n", i, j);
@@ -1046,7 +1097,7 @@ namespace VRPTW {
     /// Scans that the given solution is suitable for the capacity condition
     // Returns a bool value of the condition evaluation
     // FUNCTION USED BY: antRouteLength
-    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex)
+    __device__ bool capacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex)
     {
         int* antRouteOffset = pkernelParams->antRoute
             + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
@@ -1068,6 +1119,57 @@ namespace VRPTW {
 
             if (currentLoad > pkernelParams->truckCapacity) // truck overloaded
                 return false;
+        }
+        return true;
+    }
+
+    /// Scans that the given solution is suitable for the time window condition
+    // Returns a bool value of the condition evaluation
+    // FUNCTION USED BY: antRouteLength
+    __device__ bool timeWindowCondition(Kernel_ParamTypedef* pkernelParams, int antIndex)
+    {
+        int* antRouteOffset = pkernelParams->antRoute
+            + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
+
+        // Special care for -1: watching route vector
+        if (antIndex == -1)
+            antRouteOffset = pkernelParams->route;
+
+        // TimeWindow condition means that every customer has a time window when they can meet the truck
+        // If truck is too early, it has to wait there
+        // Trucks speed is 1 (arbitrary unit, same for time and distance)
+        float currentTime = 0.0f;
+        int src = 0, dst;
+        for (int i = 1; i < pkernelParams->routeSize; i++)
+        {
+            dst = antRouteOffset[i];
+            if (dst >= pkernelParams->size)
+                return false;   // Invalid route node
+            if (dst == 0)     // 0 node means it's a new truck that starts at t=0
+                currentTime = 0.0f;
+            else {  // Normal node
+                // Time passes while the truck arrives at the destination
+                currentTime += pkernelParams->Dist[src * pkernelParams->size + dst];
+
+                // If the truck is late, it's over
+                if (currentTime > (float)pkernelParams->timeWindows[dst].dueTime)
+                    return false;
+
+                // If ReadyTime is later, the truck has to wait there and just then make the service
+                if (currentTime < (float)pkernelParams->timeWindows[dst].readyTime)
+                {
+                    currentTime = (float)pkernelParams->timeWindows[dst].readyTime +
+                        (float)pkernelParams->timeWindows[dst].serviceTime;
+                }
+                // The truck arrived in the paerfect time, so makes the service and then leaves
+                else
+                {
+                    currentTime += (float)pkernelParams->timeWindows[dst].serviceTime;
+                }
+            }
+            
+            // Next source is current destination
+            src = dst;
         }
         return true;
     }
@@ -1109,7 +1211,11 @@ namespace VRPTW {
             return -1;
 
         // route invalid if Capacity condition is not met
-        if (!CapacityCondition(pkernelParams, antIndex))
+        if (!capacityCondition(pkernelParams, antIndex))
+            return -1;
+
+        // route invalid if TimeWindow condition is not met
+        if (!timeWindowCondition(pkernelParams, antIndex))
             return -1;
 
         assert(length != 0);

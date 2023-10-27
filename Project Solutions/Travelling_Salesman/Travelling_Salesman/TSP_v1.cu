@@ -735,7 +735,7 @@ __device__ void evaluateSolution(double* Dist, double* Pheromone, int* antRoute,
     assert(length != 0);
     double additive = multiplConstant / length; // The longer the route is, the smaller amount we are adding
     if (length < minRes && length > 0) {    // Rewarding the ant with the best yet route
-        printf("New min found: %f\n", length);
+        //printf("New min found: %f\n", length);
         minRes = length;
         additive *= REWARD_MULTIPLIER * (repNumber + 1) * (repNumber + 1);
     }

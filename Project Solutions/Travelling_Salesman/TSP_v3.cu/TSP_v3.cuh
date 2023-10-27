@@ -114,11 +114,11 @@ namespace TSP {
     // Auxilary function for greedy sequence
     // Returns the highest vertex index not yet chosen
     /// row : row of previous route element (decides, which row to watch in the function)
-    __device__ int maxInIdxRow(Kernel_ParamTypedef* pkernelParams, int row, int idx);
+    __device__ int maxInIdxRow(Kernel_ParamTypedef* pkernelParams, int row, int idx, int antIndex);
 
     // Generates a sequnce using greedy algorithm
     // Always chooses the highest possible value for the next vertex
-    __device__ void greedySequence(Kernel_ParamTypedef* pkernelParams);
+    __device__ void greedySequence(Kernel_ParamTypedef* pkernelParams, int antIndex = -1);
 
     // Copies a route into the answer vector
     __device__ void copyAntRoute(Kernel_ParamTypedef* pkernelParams, int antIndex);

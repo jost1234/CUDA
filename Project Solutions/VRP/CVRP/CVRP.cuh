@@ -40,6 +40,9 @@ __device__ __host__ int my_ceil(int osztando, int oszto) {
 namespace CVRP {
     /// CUDA LAUNCH AND KERNEL FUNCTIONS
 
+    // Host function for File Handling and Memory allocation
+    int Host_main(FILE* pfile, int size, char* weightType);
+
     // Main CUDA function
     cudaError_t CUDA_main(CUDA_Main_ParamTypedef h_params);
 

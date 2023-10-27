@@ -17,7 +17,7 @@
 int ants = 1024 * 8;
 
 // Repetition constants
-#define REPETITIONS 30
+#define REPETITIONS 10
 #define RANDOM_GENERATIONS 20
 #define FOLLOWER_GENERATIONS 500
 
@@ -72,6 +72,7 @@ namespace VRPTW {
 		int size;        // Number of graph vertices
 		int routeSize;	// Redundant, just not save stack usage (= size + maxVehicles - 1)
 		curandState* state; // CURAND random state
+		TimeWindow_ParamTypedef* timeWindows;
 		int truckCapacity;
 	} Kernel_ParamTypedef;
 
