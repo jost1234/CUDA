@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  25 OCT 2023 07:19
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  7 NOV 2023 19:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -683,8 +683,12 @@ Package hyperref Info: Option `colorlinks' set `true' on input line 39.
 (./include/titlepage.aux) (./include/declaration.aux) (./content/abstract.aux)
 (./content/bevezetes.aux) (./content/elmeletihatter.aux)
 (./content/technologiaihatter.aux) (./content/implementacio.aux)
-(./content/eredmenyek.aux) (./content/osszefoglalas.aux)
-(./content/acknowledgement.aux) (./content/appendices.aux))
+(./content/eredmenyek.aux
+
+LaTeX Warning: Label `table:TSPv2_empty' multiply defined.
+
+) (./content/osszefoglalas.aux) (./content/acknowledgement.aux)
+(./content/appendices.aux))
 \openout1 = `thesis.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
@@ -814,16 +818,16 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 ]
 Package hyperref Info: Option `pageanchor' set `false' on input line 32.
-) (./thesis.toc)
-\tf@toc=\write4
-\openout4 = `thesis.toc'.
-
-
+) (./thesis.toc
 [1
 
 
 
-]
+])
+\tf@toc=\write4
+\openout4 = `thesis.toc'.
+
+ [2]
 \openout2 = `include/declaration.aux'.
 
  (./include/declaration.tex [1
@@ -847,94 +851,70 @@ Package hyperref Info: Option `pageanchor' set `false' on input line 32.
 
 (./content/bevezetes.tex
 1. fejezet.
-) [1
+File: figures/neurons.png Graphic file (type bmp)
+<figures/neurons.png>
+[1
 
 
 
 
 ]
+File: figures/aco-visualization.png Graphic file (type bmp)
+<figures/aco-visualization.png>
+ [2]) [3]
 \openout2 = `content/elmeletihatter.aux'.
 
  (./content/elmeletihatter.tex
 2. fejezet.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\begingroup' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\NAT@ctype' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\z@' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\let' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\let' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\new@ifnextchar' on input line 5.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 5.
-
-[2
+File: figures/tsp-usacities.png Graphic file (type bmp)
+<figures/tsp-usacities.png>
+[4
 
 
 
 
 ]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\begingroup' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\NAT@ctype' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\z@' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\let' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\let' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\new@ifnextchar' on input line 20.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 20.
-
 File: figures/VRP_Szoveg_nelkul.png Graphic file (type bmp)
 <figures/VRP_Szoveg_nelkul.png>
-[3] [4] [5]) [6] [7]
+ [5] [6]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\begingroup' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<let>-command' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\NAT@ctype' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\let' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\let' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\new@ifnextchar' on input line 75.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 75.
+
+[7] [8]) [9]
 \openout2 = `content/technologiaihatter.aux'.
 
  (./content/technologiaihatter.tex
 3. fejezet.
-[8
+[10
 
 
 
@@ -947,9 +927,6 @@ Underfull \hbox (badness 2512) in paragraph at lines 16--16
 [][]|\TU/lmr/m/n/10.95 Látható, hogy kb. 2010-re befejeződött a CPU-k
  []
 
-
-LaTeX Warning: Reference `' on page 9 undefined on input line 20.
-
 File: figures/gpu-devotes-more-transistors-to-data-processing.png Graphic file 
 (type bmp)
 <figures/gpu-devotes-more-transistors-to-data-processing.png>
@@ -959,7 +936,10 @@ Underfull \hbox (badness 1400) in paragraph at lines 29--30
 valamint memória-
  []
 
-[9] [10] (c:/texlive/2023/texmf-dist/tex/latex/listings/lstlang1.sty
+[11] [12]
+File: figures/invalidIntellisenseErrorMessages.png Graphic file (type bmp)
+<figures/invalidIntellisenseErrorMessages.png>
+ (c:/texlive/2023/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 )
 (c:/texlive/2023/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -967,52 +947,83 @@ File: lstlang1.sty 2023/02/27 1.9 listings language file
 )
 (c:/texlive/2023/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2023/02/27 1.9 (Carsten Heinz)
-) [11] [12] [13]
-[14]
+) [13] [14] [15]
+[16] [17]
 File: figures/Implicit synchronization.png Graphic file (type bmp)
 <figures/Implicit synchronization.png>
- [15] [16]
-4. fejezet.
-
-Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 296.
-
+ [18]
 File: figures/install-1.png Graphic file (type bmp)
 <figures/install-1.png>
+ [19]
 File: figures/install-2.png Graphic file (type bmp)
 <figures/install-2.png>
-[17
-
-]
 File: figures/install-3.png Graphic file (type bmp)
 <figures/install-3.png>
-) [18] [19]
+) [20] [21]
 \openout2 = `content/implementacio.aux'.
 
  (./content/implementacio.tex
-5. fejezet.
-) [20
+4. fejezet.
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\begingroup' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\<let>-command' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\NAT@ctype' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\let' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\let' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\new@ifnextchar' on input line 21.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 21.
+
+[22
 
 
 
 
-]
+] [23]) [24]
 \openout2 = `content/eredmenyek.aux'.
 
  (./content/eredmenyek.tex
-6. fejezet.
-) [21
+5. fejezet.
+File: figures/nsight-compute.png Graphic file (type bmp)
+<figures/nsight-compute.png>
+[25
 
 
 
 
 ]
+File: figures/TSP_v1_hiba.png Graphic file (type bmp)
+<figures/TSP_v1_hiba.png>
+ [26] [27] [28] [29]) [30]
 \openout2 = `content/osszefoglalas.aux'.
 
  (./content/osszefoglalas.tex)
 \openout2 = `content/acknowledgement.aux'.
 
- (./content/acknowledgement.tex) [22
+
+(./content/acknowledgement.tex) [31
 
 
 
@@ -1020,20 +1031,61 @@ File: figures/install-3.png Graphic file (type bmp)
 
 
 
-]
-(./thesis.bbl
+] (./thesis.bbl
 Underfull \hbox (badness 10000) in paragraph at lines 97--100
 []\TU/lmr/m/n/10.95 55th anniversary of moore’s law. [][]$[][][][][] [] [] [] [
 ][][] [] [][][][][] [] [][][] [] [][][][] [] [][][][] [] [][] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 111--115
+Underfull \hbox (badness 1642) in paragraph at lines 113--116
+[]\TU/lmr/m/n/10.95 Cooperative groups: Flexible cuda thread programming. [][]$
+[][][][][] [] [] [] [][][][][][][][][] []
+ []
+
+
+Underfull \hbox (badness 7667) in paragraph at lines 123--126
+[]\TU/lmr/m/n/10.95 Cuda c++ programming guide - cooperative groups thread bloc
+k tile.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 123--126
+[][]$[][][][][] [] [] [] [][][][] [] [][][][][][] [] [][][] [] [][][][] [] [][]
+[][][][][][][][][][][][][][][][][][][][][][][][][] [] [][][][][] [] [][][][] []
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 128--132
 []\TU/lmr/m/n/10.95 Cuda c++ programming guide. [][]$[][][][][] [] [] [] [][][]
 [] [] [][][][][][] [] [][][] [] [][][][] []
  []
 
-) [23
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--137
+[]\TU/lmr/m/n/10.95 cudalaunchcooperativekernel documentation. [][]$[][][][][] 
+[] [] [] [][][][] [] [][][][][][] [] [][][] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--137
+[][][][] [] [][][][][][][][][][][][][][][][][][] [] [][][][][] [] [][][][][][][
+] [] [][][][][][][][][][] [] [][][][] [] [][][][][] [] [][][][][][][] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 156--162
+[]\TU/lmr/m/n/10.95 Rishal Hurbans: Ant colony optimization for be-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 156--162
+\TU/lmr/m/n/10.95 ginners. [] URL  [][]$[][][][][] [] [] [] [][][][][][][][][][
+][][][] [] [][][][][][] [] [][][] []
+ []
+
+) [32
 
 
 
@@ -1043,10 +1095,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 111--115
  (./content/appendices.tex
 File: figures/TeXstudio.png Graphic file (type bmp)
 <figures/TeXstudio.png>
- [24
+ [33
 
 
-]) [25
+]) [34
 
 ]
 \tf@thm=\write5
@@ -1064,18 +1116,18 @@ L3 programming layer <2023-10-10>
  ***********
 
 
-LaTeX Warning: There were undefined references.
+LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 3D089266479BBE15B41814752D35BBDE;5022.
+(rerunfilecheck)             Checksum: 066256364FE4CBCAE023100C6FAFCEF4;6827.
  ) 
 Here is how much of TeX's memory you used:
- 18604 strings out of 475160
- 350348 string characters out of 5770264
- 2183674 words of memory out of 5000000
- 40029 multiletter control sequences out of 15000+600000
+ 18748 strings out of 475160
+ 353615 string characters out of 5770264
+ 2192674 words of memory out of 5000000
+ 40167 multiletter control sequences out of 15000+600000
  563237 words of font info for 75 fonts, out of 8000000 for 9000
  1352 hyphenation exceptions out of 8191
- 84i,12n,96p,1534b,1850s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,12n,96p,1532b,1237s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on thesis.pdf (30 pages).
+Output written on thesis.pdf (40 pages).

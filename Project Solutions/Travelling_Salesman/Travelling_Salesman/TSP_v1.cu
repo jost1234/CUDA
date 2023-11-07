@@ -102,7 +102,6 @@ int main(int argc, char* argv[])
 
 
 End:
-    getchar();
     free(Pheromone);
     free(Route);
 

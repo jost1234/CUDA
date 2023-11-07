@@ -26,7 +26,7 @@
   \bibEarlyBegin
 \else \let\bibEarlyEnd\relax \fi
 
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 \frenchspacing
 \makeatletter
 \global\def\bibIE@lowc{%
@@ -102,16 +102,42 @@
 Tóth~Márk Andor:
 \bibNewBlock Algoritmusok optimalizálása gpu-n, 2022.
 
+\bibitem{TSPimage}
+Claudemir Woche~V. C.:
+\bibNewBlock Modeling and solving the traveling salesman problem with python
+  and pyomo.
+\bibNewBlock
+\bibUrll{URL} >http://www.opl.ufc.br/en/post/tsp/>.
+
 \bibitem{CUDAcoopgroups}
 Cooperative groups: Flexible cuda thread programming.
 \bibNewBlock \url{https://developer.nvidia.com/blog/cooperative-groups/}.
 \bibNewBlock Accessed: 2017-10-04.
+
+\bibitem{CUDAdoc_coopGroups}
+Cuda c++ programming guide - cooperative groups.
+\bibNewBlock
+  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#cooperative-groups}.
+
+\bibitem{CUDAdoc_threadblockTile}
+Cuda c++ programming guide - cooperative groups thread block tile.
+\bibNewBlock
+  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#thread-block-tile-group-cg}.
 
 \bibitem{CUDAdoc}
 Cuda c++ programming guide.
 \bibNewBlock
   \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}.
 \bibNewBlock Accessed: 2020-04-27.
+
+\bibitem{CooperativeLaunchkernel}
+cudalaunchcooperativekernel documentation.
+\bibNewBlock
+  \url{https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EXECUTION.html#group__CUDART__EXECUTION_1g504b94170f83285c71031be6d5d15f73}.
+
+\bibitem{TSPdataset}
+Datasets fot traveling salesperson problem - florida state university.
+\bibNewBlock \url{https://people.sc.fsu.edu/~jburkardt/datasets/tsp/tsp.html}.
 
 \bibitem{implicitSzink}
 Prof.~Wu Feng:
@@ -125,6 +151,14 @@ Michael Held\bibAnd 1Richard~M. Karp:
   Mathematics}, 10. \'evf. (1962) 1. sz., 196--210.~p.
 \bibNewBlock
 \bibUrll{URL} >https://doi.org/10.1137/0110015>.
+
+\bibitem{ACOimage}
+Rishal Hurbans:
+\bibNewBlock Ant colony optimization for beginners.
+\bibNewBlock
+\bibUrll{URL}
+  >https://rishalhurbans.medium.com/ant-colony-optimization-for-beginners-
+  841d2be60cc6>.
 
 \bibitem{kvantum_optim}
 Király Zoltán:

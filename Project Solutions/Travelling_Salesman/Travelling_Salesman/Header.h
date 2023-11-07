@@ -13,7 +13,7 @@
 ///
 
 // Number of threads = number of ants
-const int ants = 1024*12;
+const int ants = 1024*4;
 
 // Repetition constants
 #define REPETITIONS 10
@@ -21,12 +21,12 @@ const int ants = 1024*12;
 #define FOLLOWER_GENERATIONS 500
 
 // Pheromon matrix constants
-#define RHO 0.75  // Reduction ratio of previous pheromon value
+#define RHO 0.75  // Reduction ratio of previous pheromone value
 #define REWARD_MULTIPLIER 100   // Reward multiplier after finding a shortest path until then
 #define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
 
 
-#define SERIALMAXTRIES 10    // Number of serial processes (for debug purposes)
+#define SERIALMAXTRIES 1    // Number of serial processes (for debug purposes)
 
 
 /// DIAGNOSTIC FUNCTIONS
