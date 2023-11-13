@@ -18,7 +18,7 @@
 \select@language {magyar} \contentsline {section}{\numberline {3.2}CUDA}{11}{section.3.2}%
 \select@language {magyar} \contentsline {subsection}{\numberline {3.2.1}Programozási modell }{12}{subsection.3.2.1}%
 \select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1.1}Kernel, és a többi függvénytípus}{12}{subsubsection.3.2.1.1}%
-\select@language {magyar} \contentsline {paragraph}{}{13}{section*.12}%
+\select@language {magyar} \contentsline {paragraph}{}{12}{section*.12}%
 \select@language {magyar} \contentsline {paragraph}{Példa:}{13}{section*.14}%
 \select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1.2}Szálkezelés}{13}{subsubsection.3.2.1.2}%
 \select@language {magyar} \contentsline {paragraph}{}{14}{section*.15}%
@@ -30,26 +30,30 @@
 \select@language {magyar} \contentsline {subsection}{\numberline {3.2.2}Moduláris programszerkesztés}{17}{subsection.3.2.2}%
 \select@language {magyar} \contentsline {subsection}{\numberline {3.2.3}Grid csoport}{18}{subsection.3.2.3}%
 \select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3.1}Teljes Grid csoporton belüli szinkronizáció}{18}{subsubsection.3.2.3.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {3.2.4}CUDA használata Visual Studio alatt}{19}{subsection.3.2.4}%
-\select@language {magyar} \contentsline {paragraph}{CUDA Extension letöltése}{19}{section*.22}%
-\select@language {magyar} \contentsline {paragraph}{Új projekt létrehozása}{20}{section*.24}%
-\select@language {magyar} \contentsline {paragraph}{Példakód futtatása}{20}{section*.26}%
-\select@language {magyar} \contentsline {chapter}{\numberline {4}Implementáció}{22}{chapter.4}%
-\select@language {magyar} \contentsline {section}{\numberline {4.1}Hangyakolónia algoritmus}{22}{section.4.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.1.1}Adatstruktúrák}{22}{subsection.4.1.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.1.2}Feromonok nyilvántartása}{22}{subsection.4.1.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.1.3}A rulettkerék algoritmus \cite {alg_optim}}{23}{subsection.4.1.3}%
-\select@language {magyar} \contentsline {section}{\numberline {4.2}TSP első verzió }{23}{section.4.2}%
-\select@language {magyar} \contentsline {chapter}{\numberline {5}Eredmények}{25}{chapter.5}%
-\select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{25}{section.5.1}%
-\select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{26}{section.5.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.1}TSP első verzió}{26}{subsection.5.2.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.2}TSP második (konzisztens) verzió}{27}{subsection.5.2.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.3}VRP}{28}{subsection.5.2.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.4}CVRP}{29}{subsection.5.2.4}%
-\select@language {magyar} \contentsline {section}{\numberline {5.3}Eredmények értékelése}{30}{section.5.3}%
-\select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{31}{chapter*.44}%
-\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{32}{chapter*.44}%
-\select@language {magyar} \contentsline {chapter}{Függelék}{33}{appendix*.46}%
-\select@language {magyar} \contentsline {section}{\numberline {F.1}A TeXstudio felülete}{33}{section.F.1}%
-\select@language {magyar} \contentsline {section}{\numberline {F.2}Válasz az ,,Élet, a világmindenség, meg minden'' kérdésére}{34}{section.F.2}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3.2}Program felkészítése több blokkos futtatásra}{20}{subsubsection.3.2.3.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {3.2.4}CUDA használata Visual Studio alatt}{20}{subsection.3.2.4}%
+\select@language {magyar} \contentsline {paragraph}{CUDA Extension letöltése}{20}{section*.22}%
+\select@language {magyar} \contentsline {paragraph}{Új projekt létrehozása}{21}{section*.24}%
+\select@language {magyar} \contentsline {paragraph}{Példakód futtatása}{21}{section*.26}%
+\select@language {magyar} \contentsline {chapter}{\numberline {4}Implementáció}{23}{chapter.4}%
+\select@language {magyar} \contentsline {section}{\numberline {4.1}Hangyakolónia algoritmus}{23}{section.4.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1.1}Adatstruktúrák}{23}{subsection.4.1.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1.2}Feromonok nyilvántartása}{23}{subsection.4.1.2}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.1.2.1}TSP}{23}{subsubsection.4.1.2.1}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.1.2.2}VRP variánsok}{24}{subsubsection.4.1.2.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1.3}A rulettkerék algoritmus }{24}{subsection.4.1.3}%
+\select@language {magyar} \contentsline {section}{\numberline {4.2}TSP első verzió}{25}{section.4.2}%
+\select@language {magyar} \contentsline {chapter}{\numberline {5}Eredmények}{27}{chapter.5}%
+\select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{27}{section.5.1}%
+\select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{28}{section.5.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.1}TSP első verzió}{28}{subsection.5.2.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.2}TSP második (konzisztens) verzió}{29}{subsection.5.2.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.3}VRP}{30}{subsection.5.2.3}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.4}CVRP}{31}{subsection.5.2.4}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.5}CVRPTW}{31}{subsection.5.2.5}%
+\select@language {magyar} \contentsline {section}{\numberline {5.3}Eredmények értékelése, továbbfejlesztési lehetőségek}{32}{section.5.3}%
+\select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{37}{chapter*.54}%
+\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{38}{chapter*.54}%
+\select@language {magyar} \contentsline {chapter}{Függelék}{40}{appendix*.56}%
+\select@language {magyar} \contentsline {section}{\numberline {F.1}A TeXstudio felülete}{40}{section.F.1}%
+\select@language {magyar} \contentsline {section}{\numberline {F.2}Válasz az ,,Élet, a világmindenség, meg minden'' kérdésére}{41}{section.F.2}%

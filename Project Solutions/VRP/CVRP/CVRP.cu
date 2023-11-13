@@ -89,14 +89,14 @@ int main(int argc, char* argv[])
     
     // File syntax : 1st row must contain VRP type
     char vrpType[20] = { 0 };
-    if (fscanf_s(pfile, "TYPE: %s\n", vrpType) == 0)
+    if (fscanf(pfile, "TYPE: %19s\n", vrpType) == 0)
     {
         fprintf(stderr, "Missing VRP type!\n");
         return -1;
     }
 
     // File syntax : 2nd row must contain graph size in decimal
-    if (fscanf_s(pfile, "DIMENSION: %d \n", &size) != 1) {
+    if (fscanf(pfile, "DIMENSION: %d\n", &size) != 1) {
         fprintf(stderr, "Unable to read Size!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
         return -1;
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
     // File syntax : 3rd row must contain graph weight type info: 
     // Possibilities: 2D (x,y) or EXPLICIT (direct node distances)
     char weightType[20] = { 0 };
-    if (fscanf_s(pfile, "EDGE_WEIGHT_TYPE: %20s \n", weightType) == 0) {
+    if (fscanf(pfile, "EDGE_WEIGHT_TYPE: %20s \n", weightType) == 0) {
         fprintf(stderr, "Unable to read weight type info!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
         return -1;
@@ -295,13 +295,43 @@ namespace CVRP {
         printf("Capacitated Vehicle Route Problem with Ant Colony Algorithm\n");
 
         printf("\n\nR=10\n\n");
+        REPETITIONS = 10;
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
         CVRP::CUDA_main(params);
+        /*printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CVRP::CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CVRP::CUDA_main(params);
+
         REPETITIONS = 30;
         printf("\n\nR=30\n\n");
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
         CVRP::CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CVRP::CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CVRP::CUDA_main(params);
+
         REPETITIONS = 50;
         printf("\n\nR=50\n\n");
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
         CVRP::CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CVRP::CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CVRP::CUDA_main(params);*/
 
         free(params.capacities);
         free(params.Dist);
@@ -504,7 +534,7 @@ namespace CVRP {
                 return cudaStatus;
             }
 
-            float _length = sequencePrint(h_params.route, h_params.Dist, size, RouteSize(size, maxVehicles));
+            float _length = sequencePrint(&h_params);
             if (_length > 0) {
                 foundCount++;
                 sum += _length;
@@ -572,26 +602,29 @@ namespace CVRP {
     }
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
+    __device__ __host__ float sequencePrint(CUDA_Main_ParamTypedef* params) {
+        int routeSize = RouteSize(params->size, params->maxVehicles);
+        
         if (
-            2 > size ||
+            2 > params->size ||
             2 > routeSize ||
-            NULL == route ||
-            NULL == Dist) {
+            NULL == params->route ||
+            NULL == params->Dist)
+        {
             printf("Invalid input!\n");
             return -1;
         }
-
+        
         float l = 0;
         int vehicleCntr = 0, i = 0;
 
         // Check for dead end
         while (i < routeSize)
         {
-            int src = route[i];
-            int dst = route[(i + 1) % routeSize];
-            assert(src > -1 && src < size&& dst > -1 && dst < size);
-            if (Dist[src * size + dst] < 0)
+            int src = params->route[i];
+            int dst = params->route[(i + 1) % routeSize];
+            assert(src > -1 && src < params->size && dst > -1 && dst < params->size);
+            if (params->Dist[src * params->size + dst] < 0)
             {
                 printf("Route not found!\n");
                 return -1;
@@ -599,28 +632,35 @@ namespace CVRP {
             i++;
         }
 
+        // Check capacity condition
+        if (!CapacityCondition(params)) 
+        {
+            printf("Route not found, Capacity condition failed!\n");
+            return -1;
+        }
+
         i = 0;
         printf("Vehicle #0 : ");
         while (i < routeSize) {
-            int src = route[i];
-            int dst = route[(i + 1) % routeSize];
+            int src = params->route[i];
+            int dst = params->route[(i + 1) % routeSize];
 
             // End of route for a vehicle
             if (dst == 0) {
                 if (src == 0)
                     printf("Unused\nVehicle #%d : ", ++vehicleCntr);
                 else if (routeSize - 1 != i) {
-                    printf("%d (%.0f) 0\nVehicle #%d : ", src, Dist[src * size + dst], ++vehicleCntr);
+                    printf("%d (%.0f) 0\nVehicle #%d : ", src, params->Dist[src * params->size + dst], ++vehicleCntr);
                 }
                 else {
-                    printf("%d (%.0f) 0\n", src, Dist[src * size + dst]);
+                    printf("%d (%.0f) 0\n", src, params->Dist[src * params->size + dst]);
                 }
             }
             else {
                 // Next element of Route 
-                printf("%d (%.0f) ", src, Dist[src * size + dst]);
+                printf("%d (%.0f) ", src, params->Dist[src * params->size + dst]);
             }
-            l += Dist[src * size + dst];
+            l += params->Dist[src * params->size + dst];
             i++;
         }
         printf(" Total length : %.2f\n ", l);
@@ -1137,6 +1177,25 @@ namespace CVRP {
         return true;
     }
 
+    __host__ bool CapacityCondition(CUDA_Main_ParamTypedef* params) 
+    {
+        // Capacity condition means that no truck should carry more goods than its capacity
+        int currentLoad = 0;
+        for (int i = 1; i < RouteSize(params->size,params->maxVehicles); i++) {
+            int dst = params->route[i];
+            if (dst == 0)     // 0 node means it's a new, empty truck
+                currentLoad = 0;
+            else if (dst > 0 && dst < params->size)   // it is a customer
+                currentLoad += params->capacities[dst];
+            else    // it is an invalid value, solution must not be taken into account
+                return false;
+
+            if (currentLoad > params->truckCapacity) // truck overloaded
+                return false;
+        }
+        return true;
+    }
+
     // Returns the sum length of the given route of trucks
     // Returns -1 if route not possible (for example has dead end)
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex)
@@ -1301,7 +1360,6 @@ namespace CVRP {
 
                 if (workingRow > pkernelParams->routeSize)
                 {
-                    printf("ujjujj %d_%d_%d\n", workingRow, dst, vehicleIdx);
                     return;
                 }
 

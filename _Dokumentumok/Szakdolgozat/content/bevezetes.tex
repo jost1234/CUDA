@@ -32,7 +32,15 @@ Szakdolgozatom során a \textbf{Hangyakolónia optimalizáció} modelljét alkal
 A hangyák egész nap a hangyaboly környékét járják morzsák, elhullott rovarok után kutatva. Amikor egy dolgozó korábban felfedezetlen élelemforrást talál, kis részével visszaindul a bolyba, és a hazaúton egyfajta testnedvet, \textbf{feromon}t bocsát ki magából. A többi hangya megérzi a szagot, és a nyomába megy. Ha tényleg táplálékhoz vezetett a feromoncsík, akkor ők is kis részével visszaindulnak az élőhelyükre. A folyamat egészen addig tart, amíg van mit elvinni. Ezután az utólag érkező hangyák azt tapasztalják, hogy elfogyott, ezért ők visszafelé már nem eresztenek anyagot. A szél előbb-utóbb elfújja az úton hagyott feromont, ezért nem megy oda több hangya.
 
 \section{Fejezetek}
-A rövid bevezetés után először ismertetem a problémák elméleti hátterét. Matematikailag kimondom a feladatokat, valamint bemutatom, milyen - főleg valószínűségszámítási - alapok szükségesek a Hangyakolónia optimalizáció alapos megértéséhez.
+A rövid bevezetés után a \ref{theoryChapter}. fejezetben először ismertetem a problémák elméleti hátterét. Matematikailag kimondom a feladatokat, valamint bemutatom, milyen - főleg valószínűségszámítási - alapok szükségesek a Hangyakolónia optimalizáció alapos megértéséhez.
+
+A \ref{technologyChapter}. fejezetben bemutatom a GPU programozás technológiai hátterét. Kimondom a GPGPU fogalmát. Példákon keresztül szemléltetem a CUDA szoftvermodell markánsabb fogalmait. Különbséget teszek az egyes szinkronizálási szintek között. Ezek után lépésenként megmutatom, hogyan kell Visual Studio segítségével CUDA programot írni és futtatni.
+
+A \ref{implementationChapter}. fejezetben a kódimplementációimat veszem górcső alá. Részletesen beszámolok az egyes logikai elemek működéséről. Bemutatom a Hangyakolónia Algoritmus megjelenését, és az attól való bizonyos eltéréseket. Részletezem a feromonok nyilvántartását, és a véletlen számok kezelését. Logikailag egymásra építem az algoritmusokat ilyen sorrendben: TSP, VRP, CVRP, CVRPTW.
+
+A \ref{resultsChapter}. fejezet a mérési eredményeimet tartalmazza számtalan táblázat formájában. Igyekeztem minél szélesebb körben lemérni az egyes adathalmazokat. A végén értékelem a kapott eredményeket. 
+
+
 
 
 

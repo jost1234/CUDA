@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  7 NOV 2023 19:19
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  12 NOV 2023 16:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -658,14 +658,14 @@ LaTeX Info: Redefining \cite on input line 694.
 )
 (c:/texlive/2023/texmf-dist/tex/latex/tools/xspace.sty
 Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
-))
+)
 (c:/texlive/2023/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
 \multirow@colwidth=\skip65
 \multirow@cntb=\count318
 \multirow@dima=\skip66
 \bigstrutjot=\dimen195
-)
+))
 (./include/thesis-hu.tex) (./include/preamble.tex
 Package hyperref Info: Option `unicode' set `true' on input line 39.
 Package hyperref Info: Option `pdfnewwindow' set `true' on input line 39.
@@ -683,12 +683,8 @@ Package hyperref Info: Option `colorlinks' set `true' on input line 39.
 (./include/titlepage.aux) (./include/declaration.aux) (./content/abstract.aux)
 (./content/bevezetes.aux) (./content/elmeletihatter.aux)
 (./content/technologiaihatter.aux) (./content/implementacio.aux)
-(./content/eredmenyek.aux
-
-LaTeX Warning: Label `table:TSPv2_empty' multiply defined.
-
-) (./content/osszefoglalas.aux) (./content/acknowledgement.aux)
-(./content/appendices.aux))
+(./content/eredmenyek.aux) (./content/osszefoglalas.aux)
+(./content/acknowledgement.aux) (./content/appendices.aux))
 \openout1 = `thesis.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
@@ -951,79 +947,49 @@ File: lstmisc.sty 2023/02/27 1.9 (Carsten Heinz)
 [16] [17]
 File: figures/Implicit synchronization.png Graphic file (type bmp)
 <figures/Implicit synchronization.png>
- [18]
+ [18] [19]
 File: figures/install-1.png Graphic file (type bmp)
 <figures/install-1.png>
- [19]
 File: figures/install-2.png Graphic file (type bmp)
 <figures/install-2.png>
+ [20]
 File: figures/install-3.png Graphic file (type bmp)
 <figures/install-3.png>
-) [20] [21]
+) [21] [22]
 \openout2 = `content/implementacio.aux'.
 
  (./content/implementacio.tex
 4. fejezet.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\begingroup' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\<let>-command' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\NAT@ctype' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\z@' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\let' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\let' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\new@ifnextchar' on input line 21.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 21.
-
-[22
+[23
 
 
 
 
-] [23]) [24]
+]
+File: figures/tsp-to-vrp.png Graphic file (type bmp)
+<figures/tsp-to-vrp.png>
+ [24] [25]) [26]
 \openout2 = `content/eredmenyek.aux'.
 
  (./content/eredmenyek.tex
 5. fejezet.
 File: figures/nsight-compute.png Graphic file (type bmp)
 <figures/nsight-compute.png>
-[25
+[27
 
 
 
 
-]
+] [28] [29] [30] [31]
 File: figures/TSP_v1_hiba.png Graphic file (type bmp)
 <figures/TSP_v1_hiba.png>
- [26] [27] [28] [29]) [30]
+) [32] [33] [34] [35] [36]
 \openout2 = `content/osszefoglalas.aux'.
 
  (./content/osszefoglalas.tex)
 \openout2 = `content/acknowledgement.aux'.
 
-
-(./content/acknowledgement.tex) [31
+ (./content/acknowledgement.tex) [37
 
 
 
@@ -1075,30 +1041,42 @@ Underfull \hbox (badness 10000) in paragraph at lines 134--137
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 156--162
+Underfull \hbox (badness 10000) in paragraph at lines 160--166
 []\TU/lmr/m/n/10.95 Rishal Hurbans: Ant colony optimization for be-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 156--162
+Underfull \hbox (badness 10000) in paragraph at lines 160--166
 \TU/lmr/m/n/10.95 ginners. [] URL  [][]$[][][][][] [] [] [] [][][][][][][][][][
 ][][][] [] [][][][][][] [] [][][] []
  []
 
-) [32
+
+Underfull \hbox (badness 1852) in paragraph at lines 168--171
+[]\TU/lmr/m/n/10.95 Támogatott windows operációs rendszerek listája. [][]$[][][
+][][] [] [] [] [][][][][] [] [][][][][][][][][] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--171
+[][][] [] [][][][][][] [] [][][][][][][][][][][][][][] [] [][][][][][][][] [] [
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] []
+ []
+
+[38
 
 
 
-]
+]) [39]
 \openout2 = `content/appendices.aux'.
 
  (./content/appendices.tex
 File: figures/TeXstudio.png Graphic file (type bmp)
 <figures/TeXstudio.png>
- [33
+ [40
 
 
-]) [34
+]) [41
 
 ]
 \tf@thm=\write5
@@ -1114,20 +1092,16 @@ File: figures/TeXstudio.png Graphic file (type bmp)
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-10-10>
  ***********
-
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 066256364FE4CBCAE023100C6FAFCEF4;6827.
+(rerunfilecheck)             Checksum: 13CBA9B020F7E52A462718C4E18D3075;7593.
  ) 
 Here is how much of TeX's memory you used:
- 18748 strings out of 475160
- 353615 string characters out of 5770264
+ 18821 strings out of 475160
+ 355122 string characters out of 5770264
  2192674 words of memory out of 5000000
- 40167 multiletter control sequences out of 15000+600000
+ 40239 multiletter control sequences out of 15000+600000
  563237 words of font info for 75 fonts, out of 8000000 for 9000
  1352 hyphenation exceptions out of 8191
- 84i,12n,96p,1532b,1237s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,12n,96p,1533b,1237s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on thesis.pdf (40 pages).
+Output written on thesis.pdf (47 pages).

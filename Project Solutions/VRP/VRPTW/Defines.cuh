@@ -17,7 +17,7 @@
 int ants = 1024 * 8;
 
 // Repetition constants
-#define REPETITIONS 10
+int REPETITIONS = 10;
 #define RANDOM_GENERATIONS 20
 #define FOLLOWER_GENERATIONS 500
 

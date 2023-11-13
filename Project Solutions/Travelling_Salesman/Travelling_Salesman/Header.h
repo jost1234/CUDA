@@ -13,7 +13,7 @@
 ///
 
 // Number of threads = number of ants
-const int ants = 1024*4;
+const int ants = 1024*20;
 
 // Repetition constants
 #define REPETITIONS 10
@@ -26,7 +26,7 @@ const int ants = 1024*4;
 #define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
 
 
-#define SERIALMAXTRIES 1    // Number of serial processes (for debug purposes)
+#define SERIALMAXTRIES 10    // Number of serial processes (for debug purposes)
 
 
 /// DIAGNOSTIC FUNCTIONS

@@ -88,15 +88,15 @@ int main(int argc, char* argv[])
     ///
 
     // File syntax : 1st row must contain VRP type
-    char vrpType[11] = { 0 };
-    if (fscanf_s(pfile, "TYPE: %10s \n", vrpType) == 0)
+    char vrpType[20] = { 0 };
+    if (fscanf(pfile, "TYPE: %19s \n", vrpType) == 0)
     {
         fprintf(stderr, "Missing VRP type!\n");
         return -1;
     }
 
     // File syntax : 2nd row must contain graph size in decimal
-    if (fscanf_s(pfile, "DIMENSION: %d \n", &size) == 0) {
+    if (fscanf(pfile, "DIMENSION: %d\n", &size) != 1) {
         fprintf(stderr, "Unable to read Size!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
         return -1;
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
     // File syntax : 3rd row must contain graph weight type info: 
     // Possibilities: EUC_2D (x,y) or EXPLICIT (direct node distances)
     char weightType[9] = { 0 };
-    if (fscanf_s(pfile, "EDGE_WEIGHT_TYPE: %8s \n", weightType) == 0) {
+    if (fscanf(pfile, "EDGE_WEIGHT_TYPE: %8s \n", weightType) == 0) {
         fprintf(stderr, "Unable to read weight type info!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
         return -1;
@@ -249,13 +249,53 @@ namespace VRPTW {
         params.truckCapacity = truckCapacity;
 
         printf("Capacitated Vehicle Route with Time Window Problem with Ant Colony Algorithm\n");
-        VRPTW::CUDA_main(params);
+        //VRPTW::CUDA_main(params);
+
+        printf("\n\nR=10\n\n");
+        REPETITIONS = 10;
+
+        /*printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
+        CUDA_main(params);*/
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CUDA_main(params);
+
+        REPETITIONS = 30;
+        printf("\n\nR=30\n\n");
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
+        CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CUDA_main(params);
+
+        REPETITIONS = 50;
+        printf("\n\nR=50\n\n");
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
+        CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CUDA_main(params);
 
         free(params.capacities);
         free(params.Dist);
         free(params.Pheromone);
         free(params.route);
         free(params.timeWindows);
+        return 0;
     }
 
     // Host function for CUDA
@@ -535,26 +575,8 @@ namespace VRPTW {
             NULL != params->capacities);
     }
 
-    // Function to format the solution for sequencePrint
-    __device__ __host__ void formatSequence(int* route, float* Dist, int size, int routeSize)
-    {
-        // The point is to put the unused vehicles to the back of the enumeration
-        
-        int i, src, dst;
-        for (i = 0; i < routeSize-1; i++) 
-        {
-            src = route[i]; dst = route[i + 1];
-            if (src != 0 || dst != 0)   // Not new truck or not empty truck
-                continue;
-
-            // Found an empty truck, but maybe there are more
-            int emptyCount = 1;
-            //while()
-        }
-    }
-
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
+    __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
         if (
             2 > size ||
             2 > routeSize ||
@@ -825,7 +847,6 @@ namespace VRPTW {
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
         grid.sync();
 
-        __shared__ int size;                // Local Copy of argument parameter
 
         // Initialization of temporary variables
         __shared__ float multiplicationConst;
@@ -833,7 +854,6 @@ namespace VRPTW {
         globalParams.invalidInput = false;
         globalParams.isolatedVertex = false;
         globalParams.averageDist = 0.0f;
-        size = params.size; // Need to be written too many times
         params.routeSize = RouteSize(params.size, params.maxVehicles);
         globalParams.minRes = FLT_MAX;
 
@@ -1342,7 +1362,6 @@ namespace VRPTW {
 
                 if (workingRow > pkernelParams->routeSize)
                 {
-                    printf("ujjujj %d_%d_%d\n", workingRow, dst, vehicleIdx);
                     return;
                 }
 
@@ -1371,7 +1390,7 @@ namespace VRPTW {
                 maxidx = i;
             }
         }
-        //printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
+        printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
         return maxidx;
     }
 

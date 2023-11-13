@@ -31,50 +31,53 @@ Warning--to sort, need author/key/name in CUDAcoopgroups
 Warning--to sort, need author/key/name in CUDAdoc_coopGroups
 Warning--to sort, need author/key/name in CUDAdoc_threadblockTile
 Warning--to sort, need author/key/name in CooperativeLaunchkernel
+Warning--to sort, need author/key/name in supportedWinOS
 Warning--to sort, need author/key/name in TSPdataset
+Warning--to sort, need author/key/name in CVRPdataset
+Warning--to sort, need author/key/name in VRPTWdataset
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 13 entries,
+You've used 16 entries,
             4991 wiz_defined-function locations,
-            1191 strings with 13632 characters,
-and the built_in function-call counts, 32051 in all, are:
-= -- 5995
-> -- 203
+            1203 strings with 14070 characters,
+and the built_in function-call counts, 37714 in all, are:
+= -- 7079
+> -- 206
 < -- 3
-+ -- 2115
-- -- 274
-* -- 335
-:= -- 1016
-add.period$ -- 31
-call.type$ -- 13
-change.case$ -- 53
++ -- 2493
+- -- 277
+* -- 383
+:= -- 1217
+add.period$ -- 37
+call.type$ -- 16
+change.case$ -- 65
 chr.to.int$ -- 0
-cite$ -- 20
-duplicate$ -- 5130
-empty$ -- 590
+cite$ -- 26
+duplicate$ -- 5928
+empty$ -- 725
 format.name$ -- 14
-if$ -- 6692
+if$ -- 7917
 int.to.chr$ -- 0
-int.to.str$ -- 13
+int.to.str$ -- 16
 missing$ -- 1
-newline$ -- 159
+newline$ -- 171
 num.names$ -- 12
-pop$ -- 1322
+pop$ -- 1602
 preamble$ -- 1
-purify$ -- 40
+purify$ -- 49
 quote$ -- 22
-skip$ -- 347
+skip$ -- 401
 stack$ -- 0
-substring$ -- 3601
-swap$ -- 3649
+substring$ -- 4304
+swap$ -- 4292
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 65
-warning$ -- 7
-while$ -- 103
-width$ -- 15
-write$ -- 207
-(There were 9 warnings)
+type$ -- 80
+warning$ -- 10
+while$ -- 118
+width$ -- 18
+write$ -- 228
+(There were 12 warnings)

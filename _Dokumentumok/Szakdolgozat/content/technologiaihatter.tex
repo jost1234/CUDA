@@ -1,4 +1,4 @@
-\chapter{Technológiai háttér}
+\chapter{Technológiai háttér} \label{technologyChapter}
 Ebben a fejezetben szeretném ismertetni a GPU porgramozáshoz felhasznált szoftver- és hardveregyüttest. Először a grafikus segédprocesszoron történő általános célú programozást tárgyalom, majd bemutatom az Nvidia\textsuperscript{TM} által erre kifejlesztett párhuzamos számítási platformot, a CUDA keretrendszert. Részletezem a megértéshez szükséges fontosabb fogalmakat, valamint bemutatom a CUDA platformon fejlesztéshez elengedhetetlen lépéseket. A fogalmak összegyűjtéséhez nagymértékben ihletett nyújtott többek között Király Gábor diplomamunkája, mely hasonló témakörrel foglalkozik. \cite{kvantum_optim}
 
 \section{GPGPU}
@@ -7,13 +7,13 @@ szoftverfejlesztési gyakorlat, melynek során a grafikus feldolgozóegységet (
 célú számítási műveletek elvégzésére használjuk. \cite{kvantum_optim} Korábban a GPU-t azért találták fel, hogy a grafikus felületek elterjedése után a renderelési, 2D-s vagy 3D-s megjelenítési feladatok terén tehermentesítse a CPU-t. Később kiderült, hogy a GPU alkalmas általánosabb megközelítésekre is, bizonyos aritmetikai utasítások kifejezetten hatékonyan tudnak működni rajta.
 
 \subsection{Motiváció}
-Az 1980-as években megjelentek az első személyi számítógépek (PC-k), melyek központi feldolgozóegységei (CPU) kezdetekben néhány MHz-es belső órajellel működtek. Akkor az volt a számítástechnikai fejlesztőmérnökök fő eszköze a számítási gyorsaság növelésére, hogy az órajelfrekvenciát növelték. Ez frekventáltabb utasításvégrehajtást biztosított, és evidens volt, hogy a nagyobb frekvencia nagyobb számítási erővel is jár. Számos kiváló mérnöki megoldás született, ezek közül talán az egyik legjelentősebb találmány a fáziszárt hurok (Phase-Locked Loop - PLL). A PLL egy olyan Szabályozható hurok, amely (a részleteket mellőzve, nem tárgya dolgozatomnak) egy bemeneti referenciafrekvenciát tud megsokszorozni. Nélküle gyakorlatilag képtelenség lett volna felhasználói szinten 50-60 MHz fölé menni a személyi számítógépek belső órajelénél. Nagyjából 30 évvel később elérték a hardverfejlesztők, hogy a legtöbb asztali processzor órajele 1GHz és 4GHz között legyen képes működni, ez az eredeti PC-k operatív belső frekvenciájának több, mint az ezerszerese. Napjainkban változás látható a fejlesztési trendekben, ugyanis az órajelnövelést a processzorok hődisszipációja felülről korlátozza. Egyelőre nem tűnik könnyen lehetségesnek 5GHz fölé menni úgy, hogy közben az eszköz helyes működése garantálható legyen. A különböző hűtési technológiák (léghűtés, vízhűtés) bizonyos fokig tudnak javítani a sebességen, viszont nagyságrendeket ugorni velük sem lehetséges. 
+Az 1980-as években megjelentek az első személyi számítógépek (PC-k), melyek központi feldolgozóegységei (CPU) kezdetekben néhány MHz-es belső órajellel működtek. Akkor az volt a számítástechnikai fejlesztőmérnökök fő eszköze a számítási gyorsaság növelésére, hogy az órajelfrekvenciát növelték. Ez frekventáltabb utasítás-végrehajtást biztosított, és evidens volt, hogy a nagyobb frekvencia nagyobb számítási erővel is jár. Számos kiváló mérnöki megoldás született, ezek közül talán az egyik legjelentősebb találmány a fáziszárt hurok (Phase-Locked Loop - PLL). A PLL egy olyan Szabályozható hurok, amely (a részleteket mellőzve, nem tárgya dolgozatomnak) egy bemeneti referenciafrekvenciát tud megsokszorozni. Nélküle gyakorlatilag képtelenség lett volna felhasználói szinten 50-60 MHz fölé menni a személyi számítógépek belső órajelénél. Nagyjából 30 évvel később elérték a hardverfejlesztők, hogy a legtöbb asztali processzor órajele 1GHz és 4GHz között legyen képes működni, ez az eredeti PC-k operatív belső frekvenciájának több, mint az ezerszerese. Napjainkban változás látható a fejlesztési trendekben, ugyanis az órajelnövelést a processzorok hődisszipációja felülről korlátozza. Egyelőre nem tűnik könnyen lehetségesnek 5GHz fölé menni úgy, hogy közben az eszköz helyes működése garantálható legyen. A különböző hűtési technológiák (léghűtés, vízhűtés) bizonyos fokig tudnak javítani a sebességen, viszont nagyságrendeket ugorni velük sem lehetséges. 
 A számítógépgyártók mai napig új, alternatív megoldásokat keresnek a számítási teljesítmény növelésére. Napjainkban a kutatásoknak két nagy témája van. Egyik a kvantumszámítógépek témaköre, amit dolgozatomban nem részletezek. Másik aktívan vizsgált lehetőség a párhuzamosítás minél több szálon. Már a CPU-k fejlesztésénél is megfigyelhető, hogy inkább a minél több processzormag telepítése az iparági trend.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=150mm, keepaspectratio]{figures/CPU-cores-trend.png}
-	\caption{Látható, hogy kb. 2010-re befejeződött a CPU-k órajelfrekvencia-növekedése, helyette egyre nőni kezdtek a magok számai. \cite{CPUcores} \textcolor{red}{POCSÉK KÉP, LECSERÉLNI} }
+	\caption{Látható, hogy kb. 2010-re befejeződött a CPU-k órajelfrekvencia-növekedése, helyette egyre nőni kezdtek a magok számai. \cite{CPUcores} }
 \end{figure}
 
 Párhuzamosításra legalkalmasabb a grafikus segédprocesszor, a GPU, hiszen felépítéséből adódóan erre készült. Amíg a CPU feladata az, hogy műveletek egy adott szekvenciáját, és annak minden utasítását a lehető leggyorsabban hajtsa végre, addig a GPU célja minél több szál (akár több ezer, vagy több tízezer) párhuzamos futtatása. A videokártyák előnye akkor válik láthatóvá, ha ugyanazt az utasítást több nagy adattömbön kell végrehajtani. Ez az úgynevezett SIMD megközelítés (Single Instruction Multiple Data). \cite{kvantum_optim}
@@ -46,6 +46,8 @@ Egyéb kulcsszavak is léteznek. Egyik a "\textit{\_\_host\_\_}", ami azt jelzi,
 
 \paragraph{}
 Az, hogy a kernelt egy adott híváskor hány CUDA szálon szeretnénk futtatni, az új nyelvi elemként megjelenő <<< · · · >>> végrehajtási konfiguráció szintaxissal tudjuk specifikálni. Sajnos a Visual Studio még szintaxishibaként kezeli \textcolor{red}{verziószám?}, ezért a programozónak érdemes odafigyelni, hogy milyen IntelliSense hibaüzeneket vesz figyelembe. A \ref{invalidErrors}. ábrán például olyan fogalmakra jelez a fejlesztői környezet, amelyek a keretrendszer adta bővítményekben vannak definiálva. Minden, a kernelt végrehajtó szál egy egyedi thread azonosítót kap, mely a beépített threadIdx változón keresztül érhető el a kernelből.
+
+%TODO verziószám
 
 \begin{figure}[ht!]
 	\centering
@@ -304,6 +306,8 @@ A kooperatív csoportok bevezetése előtt a CUDA programozási modell natív t�
 	\label{fig:Implicitsync}
 \end{figure}
 
+%TODO UTALÁS
+
 A módszer több szempontból problémás. Egyrészt egy kernel hívása sok erőforrást igényel, ezért lehet, hogy sok kernelhívás mellett lassabb lesz a program, mintha egy szálon CPU-n futtattuk volna. Másrészt ha az eredeti függvényben ciklus iterációnként akarnánk szinkronizálni, akkor Implicit szinkronizációs módszer mellett a kernelhívásokat kéne CPU cikluson belülre helyezni. Ez még jobb esetben átláthatatlan és fenntarthatatlan kódot eredményez, de rosszabb esetben a grafikus kártya meghibásodását is okozhatja a sűrű kernelhívás miatt. A probléma tehát adott, de nézzük, hogy a kooperatív csoportok hogyan jelentenek erre megoldást.
 
 Ahhoz, hogy grid csoporton belül szinkronizáljunk, első ránézésre elég a \textit{grid.sync()} függvényt használnunk, mint ahogy azt a thread blokkon belül is tettük.
@@ -315,7 +319,54 @@ Ahhoz, hogy grid csoporton belül szinkronizáljunk, első ránézésre elég a 
 
 A főbb különbséget ott tapasztaljuk, amikor a kernel hívására kerül sor. A szokásos < < <...> > > konfigurációs szintaktika helyett a CUDA runtime API hívást kell végrehajtani (vagy annak driver megfelelőjét) \cite{CooperativeLaunchkernel}
 
-\textcolor{red}{HIÁNYZIK A STORY FELE :( }
+Többféle módszer van a megfelelő több blokkos API hívásra, ezek közül nézzünk párat.
+Ahhoz, hogy biztosítsuk a thread blokkok megfelelő együttműködését a GPU-n, a blokkok száma előre megfontolandó. Ahhoz, hogy annyi blokkot futtassunk, ahány Streaming Multiprocessor (SM) van beépítve a rendszerbe, az alábbi kód alkalmas:
+\begin{lstlisting}[style=CStyle]
+	int device = 0;
+	cudaDeviceProp deviceProp;
+	cudaGetDeviceProperties(&deviceProp, device);
+	// initialize, then launch
+	cudaLaunchCooperativeKernel((void*)my_kernel, deviceProp.multiProcessorCount,numThreads,args);
+\end{lstlisting}
+
+Ajánlott megvizsgálnunk, hogy a kernel hívásához mekkora maximális blokkPerSM aránnyal dolgozhatunk (legfeljebb hány blokk fér el egy SM-en). Tegyük, fel, hogy szükségünk van 128 szálra, akkor így járhatunk el. A CUDA documentation az alábbi példakódhoz hasonló eljárást javasol:
+
+\begin{lstlisting}[style=CStyle]
+	/// This will launch a grid that can maximally fill the GPU, on the default stream with kernel arguments
+	int numBlocksPerSm = 0;
+	// Number of threads my_kernel will be launched with
+	int numThreads = 128;
+	cudaDeviceProp deviceProp;
+	cudaGetDeviceProperties(&deviceProp, dev);
+	cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, my_kernel, numThreads, 0);
+	// launch
+	void *kernelArgs[] = { /* add kernel args */ };
+	dim3 dimBlock(numThreads, 1, 1);
+	dim3 dimGrid(deviceProp.multiProcessorCount*numBlocksPerSm, 1, 1);
+	cudaLaunchCooperativeKernel((void*)my_kernel, dimGrid, dimBlock, kernelArgs);
+\end{lstlisting}
+
+Érdemes futtatás előtt ellenőrizni, hogy grafikus kártyánk egyáltalán támogatja-e a grid szinkronizációt. Ennek komoly feltételei vannak:
+\begin{itemize}
+	\item Csak 6.0 compute capability eszközök támogatottak
+	\item Támogatott Windows operációs rendszer - Aktuális verziók: 8.1/10/11 \cite{supportedWinOS} 
+	\item MPS ellátott Linux rendszer esetén csak 7.0 compute capability eszközök támogatottak
+\end{itemize}
+
+
+Az alábbi kód a cudaDevAttrCooperativeLaunch eszköz attribútumot vizsgálja meg.
+\begin{lstlisting}[style=CStyle]
+	int dev = 0;
+	int supportsCoopLaunch = 0;
+	cudaDeviceGetAttribute(&supportsCoopLaunch, cudaDevAttrCooperativeLaunch, dev);
+\end{lstlisting}
+
+Ez 1-be állítja a supportsCoopLaunch flaget ha a művelet támogatott a 0-s eszközön (egy grafikus kártyás rendszeren ez az alapértelmezett eszköz).
+
+\subsubsection{Program felkészítése több blokkos futtatásra}
+Mint azt már tárgyaltuk, bizonyos thread szám felett (jelenlegi GPU-kon 1024) a kerneleket már több blokkon szükséges futtani hardveres okokból kifolyólag. Amennyiben elég egy blokk használata, márpedig számos alkalommal ez a helyzet, ki tudunk használni olyan trükköket gyorsításra, mint például a \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory}{gyors megosztott memória} használata a globális device memória helyett vagy a warpok hatékonyabb kihasználása. Előnyös lehet, ha algoritmusunkat egy és több blokkos használatra is megírjuk. Így képesek leszünk kezelni nagy thread számokat is, míg kis thread szám esetén kihasználjuk a lehetséges optimalizálási tulajdonságokat.
+
+
 
 \subsection{CUDA használata Visual Studio alatt}
 

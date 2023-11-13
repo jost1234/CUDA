@@ -135,6 +135,10 @@ cudalaunchcooperativekernel documentation.
 \bibNewBlock
   \url{https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EXECUTION.html#group__CUDART__EXECUTION_1g504b94170f83285c71031be6d5d15f73}.
 
+\bibitem{CVRPdataset}
+Cvrplib - capacitated vehicle routing problem library.
+\bibNewBlock \url{http://vrp.galgos.inf.puc-rio.br/index.php/en/}.
+
 \bibitem{TSPdataset}
 Datasets fot traveling salesperson problem - florida state university.
 \bibNewBlock \url{https://people.sc.fsu.edu/~jburkardt/datasets/tsp/tsp.html}.
@@ -159,6 +163,15 @@ Rishal Hurbans:
 \bibUrll{URL}
   >https://rishalhurbans.medium.com/ant-colony-optimization-for-beginners-
   841d2be60cc6>.
+
+\bibitem{supportedWinOS}
+Támogatott windows operációs rendszerek listája.
+\bibNewBlock
+  \url{https://learn.microsoft.com/en-us/microsoft-365/security/defender-vulnerability-management/tvm-supported-os?view=o365-worldwide}.
+
+\bibitem{VRPTWdataset}
+Vrptw benchmark problems.
+\bibNewBlock \url{http://web.cba.neu.edu/~msolomon/problems.htm}.
 
 \bibitem{kvantum_optim}
 Király Zoltán:
