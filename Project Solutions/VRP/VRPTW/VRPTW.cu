@@ -108,8 +108,8 @@ int main(int argc, char* argv[])
 
     // File syntax : 3rd row must contain graph weight type info: 
     // Possibilities: EUC_2D (x,y) or EXPLICIT (direct node distances)
-    char weightType[9] = { 0 };
-    if (fscanf(pfile, "EDGE_WEIGHT_TYPE: %8s \n", weightType) == 0) {
+    char weightType[20] = { 0 };
+    if (fscanf(pfile, "EDGE_WEIGHT_TYPE: %19s \n", weightType) == 0) {
         fprintf(stderr, "Unable to read weight type info!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
         return -1;
@@ -160,20 +160,26 @@ namespace VRPTW {
         int truckCapacity = -1;
         float optimalValue = -1.0f;
         // File syntax : row after dist values must contain maximum vehicle count in decimal
-        if (fscanf_s(pfile, "No of trucks: %d, Capacity: %d, Optimal value: %f\n", &maxVehicles, &truckCapacity, &optimalValue) < 3) {
+        if (fscanf(pfile, "No of trucks: %d, Capacity: %d, Optimal value: %f\n", &maxVehicles, &truckCapacity, &optimalValue) < 3) {
             fprintf(stderr, "Incorrect read of MaxVehicles, OptimalValue or TruckCapacity!\n");
             fclose(pfile);
             return -1;
         }
 
+        // Distance matrix
+        // Store type: adjacency matrix format
+        float* Dist = (float*)calloc(size * size, sizeof(float));
+
+        // Capacity vector
+        int* capacities = (int*)calloc(size, sizeof(int));
+
         // File syntax necessity
-        fscanf_s(pfile, "CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE   TIME\n");
+        fscanf(pfile, "CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE   TIME\n");
 
         // Temporary array for 2D values
         int2* _2dvalues = (int2*)malloc(size * sizeof(int2));
 
-        // Capacity vector
-        int* capacities = (int*)calloc(size, sizeof(int));
+        
 
         /// Time Window vector
         TimeWindow_ParamTypedef* times = (TimeWindow_ParamTypedef*)malloc(size * sizeof(TimeWindow_ParamTypedef));
@@ -181,7 +187,7 @@ namespace VRPTW {
         int temp1;
         for (int i = 0; i < size; i++)  // Scanning file
         {
-            if (fscanf_s(pfile, "%d %d %d %d %d %d %d", 
+            if (fscanf(pfile, "%d %d %d %d %d %d %d", 
                 &temp1, 
                 &_2dvalues[i].x, &_2dvalues[i].y, 
                 &capacities[i], 
@@ -190,6 +196,7 @@ namespace VRPTW {
             {
                 fprintf(stderr, "Incorrect read in row %d!\n", i);
                 free(_2dvalues);
+                free(Dist);
                 free(capacities);
                 free(times);
                 fclose(pfile);
@@ -200,13 +207,15 @@ namespace VRPTW {
         // Closing data file
         printf("Closing file!\n");
         if (fclose(pfile) != 0) {
+            free(_2dvalues);
+            free(Dist);
+            free(capacities);
+            free(times);
             fprintf(stderr, "Unable to close file!\n");
             return -1;
         }
 
-        // Distance matrix
-        // Store type: adjacency matrix format
-        float* Dist = (float*)calloc(size * size, sizeof(float));
+        
 
         // Converting 2D values into distances
         for (int i = 0; i < size; i++) 
@@ -242,21 +251,21 @@ namespace VRPTW {
         params.Dist = Dist;
         params.maxVehicles = maxVehicles;
         params.optimalValue = optimalValue;
-        params.Pheromone = (float*)malloc(size * VRPTW::RouteSize(size, maxVehicles) * sizeof(float));
-        params.route = (int*)malloc(VRPTW::RouteSize(size, maxVehicles) * sizeof(int));
+        params.Pheromone = (float*)malloc(size * RouteSize(size, maxVehicles) * sizeof(float));
+        params.route = (int*)malloc(RouteSize(size, maxVehicles) * sizeof(int));
         params.size = size;
         params.timeWindows = times;
         params.truckCapacity = truckCapacity;
 
         printf("Capacitated Vehicle Route with Time Window Problem with Ant Colony Algorithm\n");
-        //VRPTW::CUDA_main(params);
+        //CUDA_main(params);
 
         printf("\n\nR=10\n\n");
         REPETITIONS = 10;
 
-        /*printf("\n\n1024 thread\n\n");
+        printf("\n\n1024 thread\n\n");
         params.antNum = 1024;
-        CUDA_main(params);*/
+        CUDA_main(params);
         printf("\n\n16384 thread\n\n");
         params.antNum = 1024 * 16;
         CUDA_main(params);
@@ -445,7 +454,7 @@ namespace VRPTW {
 
         // setup seeds
 
-        setup_kernel << < BlockNum, threadPerBlock >> > (d_kernelParams.state, time(NULL) * rand());
+        setup_kernel <<< BlockNum, threadPerBlock >>> (d_kernelParams.state, time(NULL) * rand());
 
         // Kernel call
 
@@ -458,7 +467,7 @@ namespace VRPTW {
             printf("\nAttempt #%d ||\n", iter);
 
             if (BlockNum == 1) {
-                Kernel_1Block << < 1, threadPerBlock >> > (d_kernelParams, d_configParams);
+                Kernel_1Block <<< 1, threadPerBlock >>> (d_kernelParams, d_configParams);
             }
             else
             {
@@ -508,7 +517,7 @@ namespace VRPTW {
                 return cudaStatus;
             }
 
-            float _length = sequencePrint(h_params.route, h_params.Dist, size, RouteSize(size, maxVehicles));
+            float _length = sequencePrint(&h_params);
             if (_length > 0) {
                 foundCount++;
                 sum += _length;
@@ -576,12 +585,14 @@ namespace VRPTW {
     }
 
     // Diagnostic function for printing given sequence
-    __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
+    __host__ float sequencePrint(CUDA_Main_ParamTypedef* params)
+    {
+        int routeSize = RouteSize(params->size, params->maxVehicles);
         if (
-            2 > size ||
+            2 > params->size ||
             2 > routeSize ||
-            NULL == route ||
-            NULL == Dist) 
+            NULL == params->route ||
+            NULL == params->Dist)
         {
             printf("Invalid input!\n");
             return -1;
@@ -593,10 +604,10 @@ namespace VRPTW {
         // Check for dead end
         while (i < routeSize)
         {
-            int src = route[i];
-            int dst = route[(i + 1) % routeSize];
-            assert(src > -1 && src < size&& dst > -1 && dst < size);
-            if (Dist[src * size + dst] < 0)
+            int src = params->route[i];
+            int dst = params->route[(i + 1) % routeSize];
+            assert(src > -1 && src < params->size && dst > -1 && dst < params->size);
+            if (params->Dist[src * params->size + dst] < 0)
             {
                 printf("Route not found!\n");
                 return -1;
@@ -604,28 +615,35 @@ namespace VRPTW {
             i++;
         }
 
+        // Check capacity condition
+        if (!CapacityCondition(params))
+        {
+            printf("Route not found, Capacity condition failed!\n");
+            return -1;
+        }
+
         i = 0;
         printf("Vehicle #0 : ");
         while (i < routeSize) {
-            int src = route[i];
-            int dst = route[(i + 1) % routeSize];
+            int src = params->route[i];
+            int dst = params->route[(i + 1) % routeSize];
 
             // End of route for a vehicle
             if (dst == 0) {
                 if (src == 0)
                     printf("Unused\nVehicle #%d : ", ++vehicleCntr);
                 else if (routeSize - 1 != i) {
-                    printf("%d (%.0f) 0\nVehicle #%d : ", src, Dist[src * size + dst], ++vehicleCntr);
+                    printf("%d (%.0f) 0\nVehicle #%d : ", src, params->Dist[src * params->size + dst], ++vehicleCntr);
                 }
                 else {
-                    printf("%d (%.2f) 0\n", src, Dist[src * size + dst]);
+                    printf("%d (%.0f) 0\n", src, params->Dist[src * params->size + dst]);
                 }
             }
             else {
                 // Next element of Route 
-                printf("%d (%.2f) ", src, Dist[src * size + dst]);
+                printf("%d (%.0f) ", src, params->Dist[src * params->size + dst]);
             }
-            l += Dist[src * size + dst];
+            l += params->Dist[src * params->size + dst];
             i++;
         }
         printf(" Total length : %.2f\n ", l);
@@ -678,8 +696,6 @@ namespace VRPTW {
         }
         block.sync();
 
-
-
         // Pheromone matrix initialization
         if (antIndex == 0)
         {
@@ -728,7 +744,6 @@ namespace VRPTW {
 
         block.sync();
 
-
         if (invalidInput || isolatedVertex)   // Invalid input, so no point of continuing
             return;                           // Case of isolated node means no route exists
 
@@ -746,8 +761,6 @@ namespace VRPTW {
             return;
         }
 
-
-
         // Calculating average distance
         if (antIndex == 0) {
             float sum = 0.0f;   // Sum of edge values
@@ -764,10 +777,8 @@ namespace VRPTW {
                 }
             }
             averageDist = sum / numPos * size;
-
         }
         block.sync();
-
 
         // Default values for routes
         initAntRoute(&params, antIndex);
@@ -776,23 +787,12 @@ namespace VRPTW {
         // Ants travelling to all directions
         for (int repNumber = 0; repNumber < configParams.Repetitions; repNumber++)
         {
-
             if (antIndex == 0)
                 multiplicationConst = averageDist / configParams.Rho * 5;
             block.sync();
-            /*block.sync();
-            if (antIndex == 0)
-            {
-                printf("\nPh2:\n");
-                print(params.Pheromone, params.size, params.routeSize);
-                printf("\nDist2:\n");
-                print(params.Dist, size);
-            }
-            block.sync();*/
             // Numerous random guesses
             for (int j = 0; j < configParams.Random_Generations; j++)
             {
-
                 generateRandomSolution(&params, antIndex);
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 block.sync();
@@ -847,7 +847,6 @@ namespace VRPTW {
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
         grid.sync();
 
-
         // Initialization of temporary variables
         __shared__ float multiplicationConst;
         multiplicationConst = 0.0f;
@@ -869,8 +868,6 @@ namespace VRPTW {
         grid.sync();
 
         // Pheromone matrix initialization
-        /*if (threadIdx.x == 0)
-        {*/
         bool foundNeighboor = false;    // Checking if any of the nodes are isolated
         int i, j;
         for (i = 0; i < params.size; i++) {
@@ -912,7 +909,6 @@ namespace VRPTW {
                 params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
             }
         }
-        //}
         grid.sync();
 
         if (globalParams.invalidInput || globalParams.isolatedVertex) {   // Invalid input, so no point of continuing
@@ -977,8 +973,8 @@ namespace VRPTW {
                 grid.sync();
             }
 
-
-            multiplicationConst *= 2;
+            if (threadIdx.x == 0)
+                multiplicationConst *= 2;
             grid.sync();
 
             // Lots of ants following pheromone of previous ants
@@ -1004,7 +1000,7 @@ namespace VRPTW {
         if (antIndex == 0) {
             // Choosing path with greedy algorithm if we dont have a valid answer
             if (!validRoute(&params)) {
-                //printf("Need to find route in greedy mode!\n");
+                printf("Need to find route in greedy mode!\n");
                 greedySequence(&params);
             }
         }
@@ -1020,7 +1016,6 @@ namespace VRPTW {
         // Optimizing array addressing
         int* antRouteOffset = pkernelParams->antRoute +
             antIndex * pkernelParams->size;
-
 
         for (int idx1 = 0; idx1 < pkernelParams->size; ++idx1) {
             antRouteOffset[idx1] = idx1;
@@ -1117,7 +1112,7 @@ namespace VRPTW {
     /// Scans that the given solution is suitable for the capacity condition
     // Returns a bool value of the condition evaluation
     // FUNCTION USED BY: antRouteLength
-    __device__ bool capacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex)
+    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex)
     {
         int* antRouteOffset = pkernelParams->antRoute
             + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
@@ -1138,6 +1133,25 @@ namespace VRPTW {
                 return false;
 
             if (currentLoad > pkernelParams->truckCapacity) // truck overloaded
+                return false;
+        }
+        return true;
+    }
+
+    __host__ bool CapacityCondition(CUDA_Main_ParamTypedef* params)
+    {
+        // Capacity condition means that no truck should carry more goods than its capacity
+        int currentLoad = 0;
+        for (int i = 1; i < RouteSize(params->size, params->maxVehicles); i++) {
+            int dst = params->route[i];
+            if (dst == 0)     // 0 node means it's a new, empty truck
+                currentLoad = 0;
+            else if (dst > 0 && dst < params->size)   // it is a customer
+                currentLoad += params->capacities[dst];
+            else    // it is an invalid value, solution must not be taken into account
+                return false;
+
+            if (currentLoad > params->truckCapacity) // truck overloaded
                 return false;
         }
         return true;
@@ -1231,12 +1245,12 @@ namespace VRPTW {
             return -1;
 
         // route invalid if Capacity condition is not met
-        if (!capacityCondition(pkernelParams, antIndex))
+        if (!CapacityCondition(pkernelParams, antIndex))
             return -1;
 
         // route invalid if TimeWindow condition is not met
-        if (!timeWindowCondition(pkernelParams, antIndex))
-            return -1;
+        /*if (!timeWindowCondition(pkernelParams, antIndex))
+            return -1;*/
 
         assert(length != 0);
         return length;
@@ -1361,9 +1375,7 @@ namespace VRPTW {
                 int dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];
 
                 if (workingRow > pkernelParams->routeSize)
-                {
                     return;
-                }
 
                 float* ptr = &(pkernelParams->Pheromone[workingRow * pkernelParams->size + dst]);
 
@@ -1390,7 +1402,7 @@ namespace VRPTW {
                 maxidx = i;
             }
         }
-        printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
+        //printf("%d. vertex with value of %.2f : %d\n", idx, max, maxidx);
         return maxidx;
     }
 

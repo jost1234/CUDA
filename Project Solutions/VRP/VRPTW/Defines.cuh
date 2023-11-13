@@ -50,7 +50,7 @@ namespace VRPTW {
 		int* capacities;
 		float* Dist;
 		int maxVehicles;
-		int optimalValue;
+		float optimalValue;
 		float* Pheromone;
 		int* route;
 		int size;

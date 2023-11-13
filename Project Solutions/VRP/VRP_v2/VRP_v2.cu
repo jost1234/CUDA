@@ -50,13 +50,26 @@ int main(int argc, char* argv[])
 
         /// Number of threads: OPTIONAL (default: 1024)
         // Command Line Syntax: ... --ants [number of ants]
-        else if ((strcmp(argv[i], "--a") == 0) || (strcmp(argv[i], "--ants") == 0))
+        else if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
         {
             if (sscanf(argv[++i], "%d", &ants) != 1) {
                 fprintf(stderr, "Unable to read ant number!\n");
             }
             else {
                 printf("Given ant number : %d\n", ants);
+            }
+        }
+
+        /// Number of full thread blocks: OPTIONAL
+        // Command Line Syntax: ... --blocks [number of ants]
+        else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--blocks") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &ants) != 1) {
+                fprintf(stderr, "Unable to read ant number!\n");
+            }
+            else {
+                printf("Given block number : %d\n", ants);
+                ants *= BLOCK_SIZE;
             }
         }
     }
@@ -151,6 +164,7 @@ namespace VRP {
         // Local variables
         int maxVehicles = h_params.maxVehicles; // Maximum number of vehicles in warehouse
         int size = h_params.size;    // Number of graph vertices
+        int routeSize = RouteSize(size, maxVehicles);
         int antNum = h_params.antNum;    // Number of Ants (= threads)
 
         // Invalid inputs
@@ -183,23 +197,23 @@ namespace VRP {
         d_kernelParams.antNum = antNum;
         d_kernelParams.size = size;
         d_kernelParams.maxVehicles = maxVehicles;
-        d_kernelParams.routeSize = RouteSize(size, maxVehicles);
+        d_kernelParams.routeSize = routeSize;
 
         // Config parameters
         Kernel_ConfigParamTypedef d_configParams;
         d_configParams.Rho = RHO;
         d_configParams.Follower_Generations = FOLLOWER_GENERATIONS;
         d_configParams.Initial_Pheromone_Value = INITIAL_PHEROMONE_VALUE;
-        d_configParams.maxTryNumber = RouteSize(size, maxVehicles);
+        d_configParams.maxTryNumber = routeSize;
         d_configParams.Random_Generations = RANDOM_GENERATIONS;
         d_configParams.Repetitions = REPETITIONS;
         d_configParams.Reward_Multiplier = REWARD_MULTIPLIER;
 
         // Size of device malloc
         size_t Dist_bytes = size * size * sizeof(float);
-        size_t Pheromone_bytes = size * RouteSize(size, maxVehicles) * sizeof(float);
+        size_t Pheromone_bytes = size * routeSize * sizeof(float);
         // We need memory for multiple Routes
-        size_t route_bytes = RouteSize(size, maxVehicles) * sizeof(int);
+        size_t route_bytes = routeSize * sizeof(int);
 
         size_t antRoute_bytes = antNum * route_bytes;   // Allocating working memory for all threads
         size_t state_bytes = antNum * sizeof(curandState);
@@ -320,7 +334,7 @@ namespace VRP {
                 return cudaStatus;
             }
 
-            float _length = sequencePrint(h_params.route, h_params.Dist, size, RouteSize(size, maxVehicles));
+            float _length = sequencePrint(&h_params);
             if (_length > 0) {
                 foundCount++;
                 sum += _length;
@@ -383,12 +397,14 @@ namespace VRP {
     }
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize) {
+    __device__ __host__ float sequencePrint(CUDA_Main_ParamTypedef* params) {
+        int routeSize = RouteSize(params->size, params->maxVehicles);
         if (
-            2 > size ||
+            2 > params->size ||
             2 > routeSize ||
-            NULL == route ||
-            NULL == Dist) {
+            NULL == params->route ||
+            NULL == params->Dist)
+        {
             printf("Invalid input!\n");
             return -1;
         }
@@ -399,10 +415,10 @@ namespace VRP {
         // Check for dead end
         while (i < routeSize)
         {
-            int src = route[i];
-            int dst = route[(i + 1) % routeSize];
-            assert(src > -1 && src < size&& dst > -1 && dst < size);
-            if (Dist[src * size + dst] < 0)
+            int src = params->route[i];
+            int dst = params->route[(i + 1) % routeSize];
+            assert(src > -1 && src < params->size && dst > -1 && dst < params->size);
+            if (params->Dist[src * params->size + dst] < 0)
             {
                 printf("Route not found!\n");
                 return -1;
@@ -413,25 +429,25 @@ namespace VRP {
         i = 0;
         printf("Vehicle #0 : ");
         while (i < routeSize) {
-            int src = route[i];
-            int dst = route[(i + 1) % routeSize];
+            int src = params->route[i];
+            int dst = params->route[(i + 1) % routeSize];
 
             // End of route for a vehicle
             if (dst == 0) {
                 if (src == 0)
                     printf("Unused\nVehicle #%d : ", ++vehicleCntr);
                 else if (routeSize - 1 != i) {
-                    printf("%d (%.0f) 0\nVehicle #%d : ", src, Dist[src * size + dst], ++vehicleCntr);
+                    printf("%d (%.0f) 0\nVehicle #%d : ", src, params->Dist[src * params->size + dst], ++vehicleCntr);
                 }
                 else {
-                    printf("%d (%.0f) 0\n", src, Dist[src * size + dst]);
+                    printf("%d (%.0f) 0\n", src, params->Dist[src * params->size + dst]);
                 }
             }
             else {
                 // Next element of Route 
-                printf("%d (%.0f) ", src, Dist[src * size + dst]);
+                printf("%d (%.0f) ", src, params->Dist[src * params->size + dst]);
             }
-            l += Dist[src * size + dst];
+            l += params->Dist[src * params->size + dst];
             i++;
         }
         printf(" Total length : %.2f\n ", l);
@@ -643,15 +659,12 @@ namespace VRP {
         int antIndex = blockIdx.x * blockDim.x + threadIdx.x;  // ant index
         grid.sync();
 
-        __shared__ int size;                // Local Copy of argument parameter
-
         // Initialization of temporary variables
         __shared__ float multiplicationConst;
         multiplicationConst = 0.0f;
         globalParams.invalidInput = false;
         globalParams.isolatedVertex = false;
         globalParams.averageDist = 0.0f;
-        size = params.size; // Need to be written too many times
         params.routeSize = RouteSize(params.size, params.maxVehicles);
         globalParams.minRes = FLT_MAX;
 
@@ -772,7 +785,7 @@ namespace VRP {
                 grid.sync();
             }
             
-            if(threadIdx.x == 0)
+            if (threadIdx.x == 0)
                 multiplicationConst *= 2;
             grid.sync();
 
@@ -799,7 +812,7 @@ namespace VRP {
         if (antIndex == 0) {
             // Choosing path with greedy algorithm if we dont have a valid answer
             if (!validRoute(&params)) {
-                //printf("Need to find route in greedy mode!\n");
+                printf("Need to find route in greedy mode!\n");
                 greedySequence(&params);
             }
         }
@@ -1024,7 +1037,6 @@ namespace VRP {
         return size + vehicleIdx - 1;
     }
 
-
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
     // Sets the route vector if we found a best yet solution
@@ -1069,7 +1081,7 @@ namespace VRP {
                 int dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];
                 
                 if (workingRow > pkernelParams->routeSize)
-                    printf("ujjujj %d_%d_%d\n",workingRow,dst,vehicleIdx);
+                    return;
                 
                 float* ptr = &(pkernelParams->Pheromone[workingRow * pkernelParams->size + dst]);
 

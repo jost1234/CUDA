@@ -57,7 +57,7 @@ namespace VRP {
     __device__ inline bool inputGood(Kernel_ParamTypedef* params);
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize);
+    __device__ __host__ float sequencePrint(CUDA_Main_ParamTypedef* params);
 
     __host__ __device__ inline int RouteSize(int size, int maxVehicles)
     {

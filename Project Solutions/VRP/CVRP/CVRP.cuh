@@ -60,7 +60,7 @@ namespace CVRP {
     __device__ inline bool inputGood(Kernel_ParamTypedef* params);
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(CUDA_Main_ParamTypedef* params);
+    __host__ float sequencePrint(CUDA_Main_ParamTypedef* params);
 
 
 

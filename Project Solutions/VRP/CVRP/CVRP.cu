@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     {
         /// Distance file: REQUIRED
         // Command Line Syntax: ... --dist [file_name]
-        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0))
+        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--data") == 0))
         {
             pfile = fopen(argv[++i], "r");
             if (pfile == NULL) {
@@ -107,9 +107,9 @@ int main(int argc, char* argv[])
     }
 
     // File syntax : 3rd row must contain graph weight type info: 
-    // Possibilities: 2D (x,y) or EXPLICIT (direct node distances)
+    // Possibilities: EUC_2D (x,y) or EXPLICIT (direct node distances)
     char weightType[20] = { 0 };
-    if (fscanf(pfile, "EDGE_WEIGHT_TYPE: %20s \n", weightType) == 0) {
+    if (fscanf(pfile, "EDGE_WEIGHT_TYPE: %19s \n", weightType) == 0) {
         fprintf(stderr, "Unable to read weight type info!\n Make sure you have the right file syntax!\n");
         fclose(pfile);
         return -1;
@@ -163,7 +163,7 @@ namespace CVRP {
         int truckCapacity = -1;
         float optimalValue = -1.0f;
         // File syntax : row after dist values must contain maximum vehicle count in decimal
-        if (fscanf_s(pfile, "No of trucks: %d, Capacity: %d, Optimal value: %f\n", &maxVehicles, &truckCapacity, &optimalValue) < 3) {
+        if (fscanf(pfile, "No of trucks: %d, Capacity: %d, Optimal value: %f\n", &maxVehicles, &truckCapacity, &optimalValue) < 3) {
             fprintf(stderr, "Incorrect read of MaxVehicles, OptimalValue or TruckCapacity!\n");
             fclose(pfile);
             return -1;
@@ -173,6 +173,9 @@ namespace CVRP {
         // Store type: adjacency matrix format
         float* Dist = (float*)calloc(size * size, sizeof(float));
 
+        /// Capacity vector
+        int* capacities = (int*)calloc(size, sizeof(int));
+
         // Reading distance values from dist file
 
         if (strcmp(weightType, "EXPLICIT") == 0)
@@ -181,14 +184,16 @@ namespace CVRP {
                 float temp;
 
                 for (int jj = 0; jj < size; ++jj) {
-                    if (fscanf_s(pfile, "%f", &temp) == 0) {
+                    if (fscanf(pfile, "%f", &temp) == 0) {
                         fprintf(stderr, "Error reading distance(%d,%d)\n", ii, jj);
+                        free(Dist);
+                        free(capacities);
                         fclose(pfile);
                         return -1;
                     }
                     Dist[ii * size + jj] = temp;
                 }
-                fscanf_s(pfile, "\n");
+                fscanf(pfile, "\n");
             }
         }
         else if (strcmp(weightType, "EXPLICIT_DIAG_LOW") == 0)
@@ -198,14 +203,16 @@ namespace CVRP {
                 float temp;
 
                 for (int jj = 0; jj <= ii; ++jj) {
-                    if (fscanf_s(pfile, "%f", &temp) == 0) {
+                    if (fscanf(pfile, "%f", &temp) == 0) {
                         fprintf(stderr, "Error reading distance(%d,%d)\n", ii, jj);
+                        free(Dist);
+                        free(capacities);
                         fclose(pfile);
                         return -1;
                     }
                     Dist[ii * size + jj] = temp;
                 }
-                fscanf_s(pfile, "\n");
+                fscanf(pfile, "\n");
             }
             // Mirroring
             for (int ii = 0; ii < size; ++ii) 
@@ -219,13 +226,15 @@ namespace CVRP {
             int temp1;
             for (int i = 0; i < size; i++)  // Scanning file
             {
-                if (fscanf_s(pfile, "%d %d %d\n",
+                if (fscanf(pfile, "%d %d %d\n",
                     &temp1,
                     &_2dvalues[i].x, &_2dvalues[i].y
                 ) != 3)
                 {
                     fprintf(stderr, "Incorrect read in row %d!\n", i);
                     free(_2dvalues);
+                    free(Dist);
+                    free(capacities);
                     fclose(pfile);
                     return -1;
                 }
@@ -246,17 +255,16 @@ namespace CVRP {
             free(_2dvalues);    // No need after
         }
 
-        /// Capacity vector
-        int* capacities = (int*)calloc(size, sizeof(int));
-
         int temp1, temp2;
-        fscanf_s(pfile, "DEMAND_SECTION\n");
+        fscanf(pfile, "DEMAND_SECTION\n");
         for (int ii = 0; ii < size; ii++)
         {
-            if (fscanf_s(pfile, "%d %d", &temp1, &temp2) < 2) {
+            if (fscanf(pfile, "%d %d", &temp1, &temp2) < 2) {
                 fprintf(stderr, "Unable to read Capacity values!\n Make sure you have the right file syntax!\n");
                 fprintf(stderr, "File Syntax:\n\t[Number of Vehicles Available]\n\t[Number of Nodes]\n\tdist11, dist12, ...\n\tdist21 ... \nNo of trucks: [int], Optimal value: [int] \n");
                 fclose(pfile);
+                free(Dist);
+                free(capacities);
                 return -1;
             }
             capacities[ii] = temp2;
@@ -265,6 +273,8 @@ namespace CVRP {
         // Closing data file
         printf("Closing file!\n");
         if (fclose(pfile) != 0) {
+            free(Dist);
+            free(capacities);
             fprintf(stderr, "Unable to close file!\n");
             return -1;
         }
@@ -287,51 +297,52 @@ namespace CVRP {
         params.Dist = Dist;
         params.maxVehicles = maxVehicles;
         params.optimalValue = optimalValue;
-        params.Pheromone = (float*)malloc(size * CVRP::RouteSize(size, maxVehicles) * sizeof(float));
-        params.route = (int*)malloc(CVRP::RouteSize(size, maxVehicles) * sizeof(int));
+        params.Pheromone = (float*)malloc(size * RouteSize(size, maxVehicles) * sizeof(float));
+        params.route = (int*)malloc(RouteSize(size, maxVehicles) * sizeof(int));
         params.size = size;
         params.truckCapacity = truckCapacity;
 
         printf("Capacitated Vehicle Route Problem with Ant Colony Algorithm\n");
+        //CUDA_main(params);
 
         printf("\n\nR=10\n\n");
         REPETITIONS = 10;
 
         printf("\n\n1024 thread\n\n");
         params.antNum = 1024;
-        CVRP::CUDA_main(params);
-        /*printf("\n\n16384 thread\n\n");
+        CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
         params.antNum = 1024 * 16;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
         printf("\n\n20480 thread\n\n");
         params.antNum = 1024 * 20;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
 
         REPETITIONS = 30;
         printf("\n\nR=30\n\n");
 
         printf("\n\n1024 thread\n\n");
         params.antNum = 1024;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
         printf("\n\n16384 thread\n\n");
         params.antNum = 1024 * 16;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
         printf("\n\n20480 thread\n\n");
         params.antNum = 1024 * 20;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
 
         REPETITIONS = 50;
         printf("\n\nR=50\n\n");
 
         printf("\n\n1024 thread\n\n");
         params.antNum = 1024;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
         printf("\n\n16384 thread\n\n");
         params.antNum = 1024 * 16;
-        CVRP::CUDA_main(params);
+        CUDA_main(params);
         printf("\n\n20480 thread\n\n");
         params.antNum = 1024 * 20;
-        CVRP::CUDA_main(params);*/
+        CUDA_main(params);
 
         free(params.capacities);
         free(params.Dist);
@@ -471,7 +482,7 @@ namespace CVRP {
 
         // setup seeds
 
-        setup_kernel << < BlockNum, threadPerBlock >> > (d_kernelParams.state, time(NULL) * rand());
+        setup_kernel <<< BlockNum, threadPerBlock >>> (d_kernelParams.state, time(NULL) * rand());
 
         // Kernel call
 
@@ -484,7 +495,7 @@ namespace CVRP {
             printf("\nAttempt #%d ||\n", iter);
 
             if (BlockNum == 1) {
-                Kernel_1Block << < 1, threadPerBlock >> > (d_kernelParams, d_configParams);
+                Kernel_1Block <<< 1, threadPerBlock >>> (d_kernelParams, d_configParams);
             }
             else
             {
@@ -544,7 +555,7 @@ namespace CVRP {
 
 
         }
-        printf("\nSummary:\nAverage length: %.2f (+%.2f%%)\n", sum / foundCount, (float)(sum / foundCount - h_params.optimalValue)/h_params.optimalValue * 100.0f);
+        printf("\nSummary:\nAverage length: %.2f (+%.2f%%)\n", sum / foundCount, (float)(sum / foundCount - h_params.optimalValue) / h_params.optimalValue * 100.0f);
         printf("Minimal length: %.2f (+%.2f%%)\n", min, (float)(min - h_params.optimalValue) / h_params.optimalValue * 100.0f);
 
         // Frees GPU device memory
@@ -602,9 +613,9 @@ namespace CVRP {
     }
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(CUDA_Main_ParamTypedef* params) {
+    __host__ float sequencePrint(CUDA_Main_ParamTypedef* params) 
+    {
         int routeSize = RouteSize(params->size, params->maxVehicles);
-        
         if (
             2 > params->size ||
             2 > routeSize ||
@@ -713,8 +724,6 @@ namespace CVRP {
         }
         block.sync();
 
-
-
         // Pheromone matrix initialization
         if (antIndex == 0)
         {
@@ -732,7 +741,7 @@ namespace CVRP {
 
                     // Error handling 
                     // Check if there are invalid given elements 
-                    // Valid input if: non-negative OR -1 OR 0 (only if i=j)
+                    // Valid input if: non-negative OR -1
                     if (i != j && params.Dist[i * size + j] < 0
                         && params.Dist[i * size + j] != -1)
                     {
@@ -763,7 +772,6 @@ namespace CVRP {
 
         block.sync();
 
-
         if (invalidInput || isolatedVertex)   // Invalid input, so no point of continuing
             return;                           // Case of isolated node means no route exists
 
@@ -781,8 +789,6 @@ namespace CVRP {
             return;
         }
 
-
-
         // Calculating average distance
         if (antIndex == 0) {
             float sum = 0.0f;   // Sum of edge values
@@ -799,10 +805,8 @@ namespace CVRP {
                 }
             }
             averageDist = sum / numPos * size;
-
         }
         block.sync();
-
 
         // Default values for routes
         initAntRoute(&params, antIndex);
@@ -811,23 +815,12 @@ namespace CVRP {
         // Ants travelling to all directions
         for (int repNumber = 0; repNumber < configParams.Repetitions; repNumber++)
         {
-
             if (antIndex == 0)
                 multiplicationConst = averageDist / configParams.Rho * 5;
             block.sync();
-            /*block.sync();
-            if (antIndex == 0)
-            {
-                printf("\nPh2:\n");
-                print(params.Pheromone, params.size, params.routeSize);
-                printf("\nDist2:\n");
-                print(params.Dist, size);
-            }
-            block.sync();*/
             // Numerous random guesses
             for (int j = 0; j < configParams.Random_Generations; j++)
             {
-
                 generateRandomSolution(&params, antIndex);
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 block.sync();
@@ -903,8 +896,6 @@ namespace CVRP {
         grid.sync();
 
         // Pheromone matrix initialization
-        /*if (threadIdx.x == 0)
-        {*/
         bool foundNeighboor = false;    // Checking if any of the nodes are isolated
         int i, j;
         for (i = 0; i < params.size; i++) {
@@ -919,7 +910,7 @@ namespace CVRP {
 
                 // Error handling 
                 // Check if there are invalid given elements 
-                // Valid input if: non-negative OR -1 OR 0 (only if i=j)
+                // Valid input if: non-negative OR -1
                 if (i != j && params.Dist[i * params.size + j] < 0
                     && params.Dist[i * params.size + j] != -1)
                 {
@@ -946,7 +937,6 @@ namespace CVRP {
                 params.Pheromone[i * params.size + j] = configParams.Initial_Pheromone_Value;
             }
         }
-        //}
         grid.sync();
 
         if (globalParams.invalidInput || globalParams.isolatedVertex) {   // Invalid input, so no point of continuing
@@ -1011,8 +1001,8 @@ namespace CVRP {
                 grid.sync();
             }
 
-
-            multiplicationConst *= 2;
+            if (threadIdx.x == 0)
+                multiplicationConst *= 2;
             grid.sync();
 
             // Lots of ants following pheromone of previous ants
@@ -1038,7 +1028,7 @@ namespace CVRP {
         if (antIndex == 0) {
             // Choosing path with greedy algorithm if we dont have a valid answer
             if (!validRoute(&params)) {
-                //printf("Need to find route in greedy mode!\n");
+                printf("Need to find route in greedy mode!\n");
                 greedySequence(&params);
             }
         }
@@ -1054,7 +1044,6 @@ namespace CVRP {
         // Optimizing array addressing
         int* antRouteOffset = pkernelParams->antRoute +
             antIndex * pkernelParams->size;
-
 
         for (int idx1 = 0; idx1 < pkernelParams->size; ++idx1) {
             antRouteOffset[idx1] = idx1;
@@ -1127,7 +1116,6 @@ namespace CVRP {
         if (antIndex == -1)
             antRouteOffset = pkernelParams->route;
 
-
         if (newParam == 0)
         {
             for (int i = 0; i < idx; ++i)
@@ -1181,7 +1169,7 @@ namespace CVRP {
     {
         // Capacity condition means that no truck should carry more goods than its capacity
         int currentLoad = 0;
-        for (int i = 1; i < RouteSize(params->size,params->maxVehicles); i++) {
+        for (int i = 1; i < RouteSize(params->size, params->maxVehicles); i++) {
             int dst = params->route[i];
             if (dst == 0)     // 0 node means it's a new, empty truck
                 currentLoad = 0;
@@ -1359,9 +1347,7 @@ namespace CVRP {
                 int dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];
 
                 if (workingRow > pkernelParams->routeSize)
-                {
                     return;
-                }
 
                 float* ptr = &(pkernelParams->Pheromone[workingRow * pkernelParams->size + dst]);
 

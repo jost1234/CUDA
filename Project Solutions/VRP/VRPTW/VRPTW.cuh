@@ -60,7 +60,7 @@ namespace VRPTW {
     __device__ inline bool inputGood(Kernel_ParamTypedef* params);
 
     // Diagnostic function for printing given sequence
-    __device__ __host__ float sequencePrint(int* route, float* Dist, int size, int routeSize);
+    __host__ float sequencePrint(CUDA_Main_ParamTypedef* params);
 
     __host__ __device__ inline int RouteSize(int size, int maxVehicles)
     {
@@ -124,7 +124,10 @@ namespace VRPTW {
     /// Scans that the given solution is suitable for the capacity condition
     // Returns a bool value of the condition evaluation
     // FUNCTION USED BY: antRouteLength
-    __device__ bool capacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
+    __device__ bool CapacityCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
+
+    // FUNCTION USED BY: sequencePrint
+    __host__ bool CapacityCondition(CUDA_Main_ParamTypedef* params);
 
     /// Scans that the given solution is suitable for the time window condition
     // Returns a bool value of the condition evaluation

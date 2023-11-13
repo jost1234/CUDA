@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     for (i = 1; i < argc; ++i)  // Processing command line arguments
     {
         // Command Line Syntax: ... --dist [file_name]
-        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0)) {
+        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--data") == 0)) {
             pfile = fopen(argv[++i], "r");
             if (pfile == NULL) {
                 fprintf(stderr, "Unable to open file \"%s\"", argv[i]);

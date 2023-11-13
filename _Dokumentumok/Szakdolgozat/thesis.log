@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  12 NOV 2023 16:10
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  13 NOV 2023 19:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -857,14 +857,14 @@ File: figures/neurons.png Graphic file (type bmp)
 ]
 File: figures/aco-visualization.png Graphic file (type bmp)
 <figures/aco-visualization.png>
- [2]) [3]
+ [2] [3]) [4]
 \openout2 = `content/elmeletihatter.aux'.
 
  (./content/elmeletihatter.tex
 2. fejezet.
 File: figures/tsp-usacities.png Graphic file (type bmp)
 <figures/tsp-usacities.png>
-[4
+[5
 
 
 
@@ -872,7 +872,7 @@ File: figures/tsp-usacities.png Graphic file (type bmp)
 ]
 File: figures/VRP_Szoveg_nelkul.png Graphic file (type bmp)
 <figures/VRP_Szoveg_nelkul.png>
- [5] [6]
+ [6] [7]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `\begingroup' on input line 75.
@@ -905,12 +905,12 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `subscript' on input line 75.
 
-[7] [8]) [9]
+[8] [9]) [10]
 \openout2 = `content/technologiaihatter.aux'.
 
  (./content/technologiaihatter.tex
 3. fejezet.
-[10
+[11
 
 
 
@@ -932,7 +932,7 @@ Underfull \hbox (badness 1400) in paragraph at lines 29--30
 valamint memória-
  []
 
-[11] [12]
+[12] [13]
 File: figures/invalidIntellisenseErrorMessages.png Graphic file (type bmp)
 <figures/invalidIntellisenseErrorMessages.png>
  (c:/texlive/2023/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -943,24 +943,24 @@ File: lstlang1.sty 2023/02/27 1.9 listings language file
 )
 (c:/texlive/2023/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2023/02/27 1.9 (Carsten Heinz)
-) [13] [14] [15]
-[16] [17]
+) [14] [15] [16]
+[17] [18]
 File: figures/Implicit synchronization.png Graphic file (type bmp)
 <figures/Implicit synchronization.png>
- [18] [19]
+ [19] [20]
 File: figures/install-1.png Graphic file (type bmp)
 <figures/install-1.png>
 File: figures/install-2.png Graphic file (type bmp)
 <figures/install-2.png>
- [20]
+ [21]
 File: figures/install-3.png Graphic file (type bmp)
 <figures/install-3.png>
-) [21] [22]
+) [22] [23]
 \openout2 = `content/implementacio.aux'.
 
  (./content/implementacio.tex
 4. fejezet.
-[23
+[24
 
 
 
@@ -968,28 +968,28 @@ File: figures/install-3.png Graphic file (type bmp)
 ]
 File: figures/tsp-to-vrp.png Graphic file (type bmp)
 <figures/tsp-to-vrp.png>
- [24] [25]) [26]
+ [25] [26]) [27]
 \openout2 = `content/eredmenyek.aux'.
 
  (./content/eredmenyek.tex
 5. fejezet.
 File: figures/nsight-compute.png Graphic file (type bmp)
 <figures/nsight-compute.png>
-[27
+[28
 
 
 
 
-] [28] [29] [30] [31]
+] [29] [30] [31] [32]
 File: figures/TSP_v1_hiba.png Graphic file (type bmp)
 <figures/TSP_v1_hiba.png>
-) [32] [33] [34] [35] [36]
+) [33] [34] [35] [36] [37]
 \openout2 = `content/osszefoglalas.aux'.
 
  (./content/osszefoglalas.tex)
 \openout2 = `content/acknowledgement.aux'.
 
- (./content/acknowledgement.tex) [37
+ (./content/acknowledgement.tex) [38
 
 
 
@@ -1063,20 +1063,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 168--171
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] []
  []
 
-[38
+[39
 
 
 
-]) [39]
+]) [40]
 \openout2 = `content/appendices.aux'.
 
  (./content/appendices.tex
 File: figures/TeXstudio.png Graphic file (type bmp)
 <figures/TeXstudio.png>
- [40
+ [41
 
 
-]) [41
+]) [42
 
 ]
 \tf@thm=\write5
@@ -1093,7 +1093,7 @@ LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-10-10>
  ***********
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 13CBA9B020F7E52A462718C4E18D3075;7593.
+(rerunfilecheck)             Checksum: AB2F49A2387025BB16E8AD078F0A80B4;7712.
  ) 
 Here is how much of TeX's memory you used:
  18821 strings out of 475160
@@ -1104,4 +1104,4 @@ Here is how much of TeX's memory you used:
  1352 hyphenation exceptions out of 8191
  84i,12n,96p,1533b,1237s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on thesis.pdf (47 pages).
+Output written on thesis.pdf (48 pages).
