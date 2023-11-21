@@ -72,6 +72,30 @@ int main(int argc, char* argv[])
                 ants *= BLOCK_SIZE;
             }
         }
+
+        // Number of reps: OPTIONAL
+        // Command Line Syntax:: ... --reps [number of reps]
+        else if ((strcmp(argv[i], "-r") == 0) || (strcmp(argv[i], "--reps") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &REPETITIONS) != 1) {
+                fprintf(stderr, "Unable to read rep number!\n");
+            }
+            else {
+                printf("Given rep number : %d\n", REPETITIONS);
+            }
+        }
+
+        // Number of serial tries: OPTIONAL
+        // Command Line Syntax:: ... --serialTries [number of serial tries]
+        else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--serialTries") == 0))
+        {
+            if (sscanf(argv[++i], "%d", &SERIALMAXTRIES) != 1) {
+                fprintf(stderr, "Unable to read Serial Try number!\n");
+            }
+            else {
+                printf("Given Serial Try number : %d\n", SERIALMAXTRIES);
+            }
+        }
     }
 
     // Checking required elements
@@ -303,9 +327,9 @@ namespace CVRP {
         params.truckCapacity = truckCapacity;
 
         printf("Capacitated Vehicle Route Problem with Ant Colony Algorithm\n");
-        //CUDA_main(params);
+        CUDA_main(params);
 
-        printf("\n\nR=10\n\n");
+        /*printf("\n\nR=10\n\n");
         REPETITIONS = 10;
 
         printf("\n\n1024 thread\n\n");
@@ -342,7 +366,7 @@ namespace CVRP {
         CUDA_main(params);
         printf("\n\n20480 thread\n\n");
         params.antNum = 1024 * 20;
-        CUDA_main(params);
+        CUDA_main(params);*/
 
         free(params.capacities);
         free(params.Dist);
@@ -714,7 +738,7 @@ namespace CVRP {
         globalParams.minRes = FLT_MAX;
 
         // Invalidate route vector
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < params.routeSize; i++)
             params.route[i] = 0;
 
         // Input check
@@ -885,7 +909,7 @@ namespace CVRP {
         globalParams.minRes = FLT_MAX;
 
         // Invalidate route vector
-        for (int i = 0; i < params.size; i++)
+        for (int i = 0; i < params.routeSize; i++)
             params.route[i] = 0;
 
         // Input check
@@ -1203,6 +1227,10 @@ namespace CVRP {
         for (int i = 0; i < pkernelParams->routeSize; ++i) {
             src = antRouteOffset[i];
             dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];   // Next node
+
+            if (src < 0 || src >= pkernelParams->size || dst < 0 || dst >= pkernelParams->size)
+                return -1; // Defending from faulty solutions
+
             if (src == 0)
                 vehicleIdx++;
 

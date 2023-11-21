@@ -15,24 +15,37 @@ Az algoritmusokhoz készítettem CPU és GPU kódot is. Az algoritmusok érdemi 
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=150mm, keepaspectratio]{figures/nsight-compute.png}
+	\includegraphics[width=85mm, keepaspectratio]{figures/nsight-compute-config.png}
+	\caption{Az NVIDIA Nsight Compute programban egy mérés összeállításához be kell állítani a mérendő exe fájlt, a munkamappát, illetve a szükséges parancssori argumentumokat}
+	\label{fig:nsight-compute-config}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=125mm, keepaspectratio]{figures/nsight-compute2.png}
 	\caption{Az NVIDIA Nsight Compute program adatok széles tárházával látja el a programozót }
 	\label{fig:nsight-compute}
 \end{figure}
 
-%TODO Konfigról a képet már csak be kell tenni
+
+
 
 Számomra a legfontosabb a futásidő volt, ezt több különböző bemenetre és konfigurációra lemértem, majd táblázatosan összegyűjtöttem.
 
 \section{Mérési eredmények}
 
-A továbbiakban táblázatokba szedtem az egyes algoritmusokon végzett profilozó méréseim eredményeit. A futásidők időegysége másodperc, mert ilyen nagyságrendben mozogtak az értékek. Többször lefuttattam a programokat ugyanolyan paraméterek mellett, ebből lejegyeztem az átlagos eredményeket (10 futás számtani közepe) és a legkisebb kapott megoldást.
+A továbbiakban táblázatokba szedtem az egyes algoritmusokon végzett profilozó méréseim eredményeit. A futásidők időegysége másodperc, mert ilyen nagyságrendben mozogtak az értékek. Többször lefuttattam a programokat ugyanolyan paraméterek mellett, ebből lejegyeztem az átlagos eredményeket (10 futás számtani közepe) és a legkisebb kapott megoldást. 
+
+A CVRPTW mérése során tapasztaltam először olyat, hogy néha a program egyáltalán nem talált megoldást. Ott új oszlopot vettem fel "Hiba (\%)" névvel. Azt mutatja, hogy a programfuttatások hány százalékában nem sikerült egyáltalán megoldást találni. Ilyenkor az átlagolást a sikeres futtatásokból számoltam.
+
+\newpage
+\newpage
 
 \subsection{TSP első verzió}
 
 Teszteléshez szükségem volt ismert eredményű adathalmazokra. A Floridai Állami Egyetem weboldalán \cite{TSPdataset} elérhető bárki számára több adathalmaz, különböző adatstruktúrában. Nekem a [fájlnév]\_d.txt nevű fájlok voltak hasznosak, ugyanis abban megtalálhatóak a szomszédossági mátrix költségei táblázatos alakban. Az itt található 6 adathalmazon végigfuttattam az algoritmusomat több konfigurációban. Mindig 10-szer ismételtem meg a futást, és képeztem az eredmények átlagát (számtani középpel), illetve minimumát. Nagy adathalmaz esetén hosszú a futásidő profilozó módban, ezért időmérés céljából egyszer futtattam újra ugyanazon beállításokkal. A TSP első verziójában a feromon mátrix és az élsúlyok tárolása csak double formátumban történik. Az összehasonlíthatóság érdekében egy iteráció során 20 random, és 500 tudatos hangya fut. A kezdeti feromon érték 1000, az elnyomási tényező \( \rho = 0.75 \), a jutalmazási arány 100, amely csak a 2. iterációtól érvényes (ha van).
 
-
+Az egyes mérések eredményei a \ref{table:TSPv1_5} - \ref{table:TSPv1_48}. táblázatokból olvashatóak ki.
 
 % Size = 5
 \begin{table}[ht!]
@@ -44,16 +57,16 @@ Teszteléshez szükségem volt ismert eredményű adathalmazokra. A Floridai Ál
 		& Futásidő (ms) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{1 rep} & & &\\
-		32 ant& 7,84 & 20,2 & 19\\
-		256 ant & 19,1 & 20,8 & 19\\
-		1024 ant & 76,1 &	20,8 &	19\\
+		32 ant& 7,84 & 20,2 (+6,3\%) & 19\\
+		256 ant & 19,1 & 20,8 (+9,5\%) & 19\\
+		1024 ant & 76,1 & 20,8 (+9,5\%) &	19\\
 		\hline
 		\textbf{10 rep} & & &\\
 		256 ant & 137,3 & 19 &	19\\
 		1024 ant & 424 &	19 &	19\\
 		\hline
 	\end{tabular}
-	\caption{Elsőnek egy kicsi, 4 állomásból (és a 0. kiindulási pontból) álló gráfon próbáltam ki az algoritmust.}
+	\caption{Elsőnek egy kicsi, a 0. kiindulási ponton kívül 4 állomásból álló gráfon próbáltam ki az algoritmust.}
 	\label{table:TSPv1_5}
 \end{table}
 
@@ -67,21 +80,23 @@ Teszteléshez szükségem volt ismert eredményű adathalmazokra. A Floridai Ál
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{1 rep} & & &\\
-		1024 ant & 0,925 & 370,2 & 291\\
-		2048 ant & 1,18 & 365 & 327\\
-		4096 ant & 1,20 & 359,7 & 332\\
+		1024 ant & 0,925 & 370,2 (+27,2\%) & 291 \\
+		2048 ant & 1,18 & 365 (+25,4\%) & 327 (+12,4\%) \\
+		4096 ant & 1,20 & 359,7 (+23,6\%) & 332 (+14,1\%)\\
 		\hline
 		\textbf{10 rep} & & &\\
-		1024 ant & 11,39 & 350,4 & 291\\
-		2048 ant & 11,47 & 328 & 295\\
-		4096 ant & 11,59 & 336,8 & 291\\
+		1024 ant & 11,39 & 350,4 (+20,4\%) & 291\\
+		2048 ant & 11,47 & 328 (+12,5\%) & 295 (+1,4\%)\\
+		4096 ant & 11,59 & 336,8 (+15,7\%) & 291\\
+		16384 ant & 13,21 & 326,2 (+12,1\%) & 295 (+1,4\%) \\
+		20480 ant & 13,46 & 323,4 (+11,1\%) & 291 \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{15 csúcsú gráfon futtatott TSP v1}
 	\label{table:TSPv1_15}
 \end{table}
 
-A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már olyan rosszul teljesítettek, hogy csak 10 iterációs eseteket soroltam fel a hangyák számának függvényében.
+A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már olyan rosszul teljesítettek, hogy a méréseket legalább 10 iterációval folytattam.
 
 % Size = 17
 \begin{table}[ht!]
@@ -93,15 +108,15 @@ A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már oly
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 14,85 & 2391,3 & 2151\\
-		2048 ant & 14,88 & 2363,4 & 2085\\
-		4096 ant & 14,97 & 2279,6 & 2097\\
-		8192 ant & 15,15 & 2306,4 & 2207\\
-		16384 ant & 15,49 & 2250,5 & 2085\\
-		20480 ant & 15,68 & 2221,7 & 2085 \\
+		1024 ant & 14,85 & 2391,3 (+14,7\%) & 2151 (+3,2\%)\\
+		2048 ant & 14,88 & 2363,4 (+13,5\%) & 2085\\
+		4096 ant & 14,97 & 2279,6 (+9,3\%) & 2097 (+0,6\%) \\
+		8192 ant & 15,15 & 2306,4 (+10,6\%) & 2207 (+5,9\%)\\
+		16384 ant & 15,49 & 2250,5 (+7,9\%) & 2085 \\
+		20480 ant & 15,68 & 2221,7 (+6,6\%) & 2085 \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{17 csúcsú gráfon futtatott TSP v1}
 	\label{table:TSPv1_17}
 \end{table}
 
@@ -115,15 +130,15 @@ A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már oly
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 39,72 & 1386,1 & 1249\\
-		2048 ant & 39,73 & 1367,1 & 1221\\
-		4096 ant & 39,82 & 1227,6 & 1121\\
-		8192 ant & 40,14 & 1158,7 & 1102\\
-		16384 ant & 40,70 & 1132,1 & 1075\\
-		20480 ant & 42,72 & 1152,3 & 1097 \\
+		1024 ant & 39,72 & 1386,1 (+47,9\%) & 1249 (+33,3\%)\\
+		2048 ant & 39,73 & 1367,1 (+45,9\%) & 1221 (+30,3\%) \\
+		4096 ant & 39,82 & 1227,6 (+31\%) & 1121 (+19,6\%) \\
+		8192 ant & 40,14 & 1158,7 (+23,7\%) & 1102 (+17,6\%) \\
+		16384 ant & 40,70 & 1132,1 (+20,8\%) & 1075 (+14,7\%) \\
+		20480 ant & 42,72 & 1152,3 (+23\%) & 1097 (+17,1\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{26 csúcsú gráfon futtatott TSP v1}
 	\label{table:TSPv1_26}
 \end{table}
 
@@ -137,20 +152,15 @@ A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már oly
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 115,41 & 1735,7 & 1554\\
-		2048 ant & 113,94 & 1420 & 1252\\
-		16384 ant & 114,34 & 987,7 & 906\\
-		20480 ant & 113,55 & 931,6 & 879 \\
+		1024 ant & 115,41 & 1735,7 (+148\%) & 1554 (+122\%) \\
+		2048 ant & 113,94 & 1420 (+103\%) & 1252 (+79\%) \\
+		16384 ant & 114,34 & 987,7 (+41\%) & 906 (+30\%) \\
+		20480 ant & 113,55 & 931,6 (+33\%) & 879 (+26\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{42 csúcsú gráfon futtatott TSP v1}
 	\label{table:TSPv1_42}
 \end{table}
-
-%%%
-%
-
-%%
 
 % Size = 48
 \begin{table}[htbp!]
@@ -162,20 +172,23 @@ A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már oly
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 156,7 & 79993.2 & 75601 \\
-		8192 ant & 152,82 & 56097,9 & 51139 \\
-		16384 ant & 153,78 & 50197,2 & 47387 \\
-		20480 ant & 154,28 & 46360,8 & 43167 \\
+		1024 ant & 156,7 & 79993,2 (+139\%) & 75601 (+126\%) \\
+		8192 ant & 152,82 & 56097,9 (+67\%) & 51139 (+53\%) \\
+		16384 ant & 153,78 & 50197,2 (+50\%) & 47387 (+41\%) \\
+		20480 ant & 154,28 & 46360,8 (+38,3\%) & 43167 (+28,77\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{48 csúcsú gráfon futtatott TSP v1}
 	\label{table:TSPv1_48}
 \end{table}
 
-
+\newpage
+\newpage
 
 \subsection{TSP második (konzisztens) verzió}
 Azért, hogy az előző fejezetben látott első verzióval érdemben össze tudjam hasonlítani a mostani verziót, hasonló iterációs számokat választottam: 1 rep-en belül 20 random hangyát követ 500 tudatos hangya. Az adathalmaz is az előbbi \cite{TSPdataset} helyről származó csomag. A számértékeket összevetve szembetűnő a gyorsulás az előző verzióhoz képest. A legfőbb szerepe ebben úgy gondolom, hogy az adatok double-ről float-ra cserélése, illetve a függvények között szigorú pointer alapú paraméterátadás jelentette.
+
+Az egyes mérések eredményei a \ref{table:TSPv2_15} - \ref{table:TSPv2_48}. táblázatokból olvashatóak ki.
 
 % Size = 15
 \begin{table}[ht!]
@@ -187,20 +200,20 @@ Azért, hogy az előző fejezetben látott első verzióval érdemben össze tud
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & &\\
-		1024 ant & 2,69 & 320  & 307\\
-		2048 ant & 2,82 & 307,6 & 291\\
-		4096 ant & 2,97 & 305,4 & 291\\
-		8192 ant & 3,19 & 300,2 & 291\\
-		12288 ant & 3,50 & 296,4 & 291\\
-		16384 ant & 3,73 & 294,6 & 291\\
-		20480 ant & 3,92 & 295,4 & 291\\
+		1024 ant & 2,69 & 320,0 (+10\%) & 307 (+5,5\%) \\
+		2048 ant & 2,82 & 307,6 (+5,7\%) & 291\\
+		4096 ant & 2,97 & 305,4 (+4,9\%) & 291\\
+		8192 ant & 3,19 & 300,2 (+3,2\%) & 291\\
+		12288 ant & 3,50 & 296,4 (+1,9\%) & 291\\
+		16384 ant & 3,73 & 294,6 (+1,2\%) & 291\\
+		20480 ant & 3,92 & 295,4 (+1,5\%) & 291\\
 		\hline
 		\textbf{30 rep} & & &\\
-		1024 ant & 8,05 & 301,6 & 291\\
+		1024 ant & 8,05 & 301,6 (+3,6\%) & 291\\
 		20480 ant & 13,37 & 291 & 291\\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{15 csúcsú gráfon futtatott TSP v2}
 	\label{table:TSPv2_15}
 \end{table}
 
@@ -214,18 +227,18 @@ Azért, hogy az előző fejezetben látott első verzióval érdemben össze tud
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 3,54 & 2246 & 2094\\
-		2048 ant & 3,69 & 2237,7 & 2207\\
-		4096 ant & 3,69 & 2196,5 & 2142\\
-		8192 ant & 3,89 & 2211,5 & 2170\\
-		16384 ant & 4,37 & 2179,2 & 2129\\
-		20480 ant & 4,55 & 2175,1 & 2134 \\
+		1024 ant & 3,54 & 2246 (+7,7\%) & 2094 (+0,4\%)\\
+		2048 ant & 3,69 & 2237,7 (+7,3\%) & 2207 (+5,9\%)\\
+		4096 ant & 3,69 & 2196,5 (+5,3\%) & 2142 (+2,7\%)\\
+		8192 ant & 3,89 & 2211,5 (+6,1\%) & 2170 (+4,1\%)\\
+		16384 ant & 4,37 & 2179,2 (+4,5\%) & 2129 (+2,1\%)\\
+		20480 ant & 4,55 & 2175,1 (+4,3\%) & 2134 (+2,4\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
 		20480 ant & 13,38 & 2146,5 & 2103 \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{17 csúcsú gráfon futtatott TSP v2}
 	\label{table:TSPv2_17}
 \end{table}
 
@@ -239,18 +252,18 @@ Azért, hogy az előző fejezetben látott első verzióval érdemben össze tud
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 9,00 & 1393 & 1347\\
-		2048 ant & 9,23 & 1363,1 & 1288\\
-		4096 ant & 9,43 & 1215,3 & 1163\\
-		8192 ant & 9,72 & 1136,9 & 1055\\
-		16384 ant & 10,82 & 1104,9 & 1007\\
-		20480 ant & 11,61 & 1111,7 & 1058 \\
+		1024 ant & 9,00 & 1393 (+48,7\%) & 1347 (+43,8\%)\\
+		2048 ant & 9,23 & 1363,1 (+45,5\%) & 1288 (+37,5\%)\\
+		4096 ant & 9,43 & 1215,3 (+29,7\%)& 1163 (+24,1\%)\\
+		8192 ant & 9,72 & 1136,9 (+21,3\%) & 1055 (+12,6\%)\\
+		16384 ant & 10,82 & 1104,9 (+17,8\%) & 1007 (+7,5\%) \\
+		20480 ant & 11,61 & 1111,7 (+18,6\%) & 1058 (+12,9\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
-		20480 ant & 32,93 & 1098,2 & 1047 \\
+		20480 ant & 32,93 & 1098,2 (+17,2\%) & 1047 (+11,7\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{26 csúcsú gráfon futtatott TSP v2}
 	\label{table:TSPv2_26}
 \end{table}
 
@@ -264,27 +277,20 @@ Azért, hogy az előző fejezetben látott első verzióval érdemben össze tud
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 26,19 & 1601,3 & 1018\\
-		2048 ant & 26,61 & 1488,4 & 1319\\
-		4096 ant & 27,02 & 1286,7 & 1168\\
-		8192 ant & 27,57 & 1118,3 & 1004\\
-		16384 ant & 31,2 & 1014,7 & 909\\
-		20480 ant & 33,31 & 964,9 & 822 \\
+		1024 ant & 26,19 & 1601,3 (+129\%) & 1018 (+46\%)\\
+		2048 ant & 26,61 & 1488,4 (+113\%) & 1319 (+89\%) \\
+		4096 ant & 27,02 & 1286,7 (+84\%) & 1168 (+67\%)\\
+		8192 ant & 27,57 & 1118,3 (+60\%) & 1004 (+44\%) \\
+		16384 ant & 31,2 & 1014,7 (+45\%) & 909 (+30\%)\\
+		20480 ant & 33,31 & 964,9 (+38\%) & 822 (+17,6\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
-		20480 ant & 99,83 & 972,8 & 886 \\
+		20480 ant & 99,83 & 972,8 (+39,2\%) & 886 (+26,75\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{42 csúcsú gráfon futtatott TSP v2}
 	\label{table:TSPv2_42}
 \end{table}
-
-%TODO: Vízszintes vonalak a repek közé
-
-%%%
-%
-
-%%
 
 % Size = 48
 \begin{table}[htbp!]
@@ -296,30 +302,32 @@ Azért, hogy az előző fejezetben látott első verzióval érdemben össze tud
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 38,12 & 84660,7 & 67541 \\
-		2048 ant & 38,63 & 72522,8 & 64969 \\
-		4096 ant & 39,14 & 62808,6 & 53395 \\
-		8192 ant & 39,69 & 59604,8 & 52514 \\
-		16384 ant & 41,56 & 48618,2 & 46227 \\
-		20480 ant & 41,93 & 49879,9 & 45836\\
+		1024 ant & 38,12 & 84660,7 (+153\%) & 67541 (+102\%) \\
+		2048 ant & 38,63 & 72522,8 (+116\%) & 64969 (+94\%) \\
+		4096 ant & 39,14 & 62808,6 (+87\%) & 53395 (+59\%) \\
+		8192 ant & 39,69 & 59604,8 (+78\%) & 52514 (+57\%) \\
+		16384 ant & 41,56 & 48618,2 (+45\%) & 46227 (+38\%)\\
+		20480 ant & 41,93 & 49879,9 (+48,8\%) & 45836 (+36,7\%)\\
 		\hline
 		\textbf{30 rep} & & & \\
-		20480 ant & 124,72 & 47562,9 & 44144 \\
+		20480 ant & 124,72 & 47562,9 (+41,9\%) & 44144 (+31,7\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{48 csúcsú gráfon futtatott TSP v2}
 	\label{table:TSPv2_48}
 \end{table}
 
+\newpage
 
 \subsection{VRP}
 A VRP-hez eleinte nem értettem, hogy miért nem találtam külön adathalmazt. Később megértettem, hogy mivel nincs megadva egyéb feltétel, (általában) teljesen mindegy, hogy hány járművet használhat az algoritmus, a legjobban akkor fog járni, ha az összes állomást ugyanazon járművel járja végig. A VRP-hez is készült külön kódimplementáció. Ez azért jó, mert amikor különböző feltételeket szabunk meg, elég annyit tenni, hogy az adott feltételt kiértékelő függvényt megírva meghívjuk az eredményt értékelő (antRouteLength) programrészben.
 
 
 \subsection{CVRP}
-Az első olyan algoritmus, amely feltételes útvonaltervezést igényel, a Kapacitásos jármű útvonaltervezési feladat. Adathalmazt a következő helyről szedtem: \cite{CVRPdataset}.
+Az első olyan algoritmus, amely feltételes útvonaltervezést igényel, a Kapacitásos járműútvonal-tervezési feladat. Adathalmazt a következő helyről szedtem: \cite{CVRPdataset}.
 Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 random hangyát követ 500 tudatos hangya.
 
+Az egyes mérések eredményei a \ref{table:CVRP_gr17} - \ref{table:CVRP_att48}. táblázatokból olvashatóak ki.
 
 % Size = 17
 \begin{table}[ht!]
@@ -331,22 +339,22 @@ Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 ra
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 2,96 & 3158,7 & 2726  \\
-		16384 ant & 3,44 & 2790,4 & 2711 \\
-		20480 ant & 3,83 & 2800,5 & 2685 \\
+		1024 ant & 2,96 & 3158,7 (+17,6\%) & 2726 (+1,5\%) \\
+		16384 ant & 3,44 & 2790,4 (+3,9\%) & 2711 (+1\%) \\
+		20480 ant & 3,83 & 2800,5 (+4,3\%) & 2685 \\
 		\hline
 		\textbf{30 rep} & & & \\
-		1024 ant & 6,05 & 2975,2 & 2685\\
-		16384 ant & 10,64 & 2846,2 & 2727 \\
-		20480 ant & 13,80 & 2758.5 & 2685 \\
+		1024 ant & 6,05 & 2975,2 (+10,8\%) & 2685\\
+		16384 ant & 10,64 & 2846,2 (+6\%) & 2727 (+1,5\%) \\
+		20480 ant & 13,80 & 2758,5 (+2,7\%) & 2685 \\
 		\hline
 		\textbf{50 rep} & & & \\
-		1024 ant & 9,97 & 2927,5 & 2685 \\
-		16384 ant & 17,64 & 2805,9 & 2685\\
-		20480 ant & 18,51 & 2990,1 & 2685\\
+		1024 ant & 9,97 & 2927,5 (+9\%) & 2685 \\
+		16384 ant & 17,64 & 2737,25 (+1,9\%) & 2685\\
+		20480 ant & 18,51 & 2724,9 (+1,5\%) & 2685\\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{gr17: 17 csúcsú gráfon futtatott CVRP}
 	\label{table:CVRP_gr17}
 \end{table}
 
@@ -360,22 +368,22 @@ Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 ra
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		1024 ant & 2,96 & 5026,3 & 4389 \\
-		16384 ant & 4,75 & 4217 & 4068 \\
-		20480 ant & 5,72 & 4103,3 & 3903 \\
+		1024 ant & 2,96 & 5026,3 (+35,7\%) & 4389 (+18,5\%) \\
+		16384 ant & 4,75 & 4217 (+13,9\%) & 4068 (+9,8\%) \\
+		20480 ant & 5,72 & 4103,3 (+10,8\%) & 3903 (+5,4\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
-		1024 ant & 8,31 & 4770,5 & 4001 \\
-		16384 ant & 12,17 & 4105,4 & 3864 \\
-		20480 ant & 16,61 & 4133 & 3881\\
+		1024 ant & 8,31 & 4770,5 (+28,8\%) & 4001 (+8\%) \\
+		16384 ant & 12,17 & 4105,4 (+10,8\%)& 3864 (+4,3\%) \\
+		20480 ant & 16,61 & 4133 (+11,6\%)& 3881 (+4,8\%) \\
 		\hline
 		\textbf{50 rep} & & & \\
-		1024 ant & 19,76 & 4467,5 & 3758 \\
-		16384 ant & 22,73 & 4259,3 & 4090 \\
-		20480 ant & 28,03 & 4211,6 & 4053 \\
+		1024 ant & 19,76 & 4467,5 (+20,6\%)& 3758 (+1,5\%)\\
+		16384 ant & 22,73 & 4259,3 (+15\%) & 4090 (+10,4\%)\\
+		20480 ant & 28,03 & 4211,6 (+13,7\%)& 4053 (+9,4\%)\\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{gr21: 21 csúcsú gráfon futtatott CVRP}
 	\label{table:CVRP_gr21}
 \end{table}
 
@@ -389,22 +397,22 @@ Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 ra
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & &\\
-		1024 ant & 5,62 & 1571,62 & 1283,05 \\
-		16384 ant & 8,61 & 1496,24 & 1342,16 \\
-		20480 ant & 13,01 & 1470,99 (+98.25\%) & 1310,18 (+76.57\%) \\
+		1024 ant & 5,62 & 1571,62 (+111,8\%) & 1283,05 (+72,9\%)\\
+		16384 ant & 8,61 & 1496,24 (+101,6\%) & 1342,16 (+80,7\%) \\
+		20480 ant & 13,01 & 1470,99 (+98,3\%) & 1310,18 (+76,6\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
-		1024 ant & 22,74 & 1529,4 & 1351,81 \\
-		16384 ant & 23,68 & 1375,43 & 1209,97 \\
-		20480 ant & 35,24 & 1415,17 (+90.72\%) & 1182,57 (+59.38\%) \\
+		1024 ant & 22,74 & 1529,4 (+106\%)& 1351,81 (+82\%)\\
+		16384 ant & 23,68 & 1375,43 (+85,3\%) & 1209,97 (+63\%)\\
+		20480 ant & 35,24 & 1415,17 (+90,7\%) & 1182,57 (+59,4\%) \\
 		\hline
 		\textbf{50 rep} & & & \\
-		1024 ant & 24,91 & 1434,34 & 1230\\
-		16384 ant & 41,26 & 1421,19 & 1361,51 \\
-		20480 ant & 61,01 & 1402,18 (+88.97\%) & 1092,92 (+47.29\%) \\
+		1024 ant & 24,91 & 1434,34 (+93,9\%) & 1230 (+65,8\%)\\
+		16384 ant & 41,26 & 1421,19 (+91,5\%) & 1361,51 (+83,5\%) \\
+		20480 ant & 61,01 & 1402,18 (+89\%) & 1092,92 (+47,3\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{a33: 33 csúcsú gráfon futtatott CVRP}
 	\label{table:CVRP_a33}
 \end{table}
 
@@ -423,17 +431,17 @@ Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 ra
 		20480 ant & 48,89 & 89271,67 (+123\%) & 56966,07 (+42\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
-		1024 ant & 76,93 & 81507,64 & 67745 \\
-		16384 ant & 133,62 & 74530,89 (+86.32\%) & 58940,59 (+47.34\%) \\
-		20480 ant & 146,36 & 76197,09 (+90.48\%) & 53783,10 (+34.45\%) \\
+		1024 ant & 76,93 & 81507,64 (+104\%) & 67745 (+69,4\%) \\
+		16384 ant & 133,62 & 74530,89 (+86,3\%) & 58940,59 (+47,3\%) \\
+		20480 ant & 146,36 & 76197,09 (+90,5\%) & 53783,10 (+34,5\%) \\
 		\hline
 		\textbf{50 rep} & & & \\
-		1024 ant & 223,39 & 75265,07 (+88.15\%) & 58007,69 (+45.01\%) \\
-		16384 ant & 223,5 & 69196,02 (+72.98\%) & 54812,73 (+37.02\%) \\
-		20480 ant & 215,03 & 64510,92 (+61.27\%) & 56817,40 (+42.04\%) \\
+		1024 ant & 223,39 & 75265,07 (+88,2\%) & 58007,69 (+45\%) \\
+		16384 ant & 223,5 & 69196,02 (+73\%) & 54812,73 (+37\%) \\
+		20480 ant & 215,03 & 64510,92 (+61,3\%) & 56817,40 (+42\%) \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{att48: 48 csúcsú gráfon futtatott CVRP}
 	\label{table:CVRP_att48}
 \end{table}
 
@@ -447,173 +455,163 @@ Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 ra
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
 		\hline
 		\textbf{10 rep} & & & \\
-		16384 ant & 110,84 & 887,96 & 645,34\\
-		20480 ant & 112,34 & 923,91 (+289.84\%) & 874,96 (+269.18\%)\\
+		16384 ant & 110,84 & 887,96 (+275\%) & 645,34 (+172\%)\\
+		20480 ant & 112,34 & 923,91 (+290\%) & 874,96 (+269\%)\\
 		\hline
 		\textbf{30 rep} & & & \\
-		16384 ant & 292,38 & 764,31 & 551,81 \\
-		20480 ant & 346,49 & 706,20 (+197.97\%) & 458,31 (+93.38\%) \\
+		16384 ant & 292,38 & 764,31 (+223\%) & 551,81 (+133\%) \\
+		20480 ant & 346,49 & 706,20 (+198\%) & 458,31 (+93\%) \\
 		\hline
 		\textbf{50 rep} & & & \\
-		16384 ant & 478,71 & 732,96 (+209.27\%) & 574,85 (+142.55\%)\\
-		20480 ant & 572,36 & 828,31 (+249.50\%) & 492.35 (+107.74\%)\\
+		16384 ant & 478,71 & 732,96 (+209\%) & 574,85 (+143\%)\\
+		20480 ant & 572,36 & 828,31 (+250\%) & 492,35 (+108\%)\\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{f72: 72 csúcsú gráfon futtatott CVRP}
 	\label{table:CVRP_f72}
 \end{table}
 
-
-
-
-
-
-
+\newpage
+\newpage
+\newpage
+\newpage
 
 \subsection{CVRPTW} \label{CVRPTWsection}
-Most már az időablakok adta bonyolítást is bevesszük a feltételek közé. Olyan adathalmazzal dolgoztam \cite{VRPTWdataset}, ami egyszerre írja elő a járművek kapacitását, illetve a célpontok készen állási és határidejét. Látható az eredményeken, hogy átlagosan \textcolor{red}{hány\%?} nőtt az eltérés az optimálishoz ahhoz képest, hogy mit tapasztaltunk kevesebb feltétel mellett. Én ezt két okra vezetem vissza. Egyik, hogy az ide tartozó adathalmaz jóval nagyobb méretű gráfokat tartalmazott (akár 100+ csúcs), mint a korábbi vizsgált adatok. Másik lehetséges ok, hogy sok feltétel mellett kevésbé hatékony a Hangyakolónia Optimalizáció. Míg a sima VRP esetén ha adott egy optimális megoldás, akkor abban kis sorrendcserék még ugyanúgy közeli eredményre vezetnek. A CVRP is ki volt ennek bizonos fokig téve (adathalmaz hiányában nem volt összemérhető a VRP-vel közvetlenül, csak a TSP-vel), de most a CVRPTW-nél fokozottan igaz, hogy kis módosítások teljesen rossz megoldást tudnak kreálni egy előző rövid végeredményből.
+Most már az időablakok adta bonyolítást is bevesszük a feltételek közé. Olyan adathalmazzal dolgoztam \cite{VRPTWdataset}, ami egyszerre írja elő a járművek kapacitását, illetve a célpontok készen állási és határidejét. A program tesztelése során egy korábban nem tapasztalt jelenséget észleltem: \textbf{gyakran egyáltalán nem talált megoldást a program}.
+
+Én ezt két okra vezetem vissza. Egyik, hogy az ide tartozó adathalmaz jóval nagyobb méretű gráfokat tartalmazott (akár 100 csúcs), mint a korábbi vizsgált adatok. Másik lehetséges ok, hogy sok feltétel mellett kevésbé hatékony a Hangyakolónia Optimalizáció. Míg a sima VRP esetén ha adott egy optimális megoldás, akkor abban kis sorrendcserék még ugyanúgy közeli eredményre vezetnek. A CVRPTW-nél fokozottan igaz, hogy kis módosítások teljesen rossz megoldást tudnak kreálni egy előző rövid végeredményből. A CVRP is ki volt téve bizonyos fokig a problémának, de ott ez látszólag nem különösebben befolyásolta az eredményeket.
 
 Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és C201. Mindkettő 101 csúcsot tartalmaz, viszont az algoritmus futtatható az első 25 vagy első 50 pontra is. A C101-ben a különböző feltételek csak néhány klienst engednek járművenként (megközelítőleg 5-10), míg a C201-ben szabadabbak a feltételek. Mindkét csúcshalmazt kipróbáltam 25, 50, és 100 csúcsra.
 
-% Size = 25
+Új oszlopként megjelent a "Hiba (\%)", mely arra utal, hogy az algoritmus a programfuttatások hány \%-ában nem talált egyáltalán megoldást. Az eredmények lejegyzésénél már a 10 iterációs eseteket elhagytam, ugyanis az összes gráfra 90-100\%-os hibával dolgoztak, vagyis egyáltalán nem tudtak eredményre jutni. Hasonló okokból kifolyólag csak a számítógépemen futtatható maximális, 20 blokkos, vagyis 20480 szálú eseteket néztem.
+
+% Size = 26
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{C101.25: 25 csúcs, minimális út: 191,3} \\
+		\multicolumn{5}{|c|}{C101.25: 2 csúcs, minimális út: 191,3} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant & &  &  &  \\
+		20480 ant & 39,31 & 441,68 (+131\%) & 336,19 (+76\%) & 70\% \\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  & \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant & 71,45 & 357,19 (+87\%) & 346,44 (+81\%) & 60\% \\
 		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{70 rep} &  &  &  &  \\
+		20480 ant & 94,93 & 410,70 (+115\%) & 391,42 (+105\%) & 60\% \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{A szigorúbb időablakokkal bíró adathalmaz első 26 csúcsára vett CVRPTW mérés (a nevében a 25 arra utal, hogy 25 kliens van, és egy raktár)}
 	\label{table:VRTPW_25_1}
 \end{table}
 
 % Size = 50
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{C101.50: 50 csúcs, minimális út: 362.4} \\
+		\multicolumn{5}{|c|}{C101.50: 50 csúcs, minimális út: 362.4} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant & &  &  &  \\
+		20480 ant &  &  &  & 100\%\\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  & \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant &  &  &  & 100\% \\
 		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{70 rep} &  &  &  &  \\
+		20480 ant &  &  &  & 100\% \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{ A szigorúbb időablakokkal bíró adathalmaz első 51 csúcsára vett CVRPTW mérés}
 	\label{table:VRTPW_50_1}
 \end{table}
 
 % Size = 100
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{C101.100: 100 csúcs, minimális út: 827.3} \\
+		\multicolumn{5}{|c|}{C101.100: 100 csúcs, minimális út: 827.3} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant & &  &  &  \\
+		20480 ant &  &  &  &  \\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  & \\
-		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant &  &  &  &  \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{[CVRPTW] A szigorúbb időablakokkal bíró adathalmaz teljes egészére vett mérés}
 	\label{table:VRTPW_100_1}
 \end{table}
 
-% Size = 25
+% Size = 26
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{C201.25: 25 csúcs, minimális út: 214.7} \\
+		\multicolumn{5}{|c|}{C201.25: 25 csúcs, minimális út: 214.7} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant & 41,61 & 590,41 (+175\%) & 432 (+101\%) & 70\%  \\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  & \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  & 477,76 (+123\%) & 452,63 (+111\%) & 70\% \\
+		16384 ant &  &  &  &  \\
+		20480 ant & 66,97 & 398,36 (+86\%) & 322 (+50\%) & 10\% \\
 		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{70 rep} &  &  &  &  \\
+		20480 ant & 96,92 & 469,16 (+119\%) & 396,80 (+85\%) & 60\% \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{A tágabb időablakokkal bíró adathalmaz első 26 csúcsára vett mérés}
 	\label{table:VRTPW_25_2}
 \end{table}
 
 % Size = 50
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{C201.50: 50 csúcs, minimális út: 360.2} \\
+		\multicolumn{5}{|c|}{C201.50: 50 csúcs, minimális út: 360.2} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant & &  &  &  \\
+		20480 ant &  &  &  & 100\% \\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant & &  &  \\
-		20480 ant &  &  & \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant &  &  &  & 100\% \\
 		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\hline
+		\textbf{70 rep} &  &  &  &  \\
+		20480 ant &  &  &  & \% \\
 		\hline
 	\end{tabular}
 	\caption{}
@@ -623,26 +621,21 @@ Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és 
 % Size = 100
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{C201.100: 100 csúcs, minimális út: 589.1} \\
+		\multicolumn{5}{|c|}{C201.100: 100 csúcs, minimális út: 589.1} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant & &  &  &  \\
+		20480 ant &  &  &  &  \\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant & &  &  \\
-		20480 ant &  &  & \\
-		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant &  &  &  &  \\
 		\hline
 	\end{tabular}
 	\caption{}
@@ -652,26 +645,21 @@ Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és 
 % Size = x
 \begin{table}[ht!]
 	\centering
-	\begin{tabular}{|p{2cm}||p{3cm}|p{3.5cm}|p{3.5cm}|}
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{4}{|c|}{Gráf neve: x csúcs, minimális út: x} \\
+		\multicolumn{5}{|c|}{Gráf neve: x csúcs, minimális út: x} \\
 		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min.\\
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
-		\textbf{10 rep} & & & \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{30 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant & &  &  &  \\
+		20480 ant &  &  &  &  \\
 		\hline
-		\textbf{30 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant & &  &  \\
-		20480 ant &  &  & \\
-		\hline
-		\textbf{50 rep} &  &  &  \\
-		1024 ant &  &  &  \\
-		16384 ant &  &  &  \\
-		20480 ant &  &  &  \\
+		\textbf{50 rep} &  &  &  &  \\
+		1024 ant &  &  &  &  \\
+		16384 ant &  &  &  &  \\
+		20480 ant &  &  &  &  \\
 		\hline
 	\end{tabular}
 	\caption{}
@@ -680,18 +668,80 @@ Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és 
 
 
 
-\section{Eredmények értékelése, továbbfejlesztési lehetőségek}
+\section{Eredmények értékelése, továbbfejlesztési lehetőségek} \label{results_section}
+Sok mérést végeztem, amiből szeretnék levonni több konklúziót.
 
+\subsection{A két Utazóügynök probléma (TSP) verzió összehasonlítása}
+
+Az első megvalósított algoritmusommal a TSP, vagyis az Utazóügynök problémát oldottam meg, segítségül hívva a már korábban látott Hangyakolónia optimalizációt. Az első verzió kellő tapasztalat hiányában készült, ezért több szempontból is problémásnak bizonyult. Ilyenek a hosszú futásidő és a korlátozott bővíthetőség. Látva a profilozó mérések eredményeit, olyan változtatásokat tudtam eszközölni, mint az adattípus cseréje \textit{float}-ra, valamint a kernelen belüli szigorú pointer szerinti paraméterátadás. A módosításoknak meglett az eredménye: hasonló végeredmények mellett \textbf{a futásidők 3-4-szer rövidebbek tudtak lenni}. Az összehasonlítás a \ref{fig:TSP-benchmark}. ábrán látható.
+
+\begin{figure}[ht!]
+	\includegraphics[width=75mm, keepaspectratio]{figures/TSP-benchmark-error.png}
+	\includegraphics[width=75mm, keepaspectratio]{figures/TSP-benchmark-time.png}
+	\caption{A két TSP verziót ugyanazon tesztadatokon futtattam. 20480 thread és 10 iteráció mellett Matlabban ábrázoltam a kapott eredményeket. Látható, hogy a TSP v2 hasonló eredmények mellett 3-4x gyorsabb futásra volt képes}
+	\label{fig:TSP-benchmark}
+\end{figure}
+
+Mindkét implementációról elmondható, hogy jócskán felülmúlta a "Brute force" megoldást. Míg nyers összehasonlításokkal egy 48 csúcsú gráf összes lehetséges csúcssorrendjének kiértékelése évmilliókba telt volna, az ACO képes volt erre 2 perc alatt úgy, hogy az optimális megoldástól átlagosan mindössze 41,2\%-kal hosszabb utat talált, legjobb esetben csak 31,6\%-kal.
+  
+
+\subsection{A különböző Járműútvonal-tervezési problémák}
 szép grafikonok plusz rizsa: több szál = lassabb, de jobb eredmény
 %TODO értékelés
 
 A futásidőkben gyakran nem fokozatos az emelkedés például a threadszám növelésével. Ez azért is lehet, mert időben nem egyszerre futtattam a teszteket, más volt a gép állapota, nem ugyanolyan programok futottak a háttérben stb.
 
-\begin{figure}[htbp!]
-	\centering
-	\includegraphics[width=0.5\textwidth]{figures/TSP\_v1\_hiba.png}
-	\caption{Matlabbal ábrázoltam a gráfcsúcsok számának függvényében az elméleti minimumhoz képesti átlagos hibát: TSP első verzió \textcolor{red}{NAGYOBB FELIRATOKAT ÉS 0-TÓL INDULJON} }
-	\label{fig:TSP_v1_hiba}
-\end{figure}
+\subsection{Kritériumfeltételek problémája a Hangyakolónia algoritmussal}
+\label{subsection:conditionsWithACO}
+Ahogy már korábban a \ref{sssec:HeldKarpEvaluate}. részben utaltam rá, a Hangyakolónia algoritmus számára is kihívással jár az, amikor a keresett útvonal különböző feltételeknek maradéktalanul meg kell feleljen. Dolgozatomban kétféle feltételrendszert vizsgáltam: a járművek korlátozott kapacitását, illetve a felhasználók megszabott időbeosztását. A CVRP esetében Most összefoglalnám, hogy miért érhettek el a feltételes esetben végzett méréseim jelentősen rosszabb eredményeket.
 
-%TODO Ábrát javítani
+Az ACO úgy működik, hogy eleinte a gyengébb megoldásokból generál egyre jobbakat. Feltételezi, hogy találunk megoldást, amit javítani tudunk. A kritériumfeltételek olyanok, hogy vagy teljesülnek, vagy nem. Nehéz úgy értékelni, hogy az első csak kicsit hibázott, a következő közepesen stb. Ha rossz, akkor nem engedhetjük a megoldáshalmazba.
+
+Most azt nézném meg, hogy ha véletlenszerű csúcssorrendeket generálok úgy, ahogyan ezt a hangyák is teszik az ACO-ban, akkor mekkora annak a valószínűsége, hogy találunk egy, a kritériumnak megfelelő megoldást.
+
+Ha egy esemény bekövetkezési valószínűsége p, akkor annak a valószínűsége, hogy n-szer ismételve az eseményt legalább 1 alkalommal bekövetkezik, binomiális valószínűségi eloszlás szerint:
+\begin{equation}
+	P(x>0) = 1-(1-p)^n
+	\label{binomial_probability}
+\end{equation}
+
+\subsection{Kapacitásfeltétel}
+Kezdjük a kapacitáskritériummal, mert az az egyszerűbb. Az első 5 adathalmazban minden csúcs igénye 1, vagyis azt kell néztünk, hogy az egyes járművek hány csúcsot járnak be. A kezdőcsúcsot nem kell beleszámolni, mert annak nincs igénye. 
+
+Probléma: Az (n-1) db csúcsot véletlenszerűen szétosztjuk k db jármű között. Mennyi annak a valószínűsége, hogy egyik járműhöz sem osztanak több, mint C db-ot? Első példa (gr17): 16 állomás, 3 jármű, a járművek kapacitása 6. \(p_{gr17}=?\)
+
+\newcommand{\pgr}{0,258}
+
+Csak 6-6-4 vagy 6-5-5 felosztásban lehetnek a csúcsok. Az összes eset \(3^{16}\), mert minden csúcsra eldöntjük, hogy melyik járműhöz osztjuk be. Összesen \(\binom{16}{6}*\binom{10}{6}*3 + \binom{16}{6}*\binom{10}{5}*3 \) esetben nem lesz több, mint 6 egyik jármű kapacitása sem.
+\begin{equation}
+	p_{gr17} = 3*\frac{\binom{16}{6}*\binom{10}{6} + \binom{16}{6}*\binom{10}{5}}{3^{16}} \approx \pgr
+	\label{gr17_p}
+\end{equation}
+Nézzük meg az att48-ra is ugyanezt: \((n-1)=47\) állomás, k=3 jármű, a járművek kapacitása C=16. \(p_{att48}=?\)
+
+\newcommand{\patt}{0,051}
+
+Ebben a problémában csak 16-16-15 felosztásban lehetnek a csúcsok. Az előbbi példához hasonlóan gondolkozva a valószínűség:
+
+\begin{equation}
+	p_{gr17} = \frac{3*\binom{47}{16}*\binom{31}{16}}{3^{47}} \approx \patt
+	\label{att48_p}
+\end{equation}
+
+\newcommand{\nInTenIterations}{4096000}
+
+Ha 20480 szálon 10 iterációt végzek, és 1 iteráción belül 20-szor generálok egymás után random sorrendet, akkor összesen n=\nInTenIterations kísérletet végzek. A \ref{binomial_probability}. egyenletbe behelyettesítve annak a valószínűsége, hogy találok megoldást:
+
+\begin{equation}
+	P_{gr17} = 1-(1-\pgr)^{\nInTenIterations} = 1
+	\label{gr17_P}
+\end{equation}
+\begin{equation}
+	P_{att48} = 1-(1-\patt)^{\nInTenIterations} = 1
+	\label{att48_P}
+\end{equation}
+
+Ezek alapján nem meglepő, hogy mindig találtam megoldást a CVRP tesztelése során.
+
+\subsection{Időablakok feltétele}
+Most jön annak a vizsgálata, hogy miért nem találtam megoldást olyan sok esetben a CVRPTW mérésekor. Sajnos itt már nem lehet olyan szépen intuitívan megállapítani egy adott problémában egy véletlenszerű bejárás megfelelőségének a valószínűségét. 

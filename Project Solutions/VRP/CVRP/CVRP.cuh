@@ -62,8 +62,7 @@ namespace CVRP {
     // Diagnostic function for printing given sequence
     __host__ float sequencePrint(CUDA_Main_ParamTypedef* params);
 
-
-
+    // Reduction to TSP
     __host__ __device__ inline int RouteSize(int size, int maxVehicles)
     {
         return size + maxVehicles - 1;

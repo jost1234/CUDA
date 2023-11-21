@@ -1,21 +1,21 @@
 \chapter{Implementáció} \label{implementationChapter}
 
-Vegyük górcső alá a témában végzett programozói munkámat. Összesen 4 algoritmussal foglalkoztam, amiket logikailag egymásra építve kezeltem:
+Ebben a fejezetben vizsgáljuk meg a témában végzett programozói munkámat. Összesen 4 algoritmussal foglalkoztam, melyeket logikailag egymásra építve kezeltem:
 TSP  \(\rightarrow\) VRP \(\rightarrow\) CVRP \(\rightarrow\) (C)VRPTW
 
 \section{Hangyakolónia algoritmus}
-A munkám során a felsorolt algoritmusok mindegyikét a hangyakolónia optimalizációval oldottam meg.
+A munkám során megvalósított algoritmusok mindegyikéhez a hangyakolónia optimalizációt használtam.
 
 \subsection{Adatstruktúrák}
-Az útvonaltervezési problémák gráfokon futnak, ezért elsődleges feladatom annak eldöntése volt, hogy milyen formában tároljam a gráfokat. Egyik legalapvetőbb megadási mód a szomszédossági mátrixával történő reprezentáció. Ennek előnye, hogy az egyes csúcsokhoz tartozó élek könnyen, direkt lekérdezhetőek, ezért a rajtuk végzett műveletek gyorsabbak lehetnek. Hátránya azonban, hogy minél kevesebb él van a gráfban, annál pazarlóbbá válik ez a megadás. Később tekintünk egyéb megadási módokat is, de most azokkal nem foglalkozok.
-Az adattípusok megválasztásában eltérőek az egyes megvalósítások: az első TSP verzióban például minden lebegőpontos számot \textit{double} típusú változóban tárolok, míg a többi algoritmusnál \textit{float} adatípust alkalmazok. A váltás hátterében az áll, hogy kipróbálva az első algoritmust azt tapasztaltam, hogy nem javít érdemben a valószínűségek dupla pontosságú számítása, cserébe sokat lehet spórolni a futásidőn egyszeres pontossággal.
+Az útvonaltervezési problémák gráfokon futnak, ezért elsődleges feladatom annak eldöntése volt, hogy milyen formában tároljam a gráfokat. Az egyik legalapvetőbb megadási mód, ami én is mindenhol alkalmaztam, az a szomszédossági mátrix reprezentáció. Előnye, hogy az egyes csúcsokhoz tartozó élek direkt lekérdezhetőek, ezért a rajtuk végzett műveletek gyorsabbak lehetnek. Hátránya azonban, hogy minél kevesebb él van a gráfban, annál pazarlóbbá válik ez a megadás. Ismertek más fajta tárolási módok is, de azokkal most nem foglalkoztam. \cite{alg_optim}
+Az adattípusok megválasztásában eltérőek az egyes megvalósítások: az első TSP verzióban például minden lebegőpontos számot \textit{double} típusú változóban tárolok, míg a többi algoritmusnál \textit{float} adattípust alkalmazok. A váltás hátterében az áll, hogy kipróbálva az első algoritmust azt tapasztaltam, hogy nem javít érdemben a valószínűségek dupla pontosságú számítása, cserébe sokat lehet spórolni a futásidőn a felbontás csökkentésével.
 
 
 \subsection{Feromonok nyilvántartása}
 A feromonokat az élekhez rendelem, ezért egy, az eredeti gráf topológiájával megegyező, teljes gráfban tárolom. A gráfélek eltárolása már másképpen történhet. 
 
 \subsubsection{TSP}
-A TSP során egy NxN-es mátrix által adott feromongráfon egyértelműen végrehajtható mohó algoritmus, vagyis olyan döntéshozatal-sorozat, hogy minden csúcsból abba a következő pontba megyünk, ahova a legtöbb feromon vezet (kivéve ha az a kezdőcsúcsba vezet, és még maradtak bejáratlan csúcsok). Hogy megtartsam az implementáció egyszerűségét, a TSP során tényleg NxN-es 2 dimenziós mátrixban tárolom a feromonértékeket. Tehát a TSP feromonmátrix a kezdőpillanatban a következő:
+A TSP során egy NxN-es mátrix által adott feromongráfon egyértelműen végrehajtható mohó algoritmus, vagyis olyan döntéshozatal-sorozat, hogy minden csúcsból abba a következő pontba megyünk, ahova a legtöbb feromon vezet (kivéve ha az a kezdőcsúcsba vezet, és még maradtak bejáratlan csúcsok). Hogy megtartsam az implementáció egyszerűségét, a TSP során tényleg NxN-es 2 dimenziós mátrixban tárolom a feromonértékeket. Tehát az n csúcsú TSP feromonmátrix a kezdőpillanatban a következő:
 
 $\begin{pmatrix}
 	0 & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
@@ -26,7 +26,7 @@ $\begin{pmatrix}
 
 Ahol P{\scriptsize i,j} az i-ből j-be él kezdeti feromonértéke. \( \forall i\in V(G) : P_{i,i}=0 \), mert a gráfunk egyszerű, nincs benne hurokél. Praktikusan \( P_{i,j}=0 \) ha az input gráfban \(v_{i,j}\) nincs behúzva. Ekkor már az első próbálkozások sem próbálnak meg arra menni. Ez a kikötés nem kötelező, előbb-utóbb ezen éleket úgyis elhalnának a feromonok. 
 
-\subsubsection{VRP variánsok}
+\subsubsection{VRP variánsok} \label{VRPvariants_subsection}
 A VRP esetében kicsit bonyolultabb a helyzet. Ha felírjuk egymás után az egyes járművek bejárási sorrendjét azt láthatjuk, hogy olyan, mintha több TSP-t hajtottunk volna végre egymás után. Képzeletben majdnem ez is történt. Úgy álltam hozzá a több útvonalhoz, hogy fejben kifeszítettem őket egy nagy körré. A kezdőcsúcs helyére gondolhatjuk azt, hogy k db csúcs van ott, akik egymástól 0 távolságra vannak. A gondolatmenetemet a \ref{tsp-to-vrp}. ábrán illusztrálom. 
 
 \begin{figure}[ht!]
@@ -35,14 +35,36 @@ A VRP esetében kicsit bonyolultabb a helyzet. Ha felírjuk egymás után az egy
 	\caption{A VRP visszavezethető a TSP-re, ha az egyes utakat képzeletben összefűzzük egy nagy körré \label{tsp-to-vrp} }
 \end{figure}
 
-Egy n csúcsot k járművel bejáró VRP visszavezethető egy n+k-1 csúcsú TSP-re. Az, hogy milyen egyéb feltételeket tűzünk még ki a feladatba, a feromonok nyilvántartásának módját nem befolyásolja, csak ott módosít, hogy hiába vezet út az adott körön, ha például a járművel kapacitásfeltétele sérül. Olyankor egyáltalán nem veszem figyelembe az adott megoldást.
+Egy n csúcsot k járművel bejáró VRP visszavezethető egy n+k-1 csúcsú TSP-re. Ha egy jármű nem vesz részt a folyamatban, akkor olyan, mintha \( (v_0,v_0) \) útvonalat tenne meg egy hurokélen haladva. Ezt most megengedjük, ezért a feromonokat tartalmazó mátrixot kibővítjük. A \(v_{0,k} \) csúcsra vonatkozó sor 0. eleme a \( v_{0,k}\)-ból \(v_{0,k+1}\)-be mutató él feromonértéke. Az első n sor ugyanolyan, mint a TSP esetén, ezzel biztosítva, hogy további járműveket belevéve a rendszerbe a TSP-ből át tudunk menni VRP-be.
 
-\textcolor{red}{BEFEJEZETLEN SZÖVEGRÉSZ}
-%TODO folytani
+Minden sor egy adott kiindulási csúcsra vonatkozik. Az i. sorban a kiindulási csúcs, ha 0 < i < n+k-1:
+\begin{itemize}
+	\item i = 0 :  \(v_{0,0}\)
+	\item 0 < i < n : \(v_i\)
+	\item n <= i < n + k - 1 :  \(v_{0,i-(n-1)}\)
+\end{itemize}
+
+Tehát a k járművel n csúcson futó VRP feromonmátrix a kezdőpillanatban a következő:
+
+$\begin{pmatrix}
+	P_{v_{0,0},v_{0,1}} & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
+	P_{1,0} & 0 & P_{1,2} & \cdots & P_{1,n-1} \\
+	\vdots & & \ddots \\
+	P_{n-1,0} & P_{n-1,1} & P_{n-1,2} & \cdots & 0 \\
+	P_{v_{0,1},v_{0,2}} & P_{v_{0,1},1} & P_{v_{0,1},2} & \cdots & P_{v_{0,1},n-1} \\
+	\vdots & & \\
+	P_{v_{0,i},v_{0,i+1}} & P_{v_{0,i},1} & P_{v_{0,i},2} & \cdots & P_{v_{0,i},n-1} \\
+	\vdots & & \\
+	P_{v_{0,k-1},v_{0,0}} & P_{v_{0,k-1},1} & P_{v_{0,k-1},2} & \cdots & P_{v_{0,k-1},n-1} \\
+\end{pmatrix}$
+
+Feltételek megnyilvánulása: az, hogy milyen egyéb feltételeket tűzünk még ki a feladatba, a feromonok nyilvántartásának módját nem befolyásolja. Csak ott módosít, hogy hiába vezet út az adott körön, ha például a járművel kapacitásfeltétele sérül. Olyankor egyáltalán nem veszem figyelembe az adott megoldást.
+
+
 
 \subsection{A rulettkerék algoritmus }
-Az algoritmusaimban többször feltűnik a random számok kezelése. Hallgatótársam, Tóth Andor Márk sokat foglalkozott a témával, és diplomamunkájából sokat tanulhattam a témában \cite{alg_optim}. Valószínűségszámításból tudjuk, hogy igazi véletlen számok nem léteznek. Elméletileg nincs is semmi értelme ennek a fogalomnak. Nézzük például a klasszikus példát: a pénzérme feldobását, ami a földre érve fejjel vagy írással felfelé landol (vagy egyes nagy sikerű filmekben a sirály még a földet érés előtt elkapja és elviszi). Ha a tér minden egyes pontjában pontosan ismernénk a különböző légnyomásértékeket, valamint tökéletesen tisztában lennénk a feldobás dinamikai jellemzőivel, mindig pontosan tudnánk, hogy melyik oldalára fog esni az érme. A véletlen illúzióját ezen ismeretek hiánya okozza. Póker közben is feltehetően nem ismerjük a keverő pontos technikáját, ezért az osztott lapok jó esetben véletlenszerűnek hatnak. A számítógépek alapesetben determinisztikus gépek, hiszen adott utasításokat hajtanak végre. 
-A CUDA is úgynevezett pszeudorandomszám-generátor elvét követi. Ez tökéletesen meghatározható egy kezdeti érték alapján, kell egy seed, ami viszont már független lehet a számítógéptől. Én a klasszikus megoldást választottam, miszerint az 1970. január 1. éjfél óta eltelt másodpercek számát vettem seednek.
+Az algoritmusaimban többször feltűnik a random számok generálásának problémája. Hallgatótársam, Tóth Andor Márk sokat foglalkozott a témával, és diplomamunkájából sokat tanulhattam a témában \cite{alg_optim}. Valószínűségszámításból tudjuk, hogy igazi véletlen számok nem léteznek. Elméletileg nincs is semmi értelme ennek a fogalomnak. Nézzük például a klasszikus példát: a pénzérme feldobását, ami a földre érve fejjel vagy írással felfelé landol (vagy egyes nagy sikerű filmekben a sirály még a földet érés előtt elkapja és elviszi). Ha a tér minden egyes pontjában pontosan ismernénk a különböző légnyomásértékeket, valamint tökéletesen tisztában lennénk a feldobás dinamikai jellemzőivel, mindig pontosan tudnánk, hogy melyik oldalára fog esni az érme. A véletlen illúzióját ezen ismeretek hiánya okozza. Póker közben feltehetően nem ismerjük a keverő pontos technikáját, ezért az osztott lapok jó esetben véletlenszerűnek hatnak. A számítógépek alapesetben determinisztikus gépek, hiszen adott utasításokat hajtanak végre. 
+A CUDA az úgynevezett PRNG (pszeudorandomszám-generátor) elvét követi. A generált szám tökéletesen meghatározható egy kezdeti érték alapján, ezért kell egy seed, ami viszont már független lehet a számítógéptől. Én a klasszikus megoldást választottam, miszerint az 1970. január 1. éjfél óta eltelt másodpercek számát vettem seednek.
 GPU oldalon a CuRand függvénykönyvtár videokártyás támogatást biztosít pszeudorandom számok generálására, ehhez a következő egyszerű kernelt kell futtatni:
 
 \begin{lstlisting}[style=CStyle]
@@ -64,8 +86,22 @@ A kernelt CPU oldalról kell felhívni a kiválasztott seeddel.
 	setup_kernel <<< BlockNum, threadPerBlock >>> (d_kernelParams.state, time(NULL) * rand());
 \end{lstlisting}
 
-\begin{lstlisting}[style=CStyle]
+\begin{lstlisting}[style=CStyle,showstringspaces=false]
 	
+\end{lstlisting}
+
+\section{A végeredmény számítása}
+\label{sec:getResult}
+Mind minden algorimtus esetében, itt is külön figyelmet kell fordítanunk arra, hogy a végső eredményt milyen formában állítjuk elő. A legkézenfekvőbb gondolat az, hogy út közben, ha minden korábbinál rövidebb megoldást találunk, akkor azt feljegyezzük, és a végén ami a legrövidebb megoldás, kinevezzük outputnak. Ezzel a megközelítéssel elméletben nincsen gond. Gyakorlatban amikor a programjaimat teszteltem, nagyon gyakran hibás végeredményt kaptam így. A hiba detektálása során arra jöttem rá, hogy a GPU nagyon gyakran hibázik, főleg adatmozgatások során. Ez azzal járt, hogy néha rossz eredményt, néha pedig semmit sem töltött a erre kijelölt tömbbe. Felismerésem után egyéb módot is kitaláltam. A megadott számú iteráció után ott marad a feromongráf, ami alapján a program önmagát tanította. Ebben a gráfban végrehajthatunk egy mohó algoritmust: kiindulva az előírt kezdőcsúcsból következő csúcsnak a megmaradtak közül mindig azt a csúcsot választjuk, ahova a legtöbb feromon vezet. Ekkor közvetlenül a kijelölt eredménytömbbe dolgozok, megkerülve a kritikusnak tapasztalt adatmozgatást. Hogy ne írjak felül jó megoldást, a mohó keresést csak akkor hajtom végre, ha a tömbben talált szekvencia érvénytelen.
+
+\begin{lstlisting}[style=CStyle,showstringspaces=false]
+	// Choosing path with greedy algorithm if we dont have a valid answer
+	if (!validRoute(&params)) 
+	{
+		// Mostly occurs when it did not find any routes, but we also prepare for corrupted memory
+		printf("Need to find route in greedy mode!\n");
+		greedySequence(&params);
+	}
 \end{lstlisting}
 
 
@@ -97,12 +133,67 @@ Van még néhány olyan algoritmus paraméter, ami a futás során változatlan,
 \end{lstlisting}
 
 Először a "Repetition" konstansokról: Az algoritmus így működik: Csináld REPETITIONS alkalommal, hogy jön RANDOM\_GENERATIONS iteráció olyan hangya, aki teljesen véletlenszerűen végigmegy a gráfon, majd őket követi FOLLOWER\_GENERATIONS iterációban olyan hangya, aki a feromon alapján dönti el az útját. Minél több iterációt hajtunk végre, annál több utat vizsgálunk meg, és elvileg annál pontosabb lehet a végeredmény.
-Az előbbiektől némileg elkülönül a SERIAL\_MAXTRIES, ami azért felel, hogy többször lefuttathassuk egymás után a GPU kernelt. Mivel az ACO egy heurisztikus algoritmus, futásonként más és más eredményt szolgáltat. Éppen ezért érdemes lehet többször (például 10-szer) egymás után végrehajtani az algoritmust, és megvizsgálni az egyes eredményeket. Ilyenkor végső eredménynek célszerű a legrövidebb megoldást venni. Sajnos a tesztelések során azt tapasztaltam, hogy a GPU főleg amikor több szálon dolgozik, mint ami fizikailag elérhető CUDA core formájában, gyakran hibázik, és nem vagy rosszul ír át memóriaterületeket. Azon memóriaterület, mely tárolja azt aktuális minimális szekvenciát, rendkívül ki van téve 
+Az előbbiektől némileg elkülönül a SERIAL\_MAXTRIES, ami azért felel, hogy többször lefuttathassuk egymás után a GPU kernelt. Mivel az ACO egy heurisztikus algoritmus, futásonként más és más eredményt szolgáltat, ezért érdemes lehet többször (például 10-szer) egymás után végrehajtani. Ilyenkor végső eredménynek célszerű a legrövidebb megoldást venni. Sajnos a tesztelések során azt tapasztaltam, hogy a GPU főleg amikor több szálon dolgozik, mint ami fizikailag elérhető CUDA core formájában, gyakran hibázik, és vagy egyáltalán nem, vagy rosszul ír át memóriaterületet. Azon memóriaterület, mely tárolja azt aktuális minimális szekvenciát, rendkívül ki van téve hasonló hibázásoknak. Elképzelhető, hogy a programfutás eredetileg tervezett végén érvénytelen adat lenne az eredmény. Ilyenkor mentő ötletként végrehajtok egy mohó algoritmust a feromongráfon. A kezdőcsúcs a \(v_{0}\), és a soron következő csúcs mindig az a megmaradt pont lesz, ahova a legtöbb feromon vezet.
 
-\textcolor{red}{Hardver ismertetése}
-\textcolor{red}{Többi algoritmus ismertetése}
+\begin{lstlisting}[style=CStyle]
+if (!validRoute(&params)) {
+	greedySequence(&params);
+}
+\end{lstlisting}
 
-%TODO többi algoritmus?
+\section{TSP második verzió}
+Amikor másodszorra álltam neki a TSP programozásának, már számos tapasztalattal bírtam. Első feladatomnak éreztem a felhasználóra bízni, hogy hány szállal kívánja használni az alkalmazást. Az ants változó már nem konstans, és parancssori argumentummal befolyásolható.
+
+\begin{lstlisting}[style=CStyle]
+// Command Line Syntax: ... --ants [number of ants]
+if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
+{
+	if (sscanf(argv[++i], "%d", &ants) != 1) {
+		fprintf(stderr, "Unable to read ant number!\n");
+	}
+	else {
+		printf("Given ant number : %d\n", ants);
+	}
+}
+\end{lstlisting}
 
 
+ Az első verzió nagyon lassúra sikerült, ezért több módon is igyekeztem gyorsabbnak lenni. Azt találtam, hogy nem olyan fontos a feromonok pontos tárolása, ezért \textit{double} helyett \textit{float} adattípusra váltottam. 
+ Sok függvényhívást alkalmazok, ezért kritikusnak bizonyult a paraméterátadások gyorsítása is. A kernel által használt változókat egy általam definiált struktúrába szerveztem. Ilyen struktúrák pointereit adom csak át függvények között, ezzel kevesebb utasítást vesznek el a vezérlésátadások. A random generált szekvenciákat úgy állítom elő hamarabb, hogy a csúcsok egyesével sorsolása helyett csak n db véletlen csúcscserét alkalmazok. Arról, hogy ezek mekkora sebességnövekedést okoztak, a \ref{results_section}. részben írok.
+
+\section{VRP}
+
+A VRP újítása, hogy több kis alegységre bomlik a körút, mert több járművet használhatunk. A \ref{VRPvariants_subsection}. részben mutatottak alapján az n csúcsú k járműves VRP-t visszavezettem egy n+k-1 csúcsú TSP-re. A kódimplementációban is látszik, hogy ezen ötlet után elég a korábbi kódot használnunk. Jól jött, hogy a TSP v2-ben bővíthetőre lett megcsinálva a parametrizálás.
+
+\begin{lstlisting}[style=CStyle,showstringspaces=false]
+	
+// Reduction to TSP
+__host__ __device__ inline int RouteSize(int size, int maxVehicles)
+{
+	return size + maxVehicles - 1;
+};	
+	
+\end{lstlisting} 
+
+\section{CVRP}
+
+A CVRP azt jelenti, hogy feltételül kaptuk a járművek korlátozott kapacitásának számításba vételét. A VRP-t egy kapacitásviszonyokat kiértékelő függvénnyel egészítettem ki, melynek logikáját a \ref{fig:CVRP_chart}. ábrán látható folyamatábra szemlélteti.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=150mm, keepaspectratio]{figures/Capacity.drawio.png}
+	\caption{A CVRP során használt, kapacitásfeltételt kiértékelő függvény folyamatábrája }
+	\label{fig:CVRP_chart}
+\end{figure}
+
+\section{CVRPTW}
+
+A CVRPTW során a kapacitáskorlátok mellett az ügyfél által megszabott határidők is további nehézséget okoznak. A CVRP-t egy időablakokat kiértékelő függvénnyel egészítettem ki, melynek logikáját a \ref{fig:VRPTW_chart}. ábrán látható folyamatábra szemlélteti.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=150mm, keepaspectratio]{figures/timeWindow.drawio.png}
+	\caption{A VRPTW során használt, időablak-feltételt kiértékelő függvény folyamatábrája }
+	\label{fig:VRPTW_chart}
+\end{figure}
 

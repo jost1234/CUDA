@@ -12,11 +12,10 @@ figure;
 plot(size,error1,'b-x', size,error2,'r-x');
 
 
-xlabel('Gráfcsúcsok száma','FontSize',20);
-ylabel (' Átlagos hiba (%)','FontSize',20);
+xlabel('Gráfcsúcsok száma');
+ylabel (' Átlagos hiba (%)');
 title('Százalékos eltérés az optimumtól','FontSize',20);
-lgd = legend('TSP v1', 'TSP v2');
-fontsize(lgd,14,'points')
+legend('TSP v2', 'TSP v2');
 xlim([0,50])
 ylim([0,50]);
 
@@ -26,8 +25,7 @@ plot(size,time1,'b-x', size,time2,'r-x');
 
 xlabel('Gráfcsúcsok száma','FontSize',20);
 ylabel (' Futásidő (sec)','FontSize',20);
-title('Futásidő mérések','FontSize',20);
-lgd = legend('TSP v1', 'TSP v2');
-fontsize(lgd,14,'points')
+title('Futásidő mérések (20480 thread, 10 iteráció)','FontSize',20);
+legend('TSP v2', 'TSP v2');
 xlim([0,50])
-ylim([0,160]);
+ylim([0,200]);

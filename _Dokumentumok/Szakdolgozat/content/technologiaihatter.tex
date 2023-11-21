@@ -1,5 +1,5 @@
 \chapter{Technológiai háttér} \label{technologyChapter}
-Ebben a fejezetben szeretném ismertetni a GPU porgramozáshoz felhasznált szoftver- és hardveregyüttest. Először a grafikus segédprocesszoron történő általános célú programozást tárgyalom, majd bemutatom az Nvidia\textsuperscript{TM} által erre kifejlesztett párhuzamos számítási platformot, a CUDA keretrendszert. Részletezem a megértéshez szükséges fontosabb fogalmakat, valamint bemutatom a CUDA platformon fejlesztéshez elengedhetetlen lépéseket. A fogalmak összegyűjtéséhez nagymértékben ihletett nyújtott többek között Király Gábor diplomamunkája, mely hasonló témakörrel foglalkozik. \cite{kvantum_optim}
+Ebben a fejezetben szeretném ismertetni a GPU porgramozáshoz felhasznált szoftver- és hardveregyüttest. Először a grafikus segédprocesszoron történő általános célú programozást tárgyalom, majd bemutatom az Nvidia\textsuperscript{TM} által erre kifejlesztett párhuzamos számítási platformot, a CUDA keretrendszert. Részletezem a megértéshez szükséges fontosabb fogalmakat, valamint röviden bemutatom, hogy lehet Visual Studio segítségével CUDA platformon C++ nyelven többszálú programot fejleszteni. A fogalmak összegyűjtéséhez nagymértékben ihletett nyújtott többek között Király Gábor diplomamunkája, mely hasonló témakörrel foglalkozik. \cite{kvantum_optim}
 
 \section{GPGPU}
 A GPGPU (general-purpose computing on graphics processing units) egy olyan
@@ -7,13 +7,13 @@ szoftverfejlesztési gyakorlat, melynek során a grafikus feldolgozóegységet (
 célú számítási műveletek elvégzésére használjuk. \cite{kvantum_optim} Korábban a GPU-t azért találták fel, hogy a grafikus felületek elterjedése után a renderelési, 2D-s vagy 3D-s megjelenítési feladatok terén tehermentesítse a CPU-t. Később kiderült, hogy a GPU alkalmas általánosabb megközelítésekre is, bizonyos aritmetikai utasítások kifejezetten hatékonyan tudnak működni rajta.
 
 \subsection{Motiváció}
-Az 1980-as években megjelentek az első személyi számítógépek (PC-k), melyek központi feldolgozóegységei (CPU) kezdetekben néhány MHz-es belső órajellel működtek. Akkor az volt a számítástechnikai fejlesztőmérnökök fő eszköze a számítási gyorsaság növelésére, hogy az órajelfrekvenciát növelték. Ez frekventáltabb utasítás-végrehajtást biztosított, és evidens volt, hogy a nagyobb frekvencia nagyobb számítási erővel is jár. Számos kiváló mérnöki megoldás született, ezek közül talán az egyik legjelentősebb találmány a fáziszárt hurok (Phase-Locked Loop - PLL). A PLL egy olyan Szabályozható hurok, amely (a részleteket mellőzve, nem tárgya dolgozatomnak) egy bemeneti referenciafrekvenciát tud megsokszorozni. Nélküle gyakorlatilag képtelenség lett volna felhasználói szinten 50-60 MHz fölé menni a személyi számítógépek belső órajelénél. Nagyjából 30 évvel később elérték a hardverfejlesztők, hogy a legtöbb asztali processzor órajele 1GHz és 4GHz között legyen képes működni, ez az eredeti PC-k operatív belső frekvenciájának több, mint az ezerszerese. Napjainkban változás látható a fejlesztési trendekben, ugyanis az órajelnövelést a processzorok hődisszipációja felülről korlátozza. Egyelőre nem tűnik könnyen lehetségesnek 5GHz fölé menni úgy, hogy közben az eszköz helyes működése garantálható legyen. A különböző hűtési technológiák (léghűtés, vízhűtés) bizonyos fokig tudnak javítani a sebességen, viszont nagyságrendeket ugorni velük sem lehetséges. 
+Az 1980-as években megjelentek az első személyi számítógépek (PC-k), melyek központi feldolgozóegységei (CPU) kezdetekben néhány MHz-es belső órajellel működtek. Akkor az volt a számítástechnikai fejlesztőmérnökök fő eszköze a számítási gyorsaság növelésére, hogy az órajelfrekvenciát növelték. Ez frekventáltabb utasítás-végrehajtást biztosított, és evidens volt, hogy a nagyobb frekvencia nagyobb számítási erővel is jár. Számos kiváló mérnöki megoldás született, ezek közül talán az egyik legjelentősebb találmány a fáziszárt hurok (Phase-Locked Loop - PLL). A PLL egy olyan Szabályozható hurok, amely (a részleteket mellőzve, nem tárgya dolgozatomnak) egy bemeneti referenciafrekvenciát tud megsokszorozni. Nélküle gyakorlatilag képtelenség lett volna felhasználói szinten 50-60 MHz fölé menni a személyi számítógépek belső órajelénél. Nagyjából 30 évvel később elérték a hardverfejlesztők, hogy a legtöbb asztali processzor órajele 1GHz és 4GHz között legyen képes működni, ez az eredeti PC-k operatív belső frekvenciájának több, mint az ezerszerese. Napjainkban változás látható a fejlesztési trendekben, ugyanis az órajelnövelést a processzorok hődisszipációja felülről korlátozza. Egyelőre nem tűnik könnyen lehetségesnek 5GHz fölé menni úgy, hogy közben az eszköz helyes működése garantálható legyen. A különböző hűtési technológiák (léghűtés, vízhűtés) bizonyos fokig tudnak javítani a sebességen, viszont nagyságrendeket ugrani velük sem lehetséges. 
 A számítógépgyártók mai napig új, alternatív megoldásokat keresnek a számítási teljesítmény növelésére. Napjainkban a kutatásoknak két nagy témája van. Egyik a kvantumszámítógépek témaköre, amit dolgozatomban nem részletezek. Másik aktívan vizsgált lehetőség a párhuzamosítás minél több szálon. Már a CPU-k fejlesztésénél is megfigyelhető, hogy inkább a minél több processzormag telepítése az iparági trend.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=150mm, keepaspectratio]{figures/CPU-cores-trend.png}
-	\caption{Látható, hogy kb. 2010-re befejeződött a CPU-k órajelfrekvencia-növekedése, helyette egyre nőni kezdtek a magok számai. \cite{CPUcores} }
+	\caption{Látható, hogy kb. 2010-re befejeződött a CPU-k órajelfrekvencia-növekedése, helyette egyre nőni kezdett az egy házon belüli magok száma. \cite{CPUcores} }
 \end{figure}
 
 Párhuzamosításra legalkalmasabb a grafikus segédprocesszor, a GPU, hiszen felépítéséből adódóan erre készült. Amíg a CPU feladata az, hogy műveletek egy adott szekvenciáját, és annak minden utasítását a lehető leggyorsabban hajtsa végre, addig a GPU célja minél több szál (akár több ezer, vagy több tízezer) párhuzamos futtatása. A videokártyák előnye akkor válik láthatóvá, ha ugyanazt az utasítást több nagy adattömbön kell végrehajtani. Ez az úgynevezett SIMD megközelítés (Single Instruction Multiple Data). \cite{kvantum_optim}
@@ -28,10 +28,8 @@ Az \ref{TransistorsInGpu}. ábra szemlélteti, hogy a CPU-hoz képest a GPU-n ar
 
 A videokártya sokkal nagyobb utasítás-áteresztőképességet, valamint memória-sávszélességet biztosít, mint a CPU hasonló ár és energiafogyasztás mellett. Egyéb számítási eszközök, mint az FPGA-k is lehetnek nagyon energiatakarékosak, viszont azok sokkal kevésbé rugalmasan programozhatóak, mint a GPU-k, ezért a fejlesztési idő sokkal hosszabb lesz és az alkalmazást nehezebb karbantartani. \cite{CUDAdoc}
 
-
-
 \section{CUDA}
-Többféle keretrendszer is megvalósítja a GPGPU szabta alapelveket. Munkám a CUDA ( Compute Unified Device Architecture ) rendszerét használtam. A CUDA egy, az NVIDIA által fejlesztett párhuzamos számítási platform és API (felhasználói interfész), amely szoftveres támogatást nyújt az ezzel kompatibilis grafikus feldolgozóegységek általános célú programozására \cite{kvantum_optim}. 
+Többféle keretrendszer is megvalósítja a GPGPU szabta alapelveket. Munkám során a CUDA ( Compute Unified Device Architecture ) rendszerét használtam. A CUDA egy, az NVIDIA által fejlesztett párhuzamos számítási platform és API (felhasználói interfész), amely szoftveres támogatást nyújt az ezzel kompatibilis grafikus feldolgozóegységek általános célú programozására \cite{kvantum_optim}. 
 
 A programozás C vagy C++ nyelven történhet, melyet minimális nyelvi kiegészítésekkel bővítettek, többek között a szálkezelés rendszerszintű használata érdekében. A CUDA programozás tanulásához elérhető egy felettébb kiterjedt dokumentáció a gyártó weboldalán, melyet folyamatosan frissítenek. \cite{CUDAdoc}
 
@@ -40,14 +38,14 @@ A továbbiakban összefoglalom a legfontosabb fogalmakat úgy, hogy ismertetem, 
 
 \subsubsection{Kernel, és a többi függvénytípus}
 A programozó speciális függvényeket definiálhat, melyeket kernelnek nevezünk. A kernel létesít kapcsolatot a CPU (host) és GPU (device) között. A CPU hívja meg a függvényt, amit aztán a GPU hajt végre, tehát a kernelfüggvény törzse a videokártyán fut végig. Minden egyes kernel példányt egy számára megadott szál hajt végre.
-A kernel a "\textit{\_\_global\_\_}" kulcsszóval definiálható. Ezt a függvény fejléce elé kell írni, ekkor tudja tudni a szoftverkörnyezet fordítóprogramja, a compiler, hogy mostantól GPU kódként kell értelmezze a programot. 
+A kernel a "\textit{\_\_global\_\_}" kulcsszóval definiálható. Ezt a függvény fejléce elé kell írni, ettől fogja tudni a szoftverkörnyezet fordítóprogramja, a compiler, hogy mostantól GPU kódként kell értelmezze a programot. Minden, a kernelt végrehajtó szál egy egyedi thread azonosítót kap, mely a beépített threadIdx változón keresztül érhető el a függvényen belül.
 
-Egyéb kulcsszavak is léteznek. Egyik a "\textit{\_\_host\_\_}", ami azt jelzi, hogy CPU által hívott, majd ugyanúgy általa futtatandó kódrészlet következik. Ha nem adunk meg egy függvény elé kulcsszót, akkor azt a preprocesszor host függvénnyé írta át, tiszta CPU kódként értelmezi, mintha nem is lenne a szoftverkörnyezet mögött a CUDA platform. Másik használható jelző a "\textit{\_\_device\_\_}", amely tisztán GPU függvényt jelez. A két kulcsszó vegyíthető: amennyiben azt írjuk, hogy "\textit{\_\_device\_\_ \_\_host\_\_}", a fordító ezt minden egyes híváskor a végrehajtó saját kódjának tekinti, vagyis nem hajt végre vezérlésátadást az eszközök között. Hasznosítható például függvénykönyvtárak GPU-ra kiterjesztésére.
+Egyéb kulcsszavak is léteznek. Egyik a "\textit{\_\_host\_\_}", ami azt jelzi, hogy CPU által hívott, majd ugyanúgy általa futtatandó kódrészlet következik. Ha nem adunk meg egy függvény elé kulcsszót, akkor azt a preprocesszor host függvénnyé írja át, tiszta CPU kódként értelmezi, mintha nem is lenne a szoftverkörnyezet mögött a CUDA platform. Másik használható jelző a "\textit{\_\_device\_\_}", amely tisztán GPU függvényt jelez. A két kulcsszó vegyíthető: amennyiben azt írjuk, hogy "\textit{\_\_device\_\_ \_\_host\_\_}", a fordító ezt minden egyes híváskor a végrehajtó saját kódjának tekinti, vagyis nem hajt végre vezérlésátadást az eszközök között. Hasznosítható például függvénykönyvtárak GPU-ra kiterjesztésére.
 
 \paragraph{}
-Az, hogy a kernelt egy adott híváskor hány CUDA szálon szeretnénk futtatni, az új nyelvi elemként megjelenő <<< · · · >>> végrehajtási konfiguráció szintaxissal tudjuk specifikálni. Sajnos a Visual Studio még szintaxishibaként kezeli \textcolor{red}{verziószám?}, ezért a programozónak érdemes odafigyelni, hogy milyen IntelliSense hibaüzeneket vesz figyelembe. A \ref{invalidErrors}. ábrán például olyan fogalmakra jelez a fejlesztői környezet, amelyek a keretrendszer adta bővítményekben vannak definiálva. Minden, a kernelt végrehajtó szál egy egyedi thread azonosítót kap, mely a beépített threadIdx változón keresztül érhető el a kernelből.
+Azt, hogy a kernelt felhívásakor hány CUDA szálon szeretnénk futtatni, az új nyelvi elemként megjelenő < < < ··· > > > végrehajtási konfiguráció szintaxissal tudjuk specifikálni. Sajnos a Visual Studio még szintaxishibaként kezeli a mostani, CUDA 12.3 verzióban, ezért a programozónak érdemes odafigyelni, hogy milyen IntelliSense hibaüzeneteket vesz figyelembe. A \ref{invalidErrors}. ábrán például olyan fogalmakra jelez a fejlesztői környezet, amelyek a keretrendszer adta bővítményekben vannak definiálva. 
 
-%TODO verziószám
+
 
 \begin{figure}[ht!]
 	\centering
@@ -57,7 +55,7 @@ Az, hogy a kernelt egy adott híváskor hány CUDA szálon szeretnénk futtatni,
 
 \paragraph{Példa:} A hivatalos dokumentáció az alábbi példát adja kernel definícióra. A kódrészlet az N méretű A és B vektorok összeadását végzi és az eredményt a C vektorban tárolja:
 
-\begin{lstlisting}[style=CStyle]
+\begin{lstlisting}[style=CStyle,showstringspaces=false]
 	#define N 1024
 	
 	// Kernel definition
@@ -81,7 +79,7 @@ Megfelelő CPU programkörnyezet hozzáadásával ellenőrizhető, hogy a péld�
 \subsubsection{Szálkezelés}
 Ahhoz, hogy CUDA programunk megfelelően működjön, a szálainkat rendszereznünk kell. 
 
-Most bemutatom, hogy CUDA API-ban milyen típusú szálak léteznek, és ezeket hogyan lehet különböző szintű szinkronizációkba hozni. Ezen fejezetrészhez intenzíven tanulmányoztam az NVIDIA hivatalos fórumának bejegyzéseit, amit mivel az ott dolgozó fejlesztőmérnökök szerkesztenek, relevánsnak tekintettem. Az egyik leghasznosabb cikket a "Cooperative Groups" nevű bővítményről találtam \cite{CUDAcoopgroups}.
+Most bemutatom, hogy CUDA API-ban milyen típusú szálak léteznek, és ezeket hogyan lehet különböző szintű szinkronizációkba hozni. Ezen fejezetrészhez intenzíven tanulmányoztam az NVIDIA hivatalos fórumának bejegyzéseit, amit mivel az ott dolgozó fejlesztőmérnökök szerkesztenek, relevánsnak tekintettem. Az egyik leghasznosabb cikket a "Cooperative Groups" nevű bővítményről találtam, a példákat belőle idézem \cite{CUDAcoopgroups}.
 
 Hatékony párhuzamosított programnak három alappillére van: \cite{kvantum_optim}
 \begin{enumerate}
@@ -92,7 +90,7 @@ Hatékony párhuzamosított programnak három alappillére van: \cite{kvantum_op
 Foglalkozzunk jelen esetben a 3. ponttal, a szinkronizálással. Szinkronizáció szükséges ahhoz, hogy elosztott programunk biztonságos, fenntartható és moduláris legyen. A CUDA 9 bevezette az ún. \textbf{Kooperatív csoport} nevű absztrakciót (angolul Cooperative Groups) \cite{CUDAdoc_coopGroups}, amely erős támogatást nyújt a kerneleknek ahhoz, hogy dinamikusan alakíthassanak ki csoportokat a szálak között.
 
 \paragraph{}
-Korábban a CUDA API egy nagyon egyszerű, de csak speciális esetekben működő megoldást biztosított a szinkronizáció kérdésére, a blokkon belüli "barrier" szinkronizációt: A "\_\_syncthreads()" függvény addig nem engedte tovább futni a szálakat, amíg \textbf{a blokkon belül} minden még futó szál el nem jutott az adott pontig. Belátható, hogy nagy szál szám mellett ez nem elég, ugyanis egy blokkon belül jelenlegi GPU-kon legfeljebb 1024 szál futhat. Ha mi több, mint 1024 threadből álló programot írnánk, azaz több Streaming multiprocessor (SM) futna egymással párhuzamosan, akkor ezek összehangolását eddig nem tudtuk volna megfelelő szoftveres támogatással elvégezni. Másik probléma az, hogyha a szálainknak csak egy kis, adott számú (például 4 vagy 32, de tipikusan 2-hatvány) részhalmazát akarjuk összehangolni akkor korábban azt sem tudtuk szépen megoldani.
+Korábban a CUDA API egy nagyon egyszerű, de csak speciális esetekben működő megoldást biztosított a szinkronizáció kérdésére, a blokkon belüli "barrier" szinkronizációt: A "\_\_syncthreads()" függvény addig nem engedte tovább futni a szálakat, amíg \textbf{a blokkon belül} minden még futó szál el nem jutott az adott pontig. Belátható, hogy nagy szál szám mellett ez nem elég, ugyanis egy blokkon belül jelenlegi GPU-kon legfeljebb 1024 szál futhat. Ha mi több, mint 1024 threadből álló programot írnánk, azaz több Streaming multiprocessor (SM) futna egymással párhuzamosan, akkor ezek összehangolását eddig nem tudtuk volna megfelelő szoftveres támogatással elvégezni. Másik probléma az, hogy ha a szálainknak csak egy kis, adott számú (például 4 vagy 32, de tipikusan 2-hatvány) részhalmazát akarjuk összehangolni akkor korábban azt sem tudtuk szépen megoldani.
 
 \paragraph{}
 Leegyszerűsítve a Cooperative Groups egy API Support Package, ami szálak csoportosítását és szinkronizálását segíti CUDA programokban. A Package nagy része az összes CUDA 9-el kompatibilis GPU-ra működik, azaz Kepler és későbbi architektúrákkal (Compute Capability 3.0+) kompatibilis.
@@ -127,8 +125,8 @@ Az egyik legfontosabb típus a csomagon belül a "thread\_group" típus, ami thr
 	bool is_valid();
 \end{lstlisting}
 
-
-\paragraph{Thread csoportokon végrahajtható kollektív (egyenhatású) műveletek} -
+%TODO kiszedni vagy nem szedni ki?
+\paragraph{Thread csoportokon végrahajtható kollektív (egyenhatású) műveletek \textcolor{red}{akár kiszedhető}} -
 A thread csoportok megadják a lehetőséget, hogy együttesen hajtsunk rajtuk végre műveleteket. Legegyszerűbb operációink egyike a szinkronizálás, ami annyit tesz, hogy a csoport tagjait nem engedi túl egy műveletsoron addig, míg minden tagja el nem jut az adott pontig. Az összes thread csoport fajta támogatja a szinkronizálást, azonban mindegyik kicsit másképp.
 
 Egy adott g csoporthoz tartozó szálakat a kollektív sync() metódussal, vagy g-re a cooperative\_groups::synchronize() függvényt meghívva szinkronizálhatjuk. Ezek a már korábban emlegetett barrier szinkronizációt hajtják végre.
@@ -137,15 +135,15 @@ Egy adott g csoporthoz tartozó szálakat a kollektív sync() metódussal, vagy 
 	cg::synchronize(g); // ekvivalens megoldás
 \end{lstlisting}
 
-\hypertarget{reducesum}{A következő egyszerű példában egy device (GPU-n futtatott) függvény} szerepel kooperatív csoportok felhasználásával. Amikor egy thread csoport meghívja, a szálak kiszámolják a szálanként kapott értékek összegét a csoporton belül.
+\hypertarget{reducesum}{A következő egyszerű példában egy device (GPU-n futtatott) függvény} szerepel kooperatív csoportok felhasználásával \cite{CUDAcoopgroups}. Amikor egy thread csoport meghívja, a szálak kiszámolják a szálanként kapott értékek összegét a csoporton belül.
 \begin{lstlisting}[style=CStyle]
 	using namespace cooperative_groups;
 	__device__ int reduce_sum(thread_group g, int *temp, int val)
 	{
 		int lane = g.thread_rank();
 		
-		// Each iteration halves the number of active threads
-		// Each thread adds its partial sum[i] to sum[lane+i]
+		// Minden iteráció megfelezi az aktiv szálak számát
+		// Minden szál hozzáadja a saját sum[i]-jét sum[lane+i]
 		for (int i = g.size() / 2; i > 0; i /= 2)
 		{
 			temp[lane] = val;
@@ -165,7 +163,7 @@ Egy thread blokk példánya az alábbi módon inicializálható:
 	thread_block block = this_thread_block();
 \end{lstlisting}
 
-Azon threadek, amelyek ugyanazon beépített CUDA blockIdx értékkel rendelkeznek, ugyanazon thread blokkba tartoznak. A blokkok szinkronizálása nagyon hasonló a korábban emített \_\_syncthreads() metódushoz. A következő kódok mind ugyanolyan hatást érnek el: (feltéve, ha a thread blokk összes szála elér odáig)
+Azon threadek, melyek beépített CUDA blockIdx értékei megegyezőek, ugyanazon thread blokkba tartoznak. A blokkok szinkronizálása nagyon hasonló a korábban emített \_\_syncthreads() metódushoz. A következő kódok mind ugyanolyan hatást érnek el: (feltéve, ha a thread blokk összes szála elér odáig)
 \begin{lstlisting}[style=CStyle]
 	__syncthreads();
 	block.sync();
@@ -296,19 +294,11 @@ A "grid\_group" adattípus kiterjeszti a "thread\_group" interfészt két, blokk
 
 \subsubsection{Teljes Grid csoporton belüli szinkronizáció}
 \label{subsubsec:Grid}
-A kooperatív csoportok bevezetése előtt a CUDA programozási modell natív támogatást csupán thread blokkokon belüli összehangolásra nyújtott. A régi gyakorlat az volt, hogy amennyiben grid szinten akartunk szinkronizációt alkalmazni, a kernelt felbontottuk több kisebb alkernelre, majd azon pontokon, ahol grid szintű szinkronizációra vágytunk, ott befejeztük az adott alkernelt, és hívtuk az újat. Ezen módszerre sokan "CPU Szinkronizáció" vagy "Implicit Szinkronizáció" néven hivatkoznak. Az \ref{fig:Implicitsync}. ábra szemlélteti a módszer lényegét. \cite{implicitSzink}
+A kooperatív csoportok bevezetése előtt a CUDA programozási modellja csak thread blokkon belüli szervezésre nyújtott natív támogatást. A régebbi gyakorlat az volt, hogy a kernelt felbontottuk több kisebb alkernelre, majd azon pontokon, ahol grid szintű szinkronizációra vágytunk, befejeztük az adott alkernelt, és hívtuk az újat. Ennek a módszernek "CPU Szinkronizáció" vagy "Implicit Szinkronizáció" a neve. 
 
-\begin{figure}[ht!]
-	\centering
-	
-	\includegraphics[width=100mm, keepaspectratio]{figures/Implicit synchronization.png}
-	\caption{A kooperatív csoportok megjelenése előtt az egyetlen járható út teljes GPU szinkronizálásra. Látható, hogy gyakorlatilag minden programozási alapelvnek ellentmond. \textcolor{red}{UTALÁS}}
-	\label{fig:Implicitsync}
-\end{figure}
+A módszer több szempontból problémás. Először is egy GPU kernel hívása sok erőforrást igényel. Sok egymás utáni hívás miatt lassabb lesz a program, \textit{ad absurdum} jobban járunk, ha bele sem vágunk a GPU programozásba, és az egész kódot tisztán CPU-ra írjuk. Másrészt ha az eredeti függvényben ciklusiterációnként akarnánk szinkronizálni, akkor Implicit szinkronizációs módszer mellett a kernelhívásokat kéne CPU cikluson belülre helyezni. Ez még jobb esetben átláthatatlan és fenntarthatatlan kódot eredményez, de rosszabb esetben a grafikus kártya meghibásodását is okozhatja a sűrű kernelhívás miatt. 
 
-%TODO UTALÁS
-
-A módszer több szempontból problémás. Egyrészt egy kernel hívása sok erőforrást igényel, ezért lehet, hogy sok kernelhívás mellett lassabb lesz a program, mintha egy szálon CPU-n futtattuk volna. Másrészt ha az eredeti függvényben ciklus iterációnként akarnánk szinkronizálni, akkor Implicit szinkronizációs módszer mellett a kernelhívásokat kéne CPU cikluson belülre helyezni. Ez még jobb esetben átláthatatlan és fenntarthatatlan kódot eredményez, de rosszabb esetben a grafikus kártya meghibásodását is okozhatja a sűrű kernelhívás miatt. A probléma tehát adott, de nézzük, hogy a kooperatív csoportok hogyan jelentenek erre megoldást.
+A probléma tehát adott, de nézzük, hogy a kooperatív csoportok hogyan jelentenek erre megoldást.
 
 Ahhoz, hogy grid csoporton belül szinkronizáljunk, első ránézésre elég a \textit{grid.sync()} függvényt használnunk, mint ahogy azt a thread blokkon belül is tettük.
 
@@ -329,7 +319,9 @@ Ahhoz, hogy biztosítsuk a thread blokkok megfelelő együttműködését a GPU-
 	cudaLaunchCooperativeKernel((void*)my_kernel, deviceProp.multiProcessorCount,numThreads,args);
 \end{lstlisting}
 
-Ajánlott megvizsgálnunk, hogy a kernel hívásához mekkora maximális blokkPerSM aránnyal dolgozhatunk (legfeljebb hány blokk fér el egy SM-en). Tegyük, fel, hogy szükségünk van 128 szálra, akkor így járhatunk el. A CUDA documentation az alábbi példakódhoz hasonló eljárást javasol:
+Ajánlott megvizsgálnunk, hogy a kernel hívásához mekkora maximális blokkPerSM aránnyal dolgozhatunk (legfeljebb hány blokk fér el egy SM-en). Tegyük, fel, hogy szükségünk van 128 szálra, akkor így járhatunk el. 
+
+A CUDA documentation az alábbi példakódhoz hasonló eljárást javasol:
 
 \begin{lstlisting}[style=CStyle]
 	/// This will launch a grid that can maximally fill the GPU, on the default stream with kernel arguments
@@ -364,7 +356,7 @@ Az alábbi kód a cudaDevAttrCooperativeLaunch eszköz attribútumot vizsgálja 
 Ez 1-be állítja a supportsCoopLaunch flaget ha a művelet támogatott a 0-s eszközön (egy grafikus kártyás rendszeren ez az alapértelmezett eszköz).
 
 \subsubsection{Program felkészítése több blokkos futtatásra}
-Mint azt már tárgyaltuk, bizonyos thread szám felett (jelenlegi GPU-kon 1024) a kerneleket már több blokkon szükséges futtani hardveres okokból kifolyólag. Amennyiben elég egy blokk használata, márpedig számos alkalommal ez a helyzet, ki tudunk használni olyan trükköket gyorsításra, mint például a \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory}{gyors megosztott memória} használata a globális device memória helyett vagy a warpok hatékonyabb kihasználása. Előnyös lehet, ha algoritmusunkat egy és több blokkos használatra is megírjuk. Így képesek leszünk kezelni nagy thread számokat is, míg kis thread szám esetén kihasználjuk a lehetséges optimalizálási tulajdonságokat.
+Mint azt már tárgyaltuk, bizonyos thread szám felett (jelenlegi GPU-kon 1024) a kerneleket már több blokkon szükséges futtatni hardveres okokból kifolyólag. Amennyiben elég egy blokk használata, márpedig számos alkalommal ez a helyzet, ki tudunk használni olyan trükköket gyorsításra, mint például a \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory}{gyors megosztott memória} használata a globális device memória helyett vagy a warpok hatékonyabb kihasználása. Előnyös lehet, ha algoritmusunkat egy és több blokkos használatra is megírjuk. Így képesek leszünk kezelni nagy thread számokat is, míg ki szám esetén kihasználjuk a lehetséges optimalizálási tulajdonságokat.
 
 
 

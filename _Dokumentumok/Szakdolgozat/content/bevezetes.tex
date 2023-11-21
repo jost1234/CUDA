@@ -27,12 +27,12 @@ A gép kiveszi a programozó kezéből az algoritmizálási feladatot. A kódol�
 
 Szakdolgozatom során a \textbf{Hangyakolónia optimalizáció} modelljét alkalmaztam. Ez egy természetből ellesett trükkön alapuló gráfbejárási algoritmus, a hangyák élelemkeresési módszereire hasonlít, melyet a \ref{ACOvisulabel}. ábra szemlélet.
 
-A koncepció központi elemei a \textbf{feromonok}, melyek biokommunikációra szolgáló, különböző állatok, rovarok által a külvilágba bocsátott kémiai anyagok, amelyek a faj másik egyedéből meghatározott viselkedést váltanak ki.
+A koncepció központi elemei a \textbf{feromonok}, melyek biokommunikációra szolgáló, különböző állatok, rovarok által a kibocsátott kémiai anyagok, amelyek a faj másik egyedéből meghatározott viselkedést váltanak ki.
 
-A hangyák egész nap a hangyaboly környékét járják morzsák, elhullott rovarok után kutatva. Amikor egy dolgozó korábban felfedezetlen élelemforrást talál, kis részével visszaindul a bolyba, és a hazaúton egyfajta testnedvet, \textbf{feromon}t bocsát ki magából. A többi hangya megérzi a szagot, és a nyomába ered. Ha tényleg táplálékhoz vezetett a feromoncsík, akkor ők is kis részével visszaindulnak az élőhelyükre. A folyamat egészen addig tart, amíg van mit elvinni. Ezután az utólag érkező hangyák azt tapasztalják, hogy elfogyott a táplálék, ezért a visszaúton nem választanak ki feromont. A szél előbb-utóbb elfújja az úton hagyott kémiai anyagokat, ezért nem megy oda több rovar.
+A hangyák egész nap a hangyaboly környékét járják morzsák, elhullott rovarok után kutatva. Amikor egy dolgozó korábban felfedezetlen élelemforrást talál, kis részével visszaindul a bolyba, és a hazaúton egyfajta testnedvet, \textbf{feromont} bocsát ki magából. A többi hangya megérzi a szagot, és a nyomába ered. Ha tényleg táplálékhoz vezetett a feromoncsík, akkor ők is kis részével visszaindulnak az élőhelyükre. A folyamat egészen addig tart, amíg van mit elvinni. Ezután az utólag érkező hangyák azt tapasztalják, hogy elfogyott a táplálék, ezért a visszaúton nem választanak ki feromont. A szél előbb-utóbb elfújja az úton hagyott kémiai anyagokat, ezért nem megy oda több rovar.
 
 \section{Fejezetek}
-A rövid bevezetés után a \ref{theoryChapter}. fejezetben először ismertetem a problémák elméleti hátterét. Matematikailag kimondom a feladatokat, valamint bemutatom, milyen - főleg valószínűségszámítási - alapok szükségesek a Hangyakolónia optimalizáció alapos megértéséhez.
+Bevezetés után a \ref{theoryChapter}. fejezetben először ismertetem a problémák elméleti hátterét. Matematikailag kimondom a feladatokat, valamint bemutatom, milyen - főleg valószínűségszámítási - alapok szükségesek a Hangyakolónia optimalizáció alapos megértéséhez.
 
 A \ref{technologyChapter}. fejezetben bemutatom a GPU programozás technológiai hátterét. Kimondom a GPGPU fogalmát. Példákon keresztül szemléltetem a CUDA szoftvermodell markánsabb fogalmait. Különbséget teszek az egyes szinkronizálási szintek között. Ezek után lépésenként megmutatom, hogyan kell Visual Studio segítségével CUDA programot írni és futtatni.
 
@@ -41,21 +41,23 @@ A \ref{implementationChapter}. fejezetben a kódimplementációimat veszem górc
 A \ref{resultsChapter}. fejezet a mérési eredményeimet tartalmazza számtalan táblázat formájában. Igyekeztem minél szélesebb körben lemérni az egyes adathalmazokat. A végén értékelem a kapott eredményeket. 
 
 \section{Rövidítések}
-dolgozatomban az alábbi rövidítéseket használom:
+Dolgozatomban az alábbi rövidítéseket használom:
 \begin{itemize}
 	\item ACO - Ant Colony Optimization: Hangyakolónia optimalizáció/algoritmus
-	\item TSP - Travelling Salesman Problem: Utazóügynök probléma
-	\item VRP - Vehicle Routing Problems: Jármű útvonaltervezési problémák
-	\item CVRP
-	\item CRPTW
-	\item CPU - 
-	\item GPU
-	\item CUDA - Compute valami
-	\item rep - Repetition: Iteráció
+	
+	\item CPU - Processzor
+	\item CUDA - Compute Unified Device Architecture
+	\item CVRP - Capacitive Vehicle Routing Problem: Korlátozott kapacitású járművek útvonaltervezési problémája
+	\item CVRPTW - Capacitive Vehicle Routing Problem with Time Windows: Korlátozott kapacitású, kötött időbeosztású járművek útvonaltervezési problémája
+	\item GPU - videokártya
 	\item min - minimum
 	\item OS - Operating System: Operációs rendszer
+	\item PRNG - Pszeudorandomszám-generátor
 	\item RAM - Random Access Memory
-	 
+	\item rep - Repetition: Iteráció
+	\item SIMD - Single Instruction Multiple Data
+	\item TSP - Travelling Salesman Problem: Utazóügynök probléma
+	\item VRP - Vehicle Routing Problems: Járműútvonal-tervezési problémák 
 \end{itemize}
 
 

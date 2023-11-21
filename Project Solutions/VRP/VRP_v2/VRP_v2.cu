@@ -490,7 +490,7 @@ namespace VRP {
         globalParams.minRes = FLT_MAX;
 
         // Invalidate route vector
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < params.routeSize; i++)
             params.route[i] = 0;
 
         // Input check
@@ -669,7 +669,7 @@ namespace VRP {
         globalParams.minRes = FLT_MAX;
 
         // Invalidate route vector
-        for (int i = 0; i < params.size; i++)
+        for (int i = 0; i < params.routeSize; i++)
             params.route[i] = 0;
 
         // Input check
@@ -941,6 +941,10 @@ namespace VRP {
         for (int i = 0; i < pkernelParams->routeSize; ++i) {
             src = antRouteOffset[i];
             dst = antRouteOffset[(i + 1) % pkernelParams->routeSize];   // Next node
+
+            if (src < 0 || src >= pkernelParams->size || dst < 0 || dst >= pkernelParams->size)
+                return -1; // Defending from faulty solutions
+
             if (src == 0)
                 vehicleIdx++;
 
