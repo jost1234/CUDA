@@ -87,9 +87,6 @@ namespace VRPTW {
     );
 
     // Generates a random sequence of numbers between 0 and (size - 1) starting with 0
-    // secondVertex: Variable used for giving an arbitrary second vertex
-    //      0 < secondvertex < size : valid input (condition = 1)
-    //      else: invalid input, no mandatory second vertex (condition = 0)
     __device__ void generateRandomSolution(
         Kernel_ParamTypedef* pkernelParams,
         int antIndex
@@ -106,7 +103,7 @@ namespace VRPTW {
 
     // Returns the sum length of the given route of trucks
     // Returns -1 if route not possible (for example has dead end) or if cap. condition not met
-    // FUNCTION USAGE: capacityCondition
+    // FUNCTION USAGE: capacityCondition, timeWindowCondition
     __device__ float antRouteLength(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
     // Represents az ant who follows other ants' pheromones
@@ -134,6 +131,12 @@ namespace VRPTW {
     // FUNCTION USED BY: antRouteLength
     __device__ bool timeWindowCondition(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
+    // FUNCTION USED BY: sequencePrint
+    __host__ bool timeWindowCondition(CUDA_Main_ParamTypedef* params);
+
+    // Sorts every truck by readyTime
+    __device__ void sortTrucksByReadyTime(Kernel_ParamTypedef* pkernelParams, int antIndex);
+
     // Manipulating the pheromone values according to the given solution
     // The longer the route is, the smaller amount we are adding
     // Sets the route vector if we found a best yet solution
@@ -159,11 +162,18 @@ namespace VRPTW {
     __device__ void copyAntRoute(Kernel_ParamTypedef* pkernelParams, int antIndex);
 
     // Validates the output vector
-    __device__ bool validRoute(Kernel_ParamTypedef* pkernelParams);
+    // Successful means valid syntax and meets criteria
+    __device__ bool validRoute(Kernel_ParamTypedef* pkernelParams, int antIndex);
+
+    __host__ bool validRoute(CUDA_Main_ParamTypedef* params, bool showData);
 
     // How many times does the given node appear in the sequence 
-    __device__ int nodeCount(Kernel_ParamTypedef* pkernelParams, int node);
+    __device__ int nodeCount(Kernel_ParamTypedef* pkernelParams, int antIndex, int node);
+
+    __host__ int nodeCount(CUDA_Main_ParamTypedef* params, int node);
 
     // Finds a value in the route vector
-    __device__ bool routeContain(Kernel_ParamTypedef* pkernelParams, int value);
+    __device__ bool routeContain(Kernel_ParamTypedef* pkernelParams, int antIndex, int value);
+
+    __host__ bool routeContain(CUDA_Main_ParamTypedef* params, int value);
 }

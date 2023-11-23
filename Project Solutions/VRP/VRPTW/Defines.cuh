@@ -14,19 +14,19 @@
 
 // Number of threads = number of ants
 // Default value: 1024
-int ants = 1024 * 8;
+int ants = 1024;
 
 // Repetition constants
 int REPETITIONS = 10;
-#define RANDOM_GENERATIONS 20
+#define RANDOM_GENERATIONS 200
 #define FOLLOWER_GENERATIONS 500
 
 // Pheromone matrix constants
-#define RHO 0.75  // Reduction ratio of previous pheromon value
+#define RHO 1  // Reduction ratio of previous pheromon value
 #define REWARD_MULTIPLIER 10   // Reward multiplier after finding a shortest path until then
 #define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
 
-#define SERIALMAXTRIES 10 // Number of serial processes (for debug purposes)
+int SERIALMAXTRIES = 10; // Number of serial processes (for debug purposes)
 
 namespace VRPTW {
 
@@ -70,7 +70,7 @@ namespace VRPTW {
 		float* Pheromone;
 		int* route;         // Sequence output
 		int size;        // Number of graph vertices
-		int routeSize;	// Redundant, just not save stack usage (= size + maxVehicles - 1)
+		int routeSize;	// Redundant, just to save stack usage (= size + maxVehicles - 1)
 		curandState* state; // CURAND random state
 		TimeWindow_ParamTypedef* timeWindows;
 		int truckCapacity;
@@ -98,4 +98,12 @@ namespace VRPTW {
 		float averageDist;
 		float minRes;    // Minimal found Route distance
 	} Kernel_GlobalParamTypedef;
+
+	// enum-like defines for antRoute state
+	#define antRouteStateVALID				 0
+	#define antRouteStateSYNTAX_ERROR		-1
+	#define antRouteStateDEADEND_ERROR		-2
+	#define antRouteStateCAPACITY_ERROR		-3
+	#define antRouteStateTIMEWINDOW_ERROR	-4
+
 }

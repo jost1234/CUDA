@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  20 NOV 2023 19:20
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  23 NOV 2023 14:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -937,7 +937,7 @@ File: figures/Capacity.drawio.png Graphic file (type bmp)
 <figures/Capacity.drawio.png>
 File: figures/timeWindow.drawio.png Graphic file (type bmp)
 <figures/timeWindow.drawio.png>
- [28]) [29]
+ [28]) [29] [30]
 \openout2 = `content/eredmenyek.aux'.
 
  (./content/eredmenyek.tex
@@ -946,51 +946,36 @@ File: figures/nsight-compute-config.png Graphic file (type bmp)
 <figures/nsight-compute-config.png>
 File: figures/nsight-compute2.png Graphic file (type bmp)
 <figures/nsight-compute2.png>
-[30
+[31
 
 
 
 
 ]
 
-LaTeX Warning: Text page 31 contains only floats.
+LaTeX Warning: Text page 32 contains only floats.
 
-[31] [32] [33] [34]
-Underfull \hbox (badness 1237) in paragraph at lines 327--329
-\TU/lmr/m/n/10.95 Az első olyan algoritmus, amely feltételes útvonaltervezést i
-gényel, a Kapacitásos
- []
-
-[35] [36] [37]
-Underfull \hbox (badness 1320) in paragraph at lines 511--511
-[][]|\TU/lmr/m/n/10.95 A szigorúbb időablakokkal bíró adathalmaz első 26 csúcsá
-ra vett
- []
-
-
-Underfull \hbox (badness 1320) in paragraph at lines 538--538
-[][]|\TU/lmr/m/n/10.95 A szigorúbb időablakokkal bíró adathalmaz első 51 csúcsá
-ra vett
- []
-
-[38]
+[32] [33] [34] [35] [36] [37] [38] [39] [40] [41]
+6. fejezet.
 File: figures/TSP-benchmark-error.png Graphic file (type bmp)
 <figures/TSP-benchmark-error.png>
 File: figures/TSP-benchmark-time.png Graphic file (type bmp)
 <figures/TSP-benchmark-time.png>
 
-Overfull \hbox (2.43088pt too wide) in paragraph at lines 679--681
+Overfull \hbox (2.43088pt too wide) in paragraph at lines 711--713
 [][] [] 
  []
 
-[39] [40] [41]) [42]
+[42
+
+] [43]) [44]
 \openout2 = `content/osszefoglalas.aux'.
 
  (./content/osszefoglalas.tex)
 \openout2 = `content/acknowledgement.aux'.
 
-
-(./content/acknowledgement.tex) [43
+ (./content/acknowledgement.tex)
+[45
 
 
 
@@ -1064,20 +1049,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 168--171
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] []
  []
 
-[44
+[46
 
 
 
-]) [45]
+]) [47]
 \openout2 = `content/appendices.aux'.
 
  (./content/appendices.tex
 File: figures/TeXstudio.png Graphic file (type bmp)
 <figures/TeXstudio.png>
- [46
+ [48
 
 
-]) [47
+]) [49
 
 ]
 \tf@thm=\write5
@@ -1093,23 +1078,16 @@ File: figures/TeXstudio.png Graphic file (type bmp)
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-10-10>
  ***********
-
-
-Package rerunfilecheck Warning: File `thesis.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `thesis.out':
-(rerunfilecheck)             Before: 2752286003B482E4B9B110E5D2F5A054;9516
-(rerunfilecheck)             After:  1979355CE449C7C1932E168DC8A08514;9687.
+Package rerunfilecheck Info: File `thesis.out' has not changed.
+(rerunfilecheck)             Checksum: 2510A0C4A5EC19046E3924A521F69063;10517.
  ) 
 Here is how much of TeX's memory you used:
- 18889 strings out of 475160
- 356627 string characters out of 5770264
+ 18893 strings out of 475160
+ 356691 string characters out of 5770264
  2192674 words of memory out of 5000000
- 40303 multiletter control sequences out of 15000+600000
+ 40307 multiletter control sequences out of 15000+600000
  563404 words of font info for 76 fonts, out of 8000000 for 9000
  1352 hyphenation exceptions out of 8191
  84i,12n,96p,1533b,1844s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on thesis.pdf (53 pages).
+Output written on thesis.pdf (55 pages).

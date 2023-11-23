@@ -49,22 +49,26 @@
 \select@language {magyar} \contentsline {section}{\numberline {4.5}VRP}{28}{section.4.5}%
 \select@language {magyar} \contentsline {section}{\numberline {4.6}CVRP}{28}{section.4.6}%
 \select@language {magyar} \contentsline {section}{\numberline {4.7}CVRPTW}{29}{section.4.7}%
-\select@language {magyar} \contentsline {chapter}{\numberline {5}Eredmények}{30}{chapter.5}%
-\select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{30}{section.5.1}%
-\select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{30}{section.5.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.1}TSP első verzió}{32}{subsection.5.2.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.2}TSP második (konzisztens) verzió}{33}{subsection.5.2.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.3}VRP}{35}{subsection.5.2.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.4}CVRP}{35}{subsection.5.2.4}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.5}CVRPTW}{36}{subsection.5.2.5}%
-\select@language {magyar} \contentsline {section}{\numberline {5.3}Eredmények értékelése, továbbfejlesztési lehetőségek}{38}{section.5.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.3.1}A két Utazóügynök probléma (TSP) verzió összehasonlítása}{38}{subsection.5.3.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.3.2}A különböző Járműútvonal-tervezési problémák}{40}{subsection.5.3.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.3.3}Kritériumfeltételek problémája a Hangyakolónia algoritmussal}{41}{subsection.5.3.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.3.4}Kapacitásfeltétel}{41}{subsection.5.3.4}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.3.5}Időablakok feltétele}{42}{subsection.5.3.5}%
-\select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{43}{chapter*.56}%
-\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{44}{chapter*.56}%
-\select@language {magyar} \contentsline {chapter}{Függelék}{46}{appendix*.58}%
-\select@language {magyar} \contentsline {section}{\numberline {F.1}A TeXstudio felülete}{46}{section.F.1}%
-\select@language {magyar} \contentsline {section}{\numberline {F.2}Válasz az ,,Élet, a világmindenség, meg minden'' kérdésére}{47}{section.F.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.7.1}Kezdeti kudarcok}{29}{subsection.4.7.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.7.2}A probléma forrása}{29}{subsection.4.7.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.7.3}A megoldás felé vezető út}{29}{subsection.4.7.3}%
+\select@language {magyar} \contentsline {chapter}{\numberline {5}Mérési eredmények}{31}{chapter.5}%
+\select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{31}{section.5.1}%
+\select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{31}{section.5.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.1}TSP első verzió}{33}{subsection.5.2.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.2}TSP második (konzisztens) verzió}{34}{subsection.5.2.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.3}VRP}{36}{subsection.5.2.3}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.4}CVRP}{36}{subsection.5.2.4}%
+\select@language {magyar} \contentsline {subsection}{\numberline {5.2.5}CVRPTW random kereséssel}{37}{subsection.5.2.5}%
+\select@language {magyar} \contentsline {section}{\numberline {5.3}CVRPTW rendezett kereséssel}{39}{section.5.3}%
+\select@language {magyar} \contentsline {chapter}{\numberline {6}Eredmények értékelése, továbbfejlesztési lehetőségek}{42}{chapter.6}%
+\select@language {magyar} \contentsline {section}{\numberline {6.1}A két Utazóügynök probléma (TSP) verzió összehasonlítása}{42}{section.6.1}%
+\select@language {magyar} \contentsline {section}{\numberline {6.2}A különböző Járműútvonal-tervezési problémák}{43}{section.6.2}%
+\select@language {magyar} \contentsline {section}{\numberline {6.3}Kritériumfeltételek problémája a Hangyakolónia algoritmussal}{43}{section.6.3}%
+\select@language {magyar} \contentsline {subsection}{\numberline {6.3.1}Kapacitásfeltétel}{43}{subsection.6.3.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {6.3.2}Időablakok feltétele}{44}{subsection.6.3.2}%
+\select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{45}{chapter*.58}%
+\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{46}{chapter*.58}%
+\select@language {magyar} \contentsline {chapter}{Függelék}{48}{appendix*.60}%
+\select@language {magyar} \contentsline {section}{\numberline {F.1}A TeXstudio felülete}{48}{section.F.1}%
+\select@language {magyar} \contentsline {section}{\numberline {F.2}Válasz az ,,Élet, a világmindenség, meg minden'' kérdésére}{49}{section.F.2}%

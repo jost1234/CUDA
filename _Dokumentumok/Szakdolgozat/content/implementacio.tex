@@ -197,3 +197,12 @@ A CVRPTW során a kapacitáskorlátok mellett az ügyfél által megszabott hat�
 	\label{fig:VRPTW_chart}
 \end{figure}
 
+\subsection{Kezdeti kudarcok}
+Miután megvalósítottam és kipróbáltam a programot tesztadatokon, arra kellett rájönnöm, hogy így nem lesz elég. Az első mérési adatokat a \ref{CVRPTW1section}. részben látjuk. Az eredmények enyhén szólva is rosszak, 25 csúcsnál nagyobb gráfok esetében képtelen volt végeredményre jutni, illetve amiket sikerült is megoldjon, azokat is rossz hatásfokkal tette.
+
+\subsection{A probléma forrása} Az eredményekből levonható az a következtetés, hogy a teljesen random közlekedő hangya nem alkalmas az algoritmus során olyan kezdeti megoldást találni, amit majd a következő hangya tovább tudna javítani. Az időablakok feltétele a kapacitással ellentétben közvetlenül a csúcsok sorrendének szab meg korlátozást. 
+
+\subsection{A megoldás felé vezető út}
+A tesztadatokon látszik, hogy viszonylag rövid időintervallumokban lehet elérni az egyes felhasználókat. Ez azt jelenti, hogy ha egy jármű számára kiosztunk egy adott csúcshalmazt, akkor az ezek permutációi közül csupán néhány lesz olyan, ami kielégíti a feltételt. Ha intuitívan közelítjük meg a helyzetet, akkor járhatunk nagy valószínűséggel a legjobban, hogyha megmondjuk minden járműnek, hogy ha a jelenlegi sorrendben nem sikerül kielégíteni az ügyfeleket, próbáljon meg olyan sorrendben haladni, ahogyan a csúcsok elérhetővé válnak.
+
+A random hangya elvét elhagyva írtam egy új függvényt \textit{sortTrucksByReadyTime} néven. Ez a függvény minden járműhöz osztott csúcshalmazt olyan sorrendbe állítja, ahogyan azok elérhetőek lesznek.

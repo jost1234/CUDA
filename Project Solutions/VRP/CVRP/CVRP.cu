@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     int fileNameIdx;
     bool foundDistFile = false;   // Error handling
     int size;    // Number of graph vertices
-    
+
     int i;  // Iterator
     srand(time(0)); // Need seeds for random solutions
 
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     ///
     /// The first 3 rows must be in the given struct:
     ///
-    
+
     // File syntax : 1st row must contain VRP type
     char vrpType[20] = { 0 };
     if (fscanf(pfile, "TYPE: %19s\n", vrpType) == 0)
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
     }
     else if (strcmp(vrpType, "VRPTW") == 0)
     {
-        
+
     }
     else
     {
@@ -173,7 +173,7 @@ namespace CVRP {
     // Host function for File Handling and Memory allocation
     int Host_main(FILE* pfile, int size, char* weightType)
     {
-        if (strcmp(weightType, "EXPLICIT") != 0 && 
+        if (strcmp(weightType, "EXPLICIT") != 0 &&
             strcmp(weightType, "EXPLICIT_DIAG_LOW") != 0 &&
             //strcmp(weightType, "EXPLICIT_DIAG_UP") != 0 &&
             strcmp(weightType, "EUC_2D") != 0)
@@ -239,8 +239,8 @@ namespace CVRP {
                 fscanf(pfile, "\n");
             }
             // Mirroring
-            for (int ii = 0; ii < size; ++ii) 
-                for (int jj = ii+1; jj < size; ++jj)         
+            for (int ii = 0; ii < size; ++ii)
+                for (int jj = ii + 1; jj < size; ++jj)
                     Dist[ii * size + jj] = Dist[jj * size + ii];
         }
         else if (strcmp(weightType, "EUC_2D") == 0)
@@ -506,7 +506,7 @@ namespace CVRP {
 
         // setup seeds
 
-        setup_kernel <<< BlockNum, threadPerBlock >>> (d_kernelParams.state, time(NULL) * rand());
+        setup_kernel << < BlockNum, threadPerBlock >> > (d_kernelParams.state, time(NULL) * rand());
 
         // Kernel call
 
@@ -519,7 +519,7 @@ namespace CVRP {
             printf("\nAttempt #%d ||\n", iter);
 
             if (BlockNum == 1) {
-                Kernel_1Block <<< 1, threadPerBlock >>> (d_kernelParams, d_configParams);
+                Kernel_1Block << < 1, threadPerBlock >> > (d_kernelParams, d_configParams);
             }
             else
             {
@@ -579,8 +579,13 @@ namespace CVRP {
 
 
         }
-        printf("\nSummary:\nAverage length: %.2f (+%.2f%%)\n", sum / foundCount, (float)(sum / foundCount - h_params.optimalValue) / h_params.optimalValue * 100.0f);
-        printf("Minimal length: %.2f (+%.2f%%)\n", min, (float)(min - h_params.optimalValue) / h_params.optimalValue * 100.0f);
+        printf("\nSummary:\n");
+        if (foundCount > 0)
+        {
+            printf("Average length: %.2f (+%.2f%%)\n", sum / foundCount, (float)(sum / foundCount - h_params.optimalValue) / h_params.optimalValue * 100.0f);
+            printf("Minimal length: %.2f (+%.2f%%)\n", min, (float)(min - h_params.optimalValue) / h_params.optimalValue * 100.0f);
+        }
+        printf("Fail Rate: %.0f %%", (float)(SERIALMAXTRIES - foundCount) / SERIALMAXTRIES * 100.0f);
 
         // Frees GPU device memory
         Free_device_memory(d_kernelParams);
@@ -637,7 +642,7 @@ namespace CVRP {
     }
 
     // Diagnostic function for printing given sequence
-    __host__ float sequencePrint(CUDA_Main_ParamTypedef* params) 
+    __host__ float sequencePrint(CUDA_Main_ParamTypedef* params)
     {
         int routeSize = RouteSize(params->size, params->maxVehicles);
         if (
@@ -649,7 +654,7 @@ namespace CVRP {
             printf("Invalid input!\n");
             return -1;
         }
-        
+
         float l = 0;
         int vehicleCntr = 0, i = 0;
 
@@ -658,7 +663,10 @@ namespace CVRP {
         {
             int src = params->route[i];
             int dst = params->route[(i + 1) % routeSize];
-            assert(src > -1 && src < params->size && dst > -1 && dst < params->size);
+            assert(src > -1 
+                && src < params->size 
+                && dst > -1 
+                && dst < params->size);
             if (params->Dist[src * params->size + dst] < 0)
             {
                 printf("Route not found!\n");
@@ -668,7 +676,7 @@ namespace CVRP {
         }
 
         // Check capacity condition
-        if (!CapacityCondition(params)) 
+        if (!CapacityCondition(params))
         {
             printf("Route not found, Capacity condition failed!\n");
             return -1;
@@ -1189,7 +1197,7 @@ namespace CVRP {
         return true;
     }
 
-    __host__ bool CapacityCondition(CUDA_Main_ParamTypedef* params) 
+    __host__ bool CapacityCondition(CUDA_Main_ParamTypedef* params)
     {
         // Capacity condition means that no truck should carry more goods than its capacity
         int currentLoad = 0;
@@ -1267,7 +1275,14 @@ namespace CVRP {
         int* antRouteOffset = pkernelParams->antRoute
             + antIndex * pkernelParams->routeSize;   // Optimizing array addressing
 
-        curandState* statePtr = &(pkernelParams->state[antIndex]);
+        curandState* statePtr;
+        if (antIndex >= 0 && antIndex < pkernelParams->antNum)
+        {
+            statePtr = &(pkernelParams->state[antIndex]);
+        }
+        else {
+            statePtr = &(pkernelParams->state[0]);
+        }
         // Expected to start in node 0
         antRouteOffset[0] = 0;
 
@@ -1308,7 +1323,7 @@ namespace CVRP {
             {
                 // Next vertex choosen by equal chances
                 do {
-                    float newfloat = curand_uniform(&pkernelParams->state[antIndex]);  // RND Number between 0 and 1
+                    float newfloat = curand_uniform(statePtr);  // RND Number between 0 and 1
                     newfloat *= (pkernelParams->size - 1) + 0.999999f;  // Transforming into the needed range
                     newParam = (int)truncf(newfloat);
                 } while (alreadyListed(pkernelParams, antIndex, i, newParam));
