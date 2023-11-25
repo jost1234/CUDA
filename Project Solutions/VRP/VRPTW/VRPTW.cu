@@ -296,9 +296,44 @@ namespace VRPTW {
         printf("\n\nR=50\n\n");
         CUDA_main(params);
 
-        REPETITIONS = 70;
-        printf("\n\nR=70\n\n");
+        /*printf("\n\nR=10\n\n");
+        REPETITIONS = 10;
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
         CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CUDA_main(params);
+
+        REPETITIONS = 30;
+        printf("\n\nR=30\n\n");
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
+        CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CUDA_main(params);
+
+        REPETITIONS = 50;
+        printf("\n\nR=50\n\n");
+
+        printf("\n\n1024 thread\n\n");
+        params.antNum = 1024;
+        CUDA_main(params);
+        printf("\n\n16384 thread\n\n");
+        params.antNum = 1024 * 16;
+        CUDA_main(params);
+        printf("\n\n20480 thread\n\n");
+        params.antNum = 1024 * 20;
+        CUDA_main(params);*/
 
         free(params.capacities);
         free(params.Dist);
@@ -811,6 +846,15 @@ namespace VRPTW {
                 generateRandomSolution(&params, antIndex);
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 block.sync();
+
+                // Detecting corrupted memory in one thread
+                if (antIndex == 0)
+                {
+                    if (globalParams.minRes < FLT_MAX && !validRoute(&params, -1)) {
+                        globalParams.minRes = FLT_MAX;
+                    }
+                }
+                block.sync();
             }
 
             if (antIndex == 0)
@@ -834,6 +878,16 @@ namespace VRPTW {
                 block.sync();
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 block.sync();
+
+                // Detecting corrupted memory in one thread
+                if (antIndex == 0)
+                {
+                    if (globalParams.minRes < FLT_MAX && !validRoute(&params, -1)) {
+                        globalParams.minRes = FLT_MAX;
+                        evaluateSolution(&params, 0, multiplicationConst, 0, repNumber);
+                    }
+                }
+                block.sync();
             }
         }
         // Removing unwanted threads
@@ -846,11 +900,7 @@ namespace VRPTW {
             printf("Need to find route in greedy mode!\n");
             greedySequence(&params);
         }
-        // If greedy sequence was unsuccessful, one last try
-        if (!validRoute(&params,-1))
-        {
-            followPheromones(&params, -1, 0);
-        }
+        
     }
 
     // Multiblock sized kernel
@@ -991,6 +1041,15 @@ namespace VRPTW {
                 // Evaluating the given solution: modifies Pheromone matrix more if shorter path found
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 grid.sync();
+
+                // Detecting corrupted memory in one thread
+                if (threadIdx.x == 0)
+                {
+                    if (globalParams.minRes < FLT_MAX && !validRoute(&params, -1)) {
+                        globalParams.minRes = FLT_MAX;
+                    }
+                }
+                grid.sync();
             }
 
             if (threadIdx.x == 0)
@@ -1014,6 +1073,16 @@ namespace VRPTW {
                 grid.sync();
                 evaluateSolution(&params, antIndex, multiplicationConst, configParams.Reward_Multiplier, repNumber);
                 grid.sync();
+
+                // Detecting corrupted memory in one thread
+                if (antIndex == 0)
+                {
+                    if (globalParams.minRes < FLT_MAX && !validRoute(&params, -1)) {
+                        globalParams.minRes = FLT_MAX;
+                        evaluateSolution(&params, 0, multiplicationConst, 0, repNumber);
+                    }
+                }
+                grid.sync();
             }
         }
 
@@ -1021,13 +1090,8 @@ namespace VRPTW {
             // Choosing path with greedy algorithm if we dont have a valid answer
             if (!validRoute(&params,-1)) 
             {
-                printf("Need to find route in greedy mode!\n");
+                printf("Need to find route in greedy mode!\n%.0f\n", globalParams.minRes);
                 greedySequence(&params);
-            }
-            // If greedy sequence was unsuccessful, one last try
-            if (!validRoute(&params,-1))
-            {
-                followPheromones(&params, -1, 0);
             }
         }
     }

@@ -50,7 +50,7 @@ Azt, hogy a kernelt felhívásakor hány CUDA szálon szeretnénk futtatni, az �
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=150mm, keepaspectratio] {figures/invalidIntellisenseErrorMessages.png}
-	\caption{Bizonyos hibaüzeneteket azért kaphatunk, mert a Visual Studio által használt Intellisense nem ismeri a CUDA által tett kiegészítéseket. Ezeket figyelmen kívül lehet hagyni \label{invalidErrors} }
+	\caption{Bizonyos hibaüzeneteket azért kaphatunk, mert a Visual Studio által használt Intellisense nem ismeri a CUDA nyelvi kiegészítései. Ezeket figyelmen kívül lehet hagyni \label{invalidErrors} }
 \end{figure}
 
 \paragraph{Példa:} A hivatalos dokumentáció az alábbi példát adja kernel definícióra. A kódrészlet az N méretű A és B vektorok összeadását végzi és az eredményt a C vektorban tárolja:
@@ -89,13 +89,11 @@ Hatékony párhuzamosított programnak három alappillére van: \cite{kvantum_op
 \end{enumerate}
 Foglalkozzunk jelen esetben a 3. ponttal, a szinkronizálással. Szinkronizáció szükséges ahhoz, hogy elosztott programunk biztonságos, fenntartható és moduláris legyen. A CUDA 9 bevezette az ún. \textbf{Kooperatív csoport} nevű absztrakciót (angolul Cooperative Groups) \cite{CUDAdoc_coopGroups}, amely erős támogatást nyújt a kerneleknek ahhoz, hogy dinamikusan alakíthassanak ki csoportokat a szálak között.
 
-\paragraph{}
 Korábban a CUDA API egy nagyon egyszerű, de csak speciális esetekben működő megoldást biztosított a szinkronizáció kérdésére, a blokkon belüli "barrier" szinkronizációt: A "\textit{\_\_syncthreads()}" függvény addig nem engedte tovább futni a szálakat, amíg \textbf{a blokkon belül} minden még futó szál el nem jutott az adott pontig. Belátható, hogy nagy szál szám mellett ez nem elég, ugyanis egy blokkon belül jelenlegi GPU-kon legfeljebb 1024 szál futhat. Ha mi több, mint 1024 threadből álló programot írnánk, azaz több Streaming multiprocessor (SM) futna egymással párhuzamosan, akkor ezek összehangolását eddig nem tudtuk volna megfelelő szoftveres támogatással elvégezni. Másik probléma az, hogy ha a szálainknak csak egy kis, adott számú (például 4 vagy 32, de tipikusan 2-hatvány) részhalmazát akarjuk összehangolni akkor korábban azt sem tudtuk szépen megoldani.
 
-\paragraph{}
-Leegyszerűsítve a Cooperative Groups egy API Support Package, ami szálak csoportosítását és szinkronizálását segíti CUDA programokban. A Package nagy része az összes CUDA 9-el kompatibilis GPU-ra működik, azaz Kepler és későbbi architektúrákkal (Compute Capability 3.0+) kompatibilis.
+A Cooperative Groups egy API Support Package, ami szálak csoportosítását és szinkronizálását segíti CUDA programokban. A Package nagy része az összes CUDA 9-el kompatibilis GPU-ra működik, azaz Kepler és későbbi architektúrákkal (Compute Capability 3.0+) kompatibilis.
 
-Ahhoz, hogy élhessünk a csomag nyújtotta lehetőségekkel, be kell illeszteni az alábbi headert .cu vagy .cuh kiterjesztésű fájlunk fejlécébe.
+Ahhoz, hogy használhassuk a csomagot, be kell illeszteni az alábbi headert .cu vagy .cuh kiterjesztésű fájlunk fejlécébe.
 
 \begin{lstlisting}[style=CStyle]
 	#include <cooperative_groups.h>
@@ -110,23 +108,35 @@ A típusok és interfészek a "cooperative\_groups" C++ névtérben vannak defin
 \end{lstlisting}
 
 \paragraph{Thread csoportok}
-Az egyik legfontosabb típus a csomagon belül a "thread\_group" típus, ami threadek, azaz szálak csoportját tudja kezelni. Ezt örökölteti le az összes, később tárgyalandó csoport objektum. Alapvető függvények rájuk:
+Az egyik legfontosabb típus a csomagon belül a "thread\_group" típus, ami threadek, azaz szálak csoportját tudja kezelni. Ezt örökölteti le az összes, később tárgyalandó csoport objektum. A következő alapvető függvények hívhatóak rájuk:
 
-- Megkaphatjuk a csoport méretét, azaz a benne futó szálak számát a size() metódussal. Használható túlcímzés elleni védelemre
+\begin{itemize}
+	\item Megkaphatjuk a csoport méretét, azaz a benne futó szálak számát a size() metódussal. Használható túlcímzés elleni védelemre
+\end{itemize}	
+
 \begin{lstlisting}[style=CStyle]
 	unsigned size();
 \end{lstlisting}
-- Megkaphatjuk a hívó thread indexét (0 és size()-1 közötti) a thread\_rank() metódussal
+
+\begin{itemize}
+	\item Megkaphatjuk a hívó thread indexét (0 és size()-1 közötti) a thread\_rank() metódussal
+\end{itemize}	
+
 \begin{lstlisting}[style=CStyle]
 	unsigned thread_rank();
 \end{lstlisting}
-- Megvizsgálhatjuk a csoport érvényességét az is\_valid() függvénnyel
+
+\begin{itemize}	
+	\item Megvizsgálhatjuk a csoport érvényességét az is\_valid() függvénnyel
+\end{itemize}
+
 \begin{lstlisting}[style=CStyle]
 	bool is_valid();
 \end{lstlisting}
 
 %TODO kiszedni vagy nem szedni ki?
-\paragraph{Thread csoportokon végrahajtható kollektív (egyenhatású) műveletek \textcolor{red}{akár kiszedhető}} -
+\paragraph{Thread csoportokon végrahajtható kollektív (egyenhatású) műveletek}
+
 A thread csoportok megadják a lehetőséget, hogy együttesen hajtsunk rajtuk végre műveleteket. Legegyszerűbb operációink egyike a szinkronizálás, ami annyit tesz, hogy a csoport tagjait nem engedi túl egy műveletsoron addig, míg minden tagja el nem jut az adott pontig. Az összes thread csoport fajta támogatja a szinkronizálást, azonban mindegyik kicsit másképp.
 
 Egy adott g csoporthoz tartozó szálakat a kollektív sync() metódussal, vagy g-re a cooperative\_groups::synchronize() függvényt meghívva szinkronizálhatjuk. Ezek a már korábban emlegetett barrier szinkronizációt hajtják végre.
@@ -135,29 +145,9 @@ Egy adott g csoporthoz tartozó szálakat a kollektív sync() metódussal, vagy 
 	cg::synchronize(g); // ekvivalens megoldás
 \end{lstlisting}
 
-\hypertarget{reducesum}{A következő egyszerű példában egy device (GPU-n futtatott) függvény} szerepel kooperatív csoportok felhasználásával \cite{CUDAcoopgroups}. Amikor egy thread csoport meghívja, a szálak kiszámolják a szálanként kapott értékek összegét a csoporton belül.
-\begin{lstlisting}[style=CStyle]
-	using namespace cooperative_groups;
-	__device__ int reduce_sum(thread_group g, int *temp, int val)
-	{
-		int lane = g.thread_rank();
-		
-		// Minden iteráció megfelezi az aktiv szálak számát
-		// Minden szál hozzáadja a saját sum[i]-jét sum[lane+i]
-		for (int i = g.size() / 2; i > 0; i /= 2)
-		{
-			temp[lane] = val;
-			g.sync(); // wait for all threads to store
-			if(lane<i) val += temp[lane + i];
-			g.sync(); // wait for all threads to load
-		}
-		return val; // note: only thread 0 will return full sum
-	}
-\end{lstlisting}
-
 \paragraph{Thread Blokk}
 Az első thread csoport fajta a Thread blokk. A Cooperative Groups azért vezette be ezt az adattípust, hogy explicit reprezentálja a CUDA programozás azonos nevű, egyik fontos fogalmát. A szálak egy-, kettő-, vagy háromdimenziós logikai egységbe szervezhetők, amit \textbf{blokk}nak nevezünk. Ez a megoldás egy természetes módot nyújt arra, hogy vektorok vagy mátrixok elemein hajtsunk végre számításokat. 
-Az egy blokkba tartozó szálak számát havdveres megfontolások felülről korlátozzák: mivel ezeknek a threadeknek közös processzormagon kell futniuk és a mag korlátos memória-erőforrásain kell osztozniuk, nem fogalhatnak el túl nagy helyet. A jelenlegi GPU-k egy blokkban legfeljebb 1024 thread futtatását támogatják, viszont a kernel több egyenlő méretű blokkban futtatható, ezért a szálak száma egyenlő a blokkonkénti szálak száma és a blokkszám szorzatával. \cite{kvantum_optim}
+Az egy blokkba tartozó szálak számát hardveres megfontolások felülről korlátozzák: mivel ezeknek a threadeknek közös processzormagon kell futniuk és a mag korlátos memória-erőforrásain kell osztozniuk, nem foglalhatnak el túl nagy helyet. A jelenlegi GPU-k egy blokkban legfeljebb 1024 thread futtatását támogatják, viszont a kernel több egyenlő méretű blokkban futtatható, ezért a szálak száma megkapható a blokkonkénti szálak száma és a blokkszám szorzataként. \cite{kvantum_optim}
 Egy thread blokk példánya az alábbi módon inicializálható:
 \begin{lstlisting}[style=CStyle]
 	thread_block block = this_thread_block();
@@ -178,71 +168,9 @@ A "thread\_block" adattípus kiterjeszti a "thread\_group" interfészt két, blo
 	dim3 thread_index(); // 3-dimenziós thread index blokkon belül
 \end{lstlisting}
 
-Az alábbi egy egyszerű kernel, ami a korábban látott \hyperlink{reducesum}{"reduce\_sum()"} device függvényt használja egy tömb elemeinek összegzésére. Gyorsítás érdekében több, párhuzamosan elvégzett rész összeadással kezd (thread\_sum()). A kernel thread blokkokat használ az összegzésre, és az atomikus "atomicAdd()" metódussal adja össze a részösszegeket.
-
-\begin{lstlisting}[style=CStyle]
-	__device__ int thread_sum(int *input, int n) 
-	{
-		int sum = 0;
-		
-		for(int i = blockIdx.x * blockDim.x + threadIdx.x;
-		i < n / 4; 
-		i += blockDim.x * gridDim.x)
-		{
-			int4 in = ((int4*)input)[i];
-			sum += in.x + in.y + in.z + in.w;
-		}
-		return sum;
-	}
-	
-	__global__ void sum_kernel_block(int *sum, int *input, int n)
-	{
-		int my_sum = thread_sum(input, n);
-		
-		extern __shared__ int temp[];
-		auto g = this_thread_block();
-		int block_sum = reduce_sum(g, temp, my_sum);
-		
-		if (g.thread_rank() == 0) atomicAdd(sum, block_sum);
-	}
-\end{lstlisting}
-
-Az előbbi függvényt futtathatjuk például egy 16 millió elemszámú tömb kiértékelésére.
-\begin{lstlisting}[style=CStyle]
-	int n = 1<<24;
-	int blockSize = 256;
-	int nBlocks = (n + blockSize - 1) / blockSize;
-	int sharedBytes = blockSize * sizeof(int);
-	
-	int *sum, *data;
-	cudaMallocManaged(&sum, sizeof(int));
-	cudaMallocManaged(&data, n * sizeof(int));
-	std::fill_n(data, n, 1); // Adatok feltöltése
-	cudaMemset(sum, 0, sizeof(int));
-	
-	// Kernelhívás
-	sum_kernel_block<<<nBlocks, blockSize, sharedBytes>>>(sum, data, n);
-\end{lstlisting}
-
-
-\paragraph{Csoport Partíciók}
-A Cooperative Groups kódcsomag megengedi, hogy már meglévő csoportjainkat rugalmasan particionáljuk új, kisebb egységekre, ezáltal kiegyensúlyozhatjuk párhuzamos algoritmusainkat. A cooperative\_groups::tiled\_partition() függvény felosztja az adott thread blokkot több részegységre. Következik egy példa, amely a teljes thread blokkot 32 szálú részegységekre bontja. A 32 gyakori felosztás, ugyanis a warpok (a CUDA szoftvermodell egyik alapfogalma, most nem térek rá ki részletesebben) méretével megegyező.
-\begin{lstlisting}[style=CStyle]
-	thread_group tile32 = cg::partition(this_thread_block(), 32);
-\end{lstlisting}
-
-Egy másik példa partíciók létrehozására, amit az NVIDIA CUDA Toolkit Documentation (\href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#thread-block-tile-group-cg}{C.4.2.1. Thread Block Tile}) \cite{CUDAdoc_threadblockTile} említ.
-
-\begin{lstlisting}[style=CStyle]
-	/// The following code will create two sets of tiled groups, of size 32 and 4 respectively:
-	/// The latter has the provenance encoded in the type, while the first stores it in the handle
-	thread_block block = this_thread_block();
-	thread_block_tile<32> tile32 = tiled_partition<32>(block);
-	thread_block_tile<4, thread_block> tile4 = tiled_partition<4>(block);
-\end{lstlisting}
 
 \subsection{Moduláris programszerkesztés}
-A kooperatív csoportok használata nem csak gyors, de hasznos is tud lenni. A kódcsomag ereje a modularitás, amikor a csoportot explicit átadjuk függvények között, és konzisztensen hivatkozunk annak méretére. Ez segít kritikus versenyhelyzetek, illetve holtpontok elkerülésében, mert nem teszünk hibás következtetéseket elágazó függvényhívások között. Az alábbi egy elkerülendő példa hibás szinkronizálásra.
+A kooperatív csoportok használata nem csak gyors, de hasznos is tud lenni. A kódcsomag ereje a modularitás, hogy amikor a csoportot explicit átadjuk függvények között, konzisztensen hivatkozhatunk annak méretére. Ez nehezebbé teszi kritikus versenyhelyzetek, illetve holtpontok kialakulását, mert nem teszünk hibás következtetéseket elágazó függvényhívások között. Az alábbi egy elkerülendő példa hibás szinkronizálásra.
 \begin{lstlisting}[style=CStyle]
 	__device__ int sum(int *x, int n) 
 	{
@@ -260,8 +188,8 @@ A kooperatív csoportok használata nem csak gyors, de hasznos is tud lenni. A k
 	}
 \end{lstlisting}
 
-A példában a threadeknek csak a fele hívja meg a sum() függvényt, ami tartalmaz "\textit{\_\_syncthreads()}" utasítást. A thread blokk nem minden threadje éri el a "\textit{\_\_syncthreads()}"-et, így holtpont alakul ki, mivel a "\textit{\_\_syncthreads()}" gátat képez addig, míg minden blokkon belüli thread el nem éri.
-Amennyiben alkalmazzuk a kooperatív csoportok adta lehetőségeket, ez a hiba nehezebben elkövethető. Fontos átadni a csoport típust, mint paramétert a hívandó függvénynek, és ekkor azon a csoporton végzünk szinkronizációt. Alapszabály, hogy tiszta GPU függvényben nem hivatkozunk közvetlenül  a kernel szálaira, különben hasonló hibákba ütközhetünk.
+A példában a threadeknek csak a fele hívja meg a sum() függvényt, amely tartalmaz "\textit{\_\_syncthreads()}" utasítást. A thread blokk nem minden threadje éri el a "\textit{\_\_syncthreads()}"-et, így holtpont alakul ki, mivel a barrier utasítás gátat képez addig, míg minden blokkon belüli thread el nem éri.
+Amennyiben alkalmazzuk a kooperatív csoportok adta lehetőségeket, ez a hiba nehezebben elkövethető. Fontos átadni a csoporttípust, mint paramétert a hívandó függvénynek, és ekkor csak azon a csoporton végzünk szinkronizációt. Alapszabály, hogy tiszta GPU függvényben nem hivatkozunk közvetlenül a kernel szálaira, különben hasonló hibákba ütközhetünk.
 \begin{lstlisting}[style=CStyle]
 	// Nyilvánvaló, hogy a teljes blokk meg kell hivja
 	// Van benne sync utasítás, ami különben holtpontot okozna
@@ -346,7 +274,7 @@ A CUDA documentation az alábbi példakódhoz hasonló eljárást javasol:
 \end{itemize}
 
 
-Az alábbi kód a cudaDevAttrCooperativeLaunch eszköz attribútumot vizsgálja meg.
+Az alábbi kód a \textit{cudaDevAttrCooperativeLaunch} eszköz attribútumot vizsgálja meg.
 \begin{lstlisting}[style=CStyle]
 	int dev = 0;
 	int supportsCoopLaunch = 0;
@@ -356,13 +284,13 @@ Az alábbi kód a cudaDevAttrCooperativeLaunch eszköz attribútumot vizsgálja 
 Ez 1-be állítja a supportsCoopLaunch flaget ha a művelet támogatott a 0-s eszközön (egy grafikus kártyás rendszeren ez az alapértelmezett eszköz).
 
 \subsubsection{Program felkészítése több blokkos futtatásra}
-Mint azt már tárgyaltuk, bizonyos thread szám felett (jelenlegi GPU-kon 1024) a kerneleket már több blokkon szükséges futtatni hardveres okokból kifolyólag. Amennyiben elég egy blokk használata, márpedig számos alkalommal ez a helyzet, ki tudunk használni olyan trükköket gyorsításra, mint például a \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory}{gyors megosztott memória} használata a globális device memória helyett vagy a warpok hatékonyabb kihasználása. Előnyös lehet, ha algoritmusunkat egy és több blokkos használatra is megírjuk. Így képesek leszünk kezelni nagy thread számokat is, míg ki szám esetén kihasználjuk a lehetséges optimalizálási tulajdonságokat.
+Bizonyos thread szám felett (jelenlegi GPU-kon 1024) a kerneleket már több blokkon szükséges futtatni hardveres okok miatt. Amennyiben elég egy blokk használata, márpedig számos alkalommal ez a helyzet, ki tudunk használni olyan trükköket gyorsításra, mint például a \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#shared-memory}{gyors megosztott memória} használata a globális device memória helyett vagy a warpok hatékonyabb kihasználása. Előnyös lehet, ha algoritmusunkat egy és több blokkos használatra is megírjuk. Így képesek leszünk kezelni nagy thread számokat is, míg ki szám esetén kihasználjuk a lehetséges optimalizálási tulajdonságokat.
 
 
 
 \subsection{CUDA használata Visual Studio alatt}
 
-Szeretnék rövid leírást nyújtani az első CUDA nyelven megírt párhuzamos program létrehozásához.
+Szeretnék rövid leírást nyújtani az első CUDA nyelven megírt párhuzamos program létrehozásához. A példaprogram egy vektoros összeadást végez el videokártyán.
 
 \paragraph{CUDA Extension letöltése}
 A gyártó bővítményt adott ki, mely a Visual Studio nevű fejlesztői környezetbe importálható. A CUDA legfrissebb verziója jelenleg a https://developer.nvidia.com/cuda-downloads webcímről tölthető le (a link később változhat). Itt lehet tájékozódni a program használati feltételeiről is. Főbb információk: néhány (3-4) GB tárhelyre, illetve 64 bites Linux vagy Windows operációs rendszerre van szükség.

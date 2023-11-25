@@ -8,12 +8,16 @@
 %----------------------------------------------------------------------------
 \chapter*{Kivonat}\addcontentsline{toc}{chapter}{Kivonat}
 
-Különböző hálózatok, legyen az egy szociális média felhasználói hálója, egy ország közúthálózata, de akár egy NYÁK-terven a különböző komponensek vezetékezése során alapvető problémák az úgynevezett útkeresési problémák (Vehicle Routing Problems - VRP). Ezek bizonyítottan NP-nehéz problémák, a megoldásuk egy költséges, ugyanakkor gyakran monoton tevékenység, hiszen sok pontsorozat hossza közül kell kiválasztani a legrövidebbet. Dolgozatom célja a Hangyakolónia Optimalizáció (Ant Colony Optimization - ACO) elvével egy heurisztikus, vagyis valószínűségi megoldás találása. Az ACO nagymértékben párhuzamosítható, melyet azzal tudtam kihasználni, hogy videokártyán összehangolt threadek ezreit voltam képes futtatni az NVIDIA CUDA keretrendszer segítségével. A készült kódot C/C++ nyelven valósítottam meg.
+Útkeresési problémákkal (Vehicle Routing Problems - VRP) az élet számos különböző területén találkozunk: egy szociális média felhasználói bázisának elemzése, egy NYÁK-terv elkészítése, vagy különböző logisztikai feladatok kezelése során. Ezek köztudottan NP-teljes problémák, melyek megoldása költséges, ugyanakkor gyakran monoton tevékenység, hiszen sok pontsorozat közül kell kiválasztani a legrövidebbet. Jelen dolgozat célja a Hangyakolónia Optimalizáció (Ant Colony Optimization - ACO) elvével heurisztikus, valószínűségi megoldást találni. Az ACO nagymértékben párhuzamosítható, amit azzal tudtam kihasználni, videokártyán összehangolt munkaszálak ezreit voltam képes futtatni az NVIDIA CUDA keretrendszerének segítségével. A készült kódot C/C++ programozási nyelven valósítottam meg.
 
-%TODO Abstractot megírni
+
+Járműútvonal-tervezési problémákkal (Vehicle Routing Problems - VRP) az élet számos különböző területén találkozunk: szociális média felületek felhasználói bázisának elemzése, NYÁK-tervek készítése, vagy különböző logisztikai feladatok kezelése során. Ezek köztudottan NP-teljes problémák, melyek megoldása költséges, ugyanakkor gyakran monoton tevékenység, hiszen sok pontsorozat közül kell kiválasztani a legrövidebbet. Jelen dolgozat célja a Hangyakolónia Optimalizáció (Ant Colony Optimization - ACO) elvével heurisztikus, valószínűségi megoldást találni. Az ACO nagymértékben párhuzamosítható, ezért az NVIDIA CUDA keretrendszer segítségével videokártyán összehangolt munkaszálak ezreit futtatva hatékonyan voltam képes megoldani a VRP-t. A készült kódot C/C++ programozási nyelven készítettem el.
+
+Az ACO nagymértékben párhuzamosítható, ezért jól kihasználhatóak az NVIDIA CUDA keretrendszer adta lehetőségek. A VRP ennek segítségével hatékonyan megvalósítható videokártyán, összehangolt munkaszálak ezreit futtatva.
 
 \vfill
 \selectenglish
+
 
 
 %----------------------------------------------------------------------------
@@ -21,7 +25,7 @@ Különböző hálózatok, legyen az egy szociális média felhasználói háló
 %----------------------------------------------------------------------------
 \chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
 
-This document is a \LaTeX-based skeleton for BSc/MSc~theses of students at the Electrical Engineering and Informatics Faculty, Budapest University of Technology and Economics. The usage of this skeleton is optional. It has been tested with the \emph{TeXLive} \TeX~implementation, and it requires the PDF-\LaTeX~compiler.
+We encounter Vehicle Routing Problems (VRP) in various aspects of life, such as analyzing the user base of a large social network, planning the layout design of a Printed Ciruit Board, or handling different logistics tasks like delivery problems. These are well-known NP-complete problems, therefore they are very costly to solve. The aim of this thesis is to use the principle of Ant Colony Optimization (ACO) method to find solutions heuristically, probabilistically. ACO is capable to be highy parallelized that I could utilize by running thousands of synchronized threads on a graphics card (GPU) using NVIDIA CUDA framework. The developed code was implemented in C/C++.
 
 
 \vfill

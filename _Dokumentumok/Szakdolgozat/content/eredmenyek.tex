@@ -324,7 +324,7 @@ A VRP-hez először nem értettem, hogy miért nem találtam külön adathalmazt
 
 
 \subsection{CVRP}
-Az első feltételes útvonaltervezést igénylő algoritmus a kapacitásos járműútvonal-tervezés. Adathalmazt a következő helyről szedtem: \cite{CVRPdataset}.
+Az első feltételes útvonaltervezést igénylő algoritmus, amivel foglalkoztam a kapacitásos járműútvonal-tervezés. Adathalmazt a következő helyről szedtem: \cite{CVRPdataset}.
 Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 random hangyát követ 500 tudatos hangya.
 
 Az egyes mérések eredményei a \ref{table:CVRP_gr17} - \ref{table:CVRP_att48}. táblázatokból olvashatóak ki.
@@ -464,7 +464,7 @@ Az egyes mérések eredményei a \ref{table:CVRP_gr17} - \ref{table:CVRP_att48}.
 		\hline
 		\textbf{50 rep} & & & \\
 		16384 ant & 478,71 & 732,96 (+209\%) & 574,85 (+143\%)\\
-		20480 ant & 572,36 & 828,31 (+250\%) & 492,35 (+108\%)\\
+		20480 ant & 572,36 & 679,4 (+186\%) & 492,35 (+108\%)\\
 		\hline
 	\end{tabular}
 	\caption{f72: 72 csúcsú gráfon futtatott CVRP}
@@ -554,9 +554,9 @@ Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és 
 	\label{table:VRTPW_empty}
 \end{table}
 
-\section{CVRPTW rendezett kereséssel}
+\subsection{CVRPTW rendezett kereséssel}
 
-Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek útvonalat az első hangyák, közepes csúcsszám mellett is képtelenség megoldást találni. Az itteni mérési eredmények már a javított random hangyákkal ellátott CVRPTW programot mérik. A tesztadathalmaz az előzővel megegyező, C101 és C201. 1 repen belül 200 random hangyát követ 500 tudatos hangya (tehát mostmár egy rep több vizsgálatot tartalmaz).
+Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek útvonalat az első hangyák, közepes csúcsszám mellett is képtelenség megoldást találni. Az itteni mérési eredmények már a javított random hangyákkal ellátott CVRPTW programot mérik. A tesztadathalmaz az előzővel megegyező, C101 és C201 mellett kiegészült a C202-es gráffal is. A C202-es gráf a C201-essel azonos elhelyezkedésű csúcsokat tartalmaz, viszont eltérőek az időablakok, így jobban tudjuk nézni a kritériumfeltétel közvetlen hatását. 1 repen belül 200 random hangyát követ 500 tudatos hangya (tehát mostmár egy rep több vizsgálatot tartalmaz). Sajnálatos módon a C101-et 50 és 100 csúcsra nem tudta megoldani a program, továbbra is túl nehéz feltételnek bizonyult az időablakok ilyen szűkre vétele.
 
 % Size = 26
 \begin{table}[ht!]
@@ -568,63 +568,23 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
 		\textbf{10 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
+		1024 ant & 19,72 & 300 (+56,8\%) & 272 (+42,3\%) &  10\% \\
+		16384 ant & 24,75 & 259,4 (+35,6\%) & 242 (+26,6\%) &  10\% \\
+		20480 ant & 27,3 & 252 (+31\%) & 227 (+18,7\%) &  20\% \\
 		\hline
 		\textbf{30 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
+		1024 ant & 62,43 & 278 (+45,4\%) & 264 (+38,3\%) &  10\% \\
+		16384 ant & 76,5 & 242 (+26,3\%) & 216 (+12,8\%) &  20\% \\
+		20480 ant & 87,72 & 240 (+25,4\%) & 233 (+22\%) &  60\% \\
 		\hline
 		\textbf{50 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
+		1024 ant & 104,63 & 270 (+41,2\%) & 255 (+33,2\%) &  10\% \\
+		16384 ant & 135,2 & 239 (+24,7\%) & 222 (+16\%) &  20\% \\
+		20480 ant & 154,9 & 236,6 (+23,7\%) & 228,7 (+19,5\%) &  20\% \\
 		\hline
 	\end{tabular}
-	\caption{A szigorúbb időablakokkal bíró adathalmaz első 26 csúcsára vett rendezett kereséses CVRPTW mérés}
+	\caption{A szigorúbb időablakokkal bíró C101-es gráf első 26 csúcsára vett rendezett kereséses CVRPTW mérés: sajnos nagyobb csúcsméretre továbbra sem talált megoldást}
 	\label{table:VRTPW2_25_1}
-\end{table}
-
-% Size = 50
-\begin{table}[ht!]
-	\centering
-	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
-		\hline
-		\multicolumn{5}{|c|}{C101.50: 51 csúcs, minimális út: 362.4} \\
-		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
-		\hline
-		\textbf{10 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-		\textbf{30 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-		\textbf{50 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-	\end{tabular}
-	\caption{ A szigorúbb időablakokkal bíró adathalmaz első 51 csúcsára vett rendezett kereséses CVRPTW mérés}
-	\label{table:VRTPW2_50_1}
-\end{table}
-
-% Size = 100
-\begin{table}[ht!]
-	\centering
-	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
-		\hline
-		\multicolumn{5}{|c|}{C101.100: 101 csúcs, minimális út: 827.3} \\
-		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
-		\hline
-		\textbf{10 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-		\textbf{30 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-		\textbf{50 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-	\end{tabular}
-	\caption{A szigorúbb időablakokkal bíró adathalmaz teljes egészére vett rendezett kereséses CVRPTW mérés}
-	\label{table:VRTPW2_100_1}
 \end{table}
 
 % Size = 26
@@ -643,7 +603,7 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 		20480 ant & 99,04 & 223 (+3,84\%) & 215,54 &  10\% \\
 		\hline
 		\textbf{50 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
+		20480 ant & 164,22 & 215,54 & 215,54 &  10\% \\
 		\hline
 	\end{tabular}
 	\caption{A tágabb időablakokkal bíró adathalmaz első 26 csúcsára vett rendezett kereséses CVRPTW mérés}
@@ -689,10 +649,10 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 		20480 ant & 1252 & 2629 (+346,3\%) & 1413,5 (+140\%) & 0\% \\
 		\hline
 		\textbf{50 rep} &  &  &  &  \\
-		20480 ant & 1989 & 2003,4 (+240\%) & 1476,6 (+150\%) & 10\% \\
+		20480 ant & 1889 & 2003,4 (+240\%) & 1476,6 (+150\%) & 10\% \\
 		\hline
 		\textbf{70 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
+		20480 ant & 2044 & 1570 (+167\%) & 1196,1 (+103\%) &  10\% \\
 		\hline
 	\end{tabular}
 	\caption{}

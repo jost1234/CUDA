@@ -12,10 +12,10 @@ Az adattípusok megválasztásában eltérőek az egyes megvalósítások: az el
 
 
 \subsection{Feromonok nyilvántartása}
-A feromonokat az élekhez rendelem, ezért egy, az eredeti gráf topológiájával megegyező, teljes gráfban tárolom. A gráfélek eltárolása már másképpen történhet. 
+A feromonokat az élekhez rendelem, ezért egy, az eredeti gráf topológiájával megegyező gráfban tárolom. A gráfélek eltárolása már változatosabb.
 
 \subsubsection{TSP}
-A TSP során egy NxN-es mátrix által adott feromongráfon egyértelműen végrehajtható mohó algoritmus, vagyis olyan döntéshozatal-sorozat, hogy minden csúcsból abba a következő pontba megyünk, ahova a legtöbb feromon vezet (kivéve ha az a kezdőcsúcsba vezet, és még maradtak bejáratlan csúcsok). Hogy megtartsam az implementáció egyszerűségét, a TSP során tényleg NxN-es 2 dimenziós mátrixban tárolom a feromonértékeket. Tehát az n csúcsú TSP feromonmátrix a kezdőpillanatban a következő:
+A TSP során egy NxN-es mátrix által adott feromongráfon egyértelműen végrehajtható mohó algoritmus, vagyis olyan döntéshozatal-sorozat, hogy minden csúcsból abba a következő pontba megyünk, ahova a legtöbb feromon vezet (kivéve ha az a kezdőcsúcsba vezet, és még maradtak bejáratlan csúcsok). Hogy megtartsam az implementáció egyszerűségét, a TSP során tényleg NxN-es 2 dimenziós mátrixban tárolom a feromonértékeket. Tehát az n csúcsú TSP feromonmátrix alakja a következő:
 
 $\begin{pmatrix}
 	0 & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
@@ -24,7 +24,7 @@ $\begin{pmatrix}
 	P_{n-1,0} & P_{n-1,1} & P_{n-1,2} & \cdots & 0
 \end{pmatrix}$
 
-Ahol P{\scriptsize i,j} az i-ből j-be él kezdeti feromonértéke. \( \forall i\in V(G) : P_{i,i}=0 \), mert a gráfunk egyszerű, nincs benne hurokél. Praktikusan \( P_{i,j}=0 \) ha az input gráfban \(v_{i,j}\) nincs behúzva. Ekkor már az első próbálkozások sem próbálnak meg arra menni. Ez a kikötés nem kötelező, előbb-utóbb ezen éleket úgyis elhalnának a feromonok. 
+Ahol P{\scriptsize i,j} az i-ből j-be él kezdeti feromonértéke. \( \forall i\in V(G) : P_{i,i}:=0 \), mert a gráfunk egyszerű, nincs benne hurokél. Praktikusan \( P_{i,j}:=0 \) ha az input gráfban \(v_{i,j}\) nincs behúzva. Ekkor már az első próbálkozások sem próbálnak meg arra menni. Ez a kikötés nem kötelező, előbb-utóbb ezen éleket úgyis elhalnának a feromonok. 
 
 \subsubsection{VRP variánsok} \label{VRPvariants_subsection}
 A VRP esetében kicsit bonyolultabb a helyzet. Ha felírjuk egymás után az egyes járművek bejárási sorrendjét azt láthatjuk, hogy olyan, mintha több TSP-t hajtottunk volna végre egymás után. Képzeletben majdnem ez is történt. Úgy álltam hozzá a több útvonalhoz, hogy fejben kifeszítettem őket egy nagy körré. A kezdőcsúcs helyére gondolhatjuk azt, hogy k db csúcs van ott, akik egymástól 0 távolságra vannak. A gondolatmenetemet a \ref{tsp-to-vrp}. ábrán illusztrálom. 
@@ -44,7 +44,7 @@ Minden sor egy adott kiindulási csúcsra vonatkozik. Az i. sorban a kiindulási
 	\item n <= i < n + k - 1 :  \(v_{0,i-(n-1)}\)
 \end{itemize}
 
-Tehát a k járművel n csúcson futó VRP feromonmátrix a kezdőpillanatban a következő:
+Tehát a k járművel n csúcson futó VRP feromonmátrix alakja a következő:
 
 $\begin{pmatrix}
 	P_{v_{0,0},v_{0,1}} & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
@@ -58,13 +58,15 @@ $\begin{pmatrix}
 	P_{v_{0,k-1},v_{0,0}} & P_{v_{0,k-1},1} & P_{v_{0,k-1},2} & \cdots & P_{v_{0,k-1},n-1} \\
 \end{pmatrix}$
 
-Feltételek megnyilvánulása: az, hogy milyen egyéb feltételeket tűzünk még ki a feladatba, a feromonok nyilvántartásának módját nem befolyásolja. Csak ott módosít, hogy hiába vezet út az adott körön, ha például a járművel kapacitásfeltétele sérül. Olyankor egyáltalán nem veszem figyelembe az adott megoldást.
+\paragraph{}
+Feltételek megnyilvánulása: az, hogy milyen egyéb feltételeket tűzünk még ki a feladatban, a feromonok nyilvántartásának módját nem befolyásolja. Változás annyi lesz, hogy hiába vezet út az adott körön, ha kritériumfeltétel, például egy jármű kapacitásfeltétele sérül. Olyankor egyáltalán nem veszem figyelembe az adott megoldást.
 
 
 
 \subsection{A rulettkerék algoritmus }
-Az algoritmusaimban többször feltűnik a random számok generálásának problémája. Hallgatótársam, Tóth Andor Márk sokat foglalkozott a témával, és diplomamunkájából sokat tanulhattam a témában \cite{alg_optim}. Valószínűségszámításból tudjuk, hogy igazi véletlen számok nem léteznek. Elméletileg nincs is semmi értelme ennek a fogalomnak. Nézzük például a klasszikus példát: a pénzérme feldobását, ami a földre érve fejjel vagy írással felfelé landol (vagy egyes nagy sikerű filmekben a sirály még a földet érés előtt elkapja és elviszi). Ha a tér minden egyes pontjában pontosan ismernénk a különböző légnyomásértékeket, valamint tökéletesen tisztában lennénk a feldobás dinamikai jellemzőivel, mindig pontosan tudnánk, hogy melyik oldalára fog esni az érme. A véletlen illúzióját ezen ismeretek hiánya okozza. Póker közben feltehetően nem ismerjük a keverő pontos technikáját, ezért az osztott lapok jó esetben véletlenszerűnek hatnak. A számítógépek alapesetben determinisztikus gépek, hiszen adott utasításokat hajtanak végre. 
-A CUDA az úgynevezett PRNG (pszeudorandomszám-generátor) elvét követi. A generált szám tökéletesen meghatározható egy kezdeti érték alapján, ezért kell egy seed, ami viszont már független lehet a számítógéptől. Én a klasszikus megoldást választottam, miszerint az 1970. január 1. éjfél óta eltelt másodpercek számát vettem seednek.
+Az algoritmusaimban többször feltűnik a random számok generálásának problémája. Hallgatótársam, Tóth Andor Márk sokat foglalkozott a témával, és diplomamunkájából sokat tanulhattam a témában \cite{alg_optim}. Valószínűségszámításból tudjuk, hogy igazi véletlen számok nem léteznek. Nézzük például a klasszikus példát: a pénzérme feldobását, ami a földre érve fejjel vagy írással felfelé landol (vagy egyes nagy sikerű filmekben a sirály még földet érés előtt elkapja és elviszi). Ha a tér minden egyes pontjában pontosan ismernénk a különböző légnyomásértékeket, valamint tökéletesen tisztában lennénk a feldobás dinamikai jellemzőivel, mindig egyértelműen kiszámolhatnánk, hogy melyik oldalára fog esni az érme. A véletlen illúzióját ezen ismeretek hiánya okozza. Póker közben feltehetően nem ismerjük a keverő pontos technikáját és a kártyák korábbi sorrendjét, ezért az osztott lapok jó esetben véletlenszerűnek hatnak. 
+
+A számítógépek alapesetben determinisztikus gépek, hiszen adott utasításokat hajtanak végre. A CUDA az úgynevezett PRNG (pszeudorandomszám-generátor) elvét követi. A generált szám tökéletesen meghatározható egy kezdeti érték alapján, ezért kell egy seed, ami viszont már független lehet a géptől. Én azon klasszikus megoldást választottam, miszerint az 1970. január 1. éjfél óta eltelt másodpercek számát vettem seednek.
 GPU oldalon a CuRand függvénykönyvtár videokártyás támogatást biztosít pszeudorandom számok generálására, ehhez a következő egyszerű kernelt kell futtatni:
 
 \begin{lstlisting}[style=CStyle]
@@ -90,9 +92,11 @@ A kernelt CPU oldalról kell felhívni a kiválasztott seeddel.
 	
 \end{lstlisting}
 
+Amikor egy feromont követő hangya következő csúcsot keres, minden elérhető élen leméri az ottani feromonértékeket. Egy egyes élek választásának valószínűsége a \ref{ACO_My_probability}. kifejezés alapján kapható meg. A megvalósítás sokat javulhatna azzal, hogy a már korábban kiválasztott éleket előre ne is vegye bele a számításba. Sajnos már nem volt időm foglalkozni ezzel.
+
 \section{A végeredmény számítása}
 \label{sec:getResult}
-Mind minden algorimtus esetében, itt is külön figyelmet kell fordítanunk arra, hogy a végső eredményt milyen formában állítjuk elő. A legkézenfekvőbb gondolat az, hogy út közben, ha minden korábbinál rövidebb megoldást találunk, akkor azt feljegyezzük, és a végén ami a legrövidebb megoldás, kinevezzük outputnak. Ezzel a megközelítéssel elméletben nincsen gond. Gyakorlatban amikor a programjaimat teszteltem, nagyon gyakran hibás végeredményt kaptam így. A hiba detektálása során arra jöttem rá, hogy a GPU nagyon gyakran hibázik, főleg adatmozgatások során. Ez azzal járt, hogy néha rossz eredményt, néha pedig semmit sem töltött a erre kijelölt tömbbe. Felismerésem után egyéb módot is kitaláltam. A megadott számú iteráció után ott marad a feromongráf, ami alapján a program önmagát tanította. Ebben a gráfban végrehajthatunk egy mohó algoritmust: kiindulva az előírt kezdőcsúcsból következő csúcsnak a megmaradtak közül mindig azt a csúcsot választjuk, ahova a legtöbb feromon vezet. Ekkor közvetlenül a kijelölt eredménytömbbe dolgozok, megkerülve a kritikusnak tapasztalt adatmozgatást. Hogy ne írjak felül jó megoldást, a mohó keresést csak akkor hajtom végre, ha a tömbben talált szekvencia érvénytelen.
+Mind minden algoritmus esetében, itt is külön figyelmet kell fordítanunk arra, hogy a végső eredményt milyen formában állítsuk elő. A legkézenfekvőbb gondolat az, hogy út közben ha új legrövidebb megoldást találunk, akkor azt feljegyezzük, és a végén ami a felírt legrövidebb megoldás, kinevezzük outputnak. Gyakorlatban amikor a programjaimat teszteltem, nagyon gyakran hibás végeredményt kaptam ilyen alapon. A hiba detektálása során arra jöttem rá, hogy a GPU főleg adatmozgatások során nagyon gyakran hibázik. Ez azzal járt, hogy néha rossz eredményt, néha pedig semmit sem töltött a erre kijelölt tömbbe. Felismerésem után egyéb módot is kitaláltam. A megadott számú iteráció után ott marad a feromongráf, amivel a program önmagát tanította. Ebben a gráfban végrehajthatunk egy mohó algoritmust: kiindulva az előírt kezdőcsúcsból következő csúcsnak a megmaradtak közül mindig azt a csúcsot választjuk, ahova a legtöbb feromon vezet. Ekkor közvetlenül a kijelölt eredménytömbbe dolgozok, megkerülve a kritikusnak tapasztalt adatmozgatást. Hogy ne írjak felül jó megoldást, a mohó keresést csak akkor hajtom végre, amikor a tömbben talált szekvencia érvénytelen.
 
 \begin{lstlisting}[style=CStyle,showstringspaces=false]
 	// Choosing path with greedy algorithm if we dont have a valid answer
@@ -106,36 +110,37 @@ Mind minden algorimtus esetében, itt is külön figyelmet kell fordítanunk arr
 
 
 \section{TSP első verzió} \label{TSP_v1_SubSection}
-Korábban már volt róla szó, de az útvonatkeresési algoritmusok ezen családjának legegyszerűbb tagja a TSP, ezért ezzel érdemes kezdenie annak, aki szeretne elmélyülni a problémakörben. Én is így tettem. Amikor még az Önálló laboratóriumi munkám során megismertem a genetikus algoritmusokat, az első feladatom a TSP megvalósítása volt CUDA nyelven. Azért tartom fontosnak kiemelni a TSP programom első verzióját, mert elsőkörben teljesen rendszertelenül álltam a problémához, nem tekintettem a feladatra egy nagyobb téma részeként. Ez később nehezen bővithető lett volna, ezért a következő verziókat teljesen a nulláról kellett felépítenem.
+Az útvonalkeresési algoritmusok ezen családjának legegyszerűbb tagja a TSP, ezért ezzel érdemes kezdenie annak, aki szeretne elmélyülni a problémakörben. Én is így tettem. Amikor még az Önálló laboratóriumi munkám során megismertem a genetikus algoritmusokat, az első feladatom a TSP megvalósítása volt CUDA nyelven. Azért tartom fontosnak kiemelni az első verziót, mert elsőkörben teljesen rendszertelenül álltam a problémához, nem tekintettem a feladatra egy nagyobb téma részeként. Ez később nehezen bővithető lett volna, ezért a következő verziókat teljesen a nulláról kellett felépítenem.
 
 A mellékletben elérhető a teljes TSP\_v1 kód, jelenleg néhány fontosabb elemet/fogalmat szeretnék kiemelni belőle.
-Bevezettem egy globális változót a hangyák (threadek) számának állítására. Jelenleg konstans, amennyiben a felhasználó egyéb számú párhuzamosítást szeretne, sajnos még bele kell nyúljon a forráskódba:
+Bevezettem egy globális változót a hangyák (threadek) számának állítására. Értéke fordítási konstans, ezért ha a felhasználó egyéb számú párhuzamosítást szeretne, bele kell nyúljon a forráskódba:
 
 \begin{lstlisting}[style=CStyle]
-	// Number of threads = number of ants
+	// Hangyák száma = párhuzamos szálak száma
 	const int ants = 1024;
 \end{lstlisting}
 
-Van még néhány olyan algoritmus paraméter, ami a futás során változatlan, viszont értékük befolyásolja a futásidőt, illetve a végeredményt. Kiszerveztem őket makróba, hogy csak egy helyen kelljen változtatni.
+Van még néhány olyan algoritmus paraméter, ami a futás során változatlan, viszont értékük befolyásolja a futásidőt, illetve a végeredményt. Kiszerveztem őket makrókba, hogy egy helyen kelljen állítani őket.
 
 \begin{lstlisting}[style=CStyle]
-	// Repetition constants
+	// Iterációszámot állító konstansok
 	#define REPETITIONS 10
 	#define RANDOM_GENERATIONS 20
 	#define FOLLOWER_GENERATIONS 500
 	
-	// Pheromon matrix constants
-	#define RHO 0.75  // Reduction ratio of previous pheromon value
-	#define REWARD_MULTIPLIER 100   // Reward multiplier after finding a shortest path until then
-	#define INITIAL_PHEROMONE_VALUE 1000    // Initial value of elements in the Pheromone matrix
+	// Feromonmátrix konstansok
+	#define RHO 0.75  // Elnyomási tényező
+	#define REWARD_MULTIPLIER 100   // Jutalom szorzó
+	#define INITIAL_PHEROMONE_VALUE 1000    // Mátrixelemek kezdeti értéke
 	
-	#define SERIALMAXTRIES 10    // Number of serial processes
+	#define SERIALMAXTRIES 10    // Próbálkozások száma
 \end{lstlisting}
 
-Először a "Repetition" konstansokról: Az algoritmus így működik: Csináld REPETITIONS alkalommal, hogy jön RANDOM\_GENERATIONS iteráció olyan hangya, aki teljesen véletlenszerűen végigmegy a gráfon, majd őket követi FOLLOWER\_GENERATIONS iterációban olyan hangya, aki a feromon alapján dönti el az útját. Minél több iterációt hajtunk végre, annál több utat vizsgálunk meg, és elvileg annál pontosabb lehet a végeredmény.
+Az algoritmus így működik: Csináld REPETITIONS alkalommal, hogy jön RANDOM\_GENERATIONS iteráció olyan hangya, aki teljesen véletlenszerűen végigmegy a gráfon, majd őket követi FOLLOWER\_GENERATIONS iterációban olyan hangya, aki a feromon alapján dönti el az útját. Minél több iterációt hajtunk végre, annál több utat vizsgálunk meg, és elvileg annál optimálisabb lehet a végeredmény.
+
 Az előbbiektől némileg elkülönül a SERIAL\_MAXTRIES, ami azért felel, hogy többször lefuttathassuk egymás után a GPU kernelt. Mivel az ACO egy heurisztikus algoritmus, futásonként más és más eredményt szolgáltat, ezért érdemes lehet többször (például 10-szer) egymás után végrehajtani. Ilyenkor végső eredménynek célszerű a legrövidebb megoldást venni. Sajnos a tesztelések során azt tapasztaltam, hogy a GPU főleg amikor több szálon dolgozik, mint ami fizikailag elérhető CUDA core formájában, gyakran hibázik, és vagy egyáltalán nem, vagy rosszul ír át memóriaterületet. Azon memóriaterület, mely tárolja azt aktuális minimális szekvenciát, rendkívül ki van téve hasonló hibázásoknak. Elképzelhető, hogy a programfutás eredetileg tervezett végén érvénytelen adat lenne az eredmény. Ilyenkor mentő ötletként végrehajtok egy mohó algoritmust a feromongráfon. A kezdőcsúcs a \(v_{0}\), és a soron következő csúcs mindig az a megmaradt pont lesz, ahova a legtöbb feromon vezet.
 
-\begin{lstlisting}[style=CStyle]
+\begin{lstlisting}[style=CStyle,showstringspaces=false]
 if (!validRoute(&params)) {
 	greedySequence(&params);
 }
@@ -144,8 +149,8 @@ if (!validRoute(&params)) {
 \section{TSP második verzió}
 Amikor másodszorra álltam neki a TSP programozásának, már számos tapasztalattal bírtam. Első feladatomnak éreztem a felhasználóra bízni, hogy hány szállal kívánja használni az alkalmazást. Az ants változó már nem konstans, és parancssori argumentummal befolyásolható.
 
-\begin{lstlisting}[style=CStyle]
-// Command Line Syntax: ... --ants [number of ants]
+\begin{lstlisting}[style=CStyle,showstringspaces=false]
+// Parancssori argumentum szintaktika: ... --ants [number of ants]
 if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
 {
 	if (sscanf(argv[++i], "%d", &ants) != 1) {
@@ -157,17 +162,16 @@ if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
 }
 \end{lstlisting}
 
-
- Az első verzió nagyon lassúra sikerült, ezért több módon is igyekeztem gyorsabbnak lenni. Azt találtam, hogy nem olyan fontos a feromonok pontos tárolása, ezért \textit{double} helyett \textit{float} adattípusra váltottam. 
+ Az első verzió nagyon lassúra sikerült, ezért több módon is igyekeztem gyorsabbnak lenni. Azt tapasztltam, hogy nem olyan fontos a feromonok pontos tárolása, ezért \textit{double} helyett \textit{float} adattípusra váltottam. 
  Sok függvényhívást alkalmazok, ezért kritikusnak bizonyult a paraméterátadások gyorsítása is. A kernel által használt változókat egy általam definiált struktúrába szerveztem. Ilyen struktúrák pointereit adom csak át függvények között, ezzel kevesebb utasítást vesznek el a vezérlésátadások. A random generált szekvenciákat úgy állítom elő hamarabb, hogy a csúcsok egyesével sorsolása helyett csak n db véletlen csúcscserét alkalmazok. Arról, hogy ezek mekkora sebességnövekedést okoztak, a \ref{results_section}. részben írok.
 
 \section{VRP}
 
-A VRP újítása, hogy több kis alegységre bomlik a körút, mert több járművet használhatunk. A \ref{VRPvariants_subsection}. részben mutatottak alapján az n csúcsú k járműves VRP-t visszavezettem egy n+k-1 csúcsú TSP-re. A kódimplementációban is látszik, hogy ezen ötlet után elég a korábbi kódot használnunk. Jól jött, hogy a TSP v2-ben bővíthetőre lett megcsinálva a parametrizálás.
+A VRP újítása, hogy több kis alegységre bomlik a körút, mert több járművet használhatunk. A \ref{VRPvariants_subsection}. részben mutatottak alapján az n csúcsú k járműves VRP-t visszavezettem egy n+k-1 csúcsú TSP-re. A kódimplementációban is látszik, hogy ezen ötlet után majdnem változtatás nélkül átemelhető lett az előző kód. Jól jött, hogy a TSP v2-ben bővíthetőre lett megcsinálva a parametrizálás.
 
 \begin{lstlisting}[style=CStyle,showstringspaces=false]
 	
-// Reduction to TSP
+// Visszavezetés az n+k-1 csúcsú Utazóügynök problémára
 __host__ __device__ inline int RouteSize(int size, int maxVehicles)
 {
 	return size + maxVehicles - 1;
@@ -177,7 +181,7 @@ __host__ __device__ inline int RouteSize(int size, int maxVehicles)
 
 \section{CVRP}
 
-A CVRP azt jelenti, hogy feltételül kaptuk a járművek korlátozott kapacitásának számításba vételét. A VRP-t egy kapacitásviszonyokat kiértékelő függvénnyel egészítettem ki, melynek logikáját a \ref{fig:CVRP_chart}. ábrán látható folyamatábra szemlélteti.
+A CVRP azt jelenti, hogy feltételül kaptuk a járművek korlátozott kapacitásának figyelembe vételét. A VRP-t egy kapacitásviszonyokat kiértékelő függvénnyel egészítettem ki, melynek logikáját a \ref{fig:CVRP_chart}. ábrán látható folyamatábra szemlélteti.
 
 \begin{figure}[ht!]
 	\centering
@@ -188,21 +192,21 @@ A CVRP azt jelenti, hogy feltételül kaptuk a járművek korlátozott kapacitá
 
 \section{CVRPTW}
 
-A CVRPTW során a kapacitáskorlátok mellett az ügyfél által megszabott határidők is további nehézséget okoznak. A CVRP-t egy időablakokat kiértékelő függvénnyel egészítettem ki, melynek logikáját a \ref{fig:VRPTW_chart}. ábrán látható folyamatábra szemlélteti.
+A CVRPTW során a kapacitáskorlátok mellett az ügyfél által megszabott határidők is további nehézséget okoznak. A CVRP-t először egy időablakokat kiértékelő függvénnyel egészítettem ki. A függvény logikáját a \ref{fig:VRPTW_chart}. ábrán látható folyamatábra szemlélteti.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=150mm, keepaspectratio]{figures/timeWindow.drawio.png}
-	\caption{A VRPTW során használt, időablak-feltételt kiértékelő függvény folyamatábrája }
+	\caption{A VRPTW során használt, időablak-feltételt kiértékelő függvény folyamatábrája}
 	\label{fig:VRPTW_chart}
 \end{figure}
 
 \subsection{Kezdeti kudarcok}
-Miután megvalósítottam és kipróbáltam a programot tesztadatokon, arra kellett rájönnöm, hogy így nem lesz elég. Az első mérési adatokat a \ref{CVRPTW1section}. részben látjuk. Az eredmények enyhén szólva is rosszak, 25 csúcsnál nagyobb gráfok esetében képtelen volt végeredményre jutni, illetve amiket sikerült is megoldjon, azokat is rossz hatásfokkal tette.
+Miután megvalósítottam és kipróbáltam a programot a kapott tesztadatokon \ref{CVRPTW1section}, sajnálattal tapasztaltam, hogy 25 csúcsnál nagyobb gráfok esetében képtelen volt végeredményre jutni, illetve amiket sikerült is megoldjon, azokat is rossz hatásfokkal tette.
 
-\subsection{A probléma forrása} Az eredményekből levonható az a következtetés, hogy a teljesen random közlekedő hangya nem alkalmas az algoritmus során olyan kezdeti megoldást találni, amit majd a következő hangya tovább tudna javítani. Az időablakok feltétele a kapacitással ellentétben közvetlenül a csúcsok sorrendének szab meg korlátozást. 
+\subsection{A probléma forrása} Az eredményekből levonható az a következtetés, hogy a teljesen random közlekedő hangya nem alkalmas az algoritmus során olyan kezdeti megoldást találni, amit majd a következő hangya tovább tudna javítani. Az időablakok feltétele a kapacitással ellentétben közvetlenül a csúcsok sorrendének szab meg korlátozást, vagyis gyakorlatilag lehetetlen pont a jó sorrendet eltalálni. 
 
 \subsection{A megoldás felé vezető út}
-A tesztadatokon látszik, hogy viszonylag rövid időintervallumokban lehet elérni az egyes felhasználókat. Ez azt jelenti, hogy ha egy jármű számára kiosztunk egy adott csúcshalmazt, akkor az ezek permutációi közül csupán néhány lesz olyan, ami kielégíti a feltételt. Ha intuitívan közelítjük meg a helyzetet, akkor járhatunk nagy valószínűséggel a legjobban, hogyha megmondjuk minden járműnek, hogy ha a jelenlegi sorrendben nem sikerül kielégíteni az ügyfeleket, próbáljon meg olyan sorrendben haladni, ahogyan a csúcsok elérhetővé válnak.
+A tesztadatokon látszik, hogy viszonylag rövid időintervallumokban lehet elérni az egyes felhasználókat. Ez azt jelenti, hogy ha egy jármű számára kiosztunk egy adott csúcshalmazt, akkor az ezek permutációi közül csupán néhány lesz olyan, ami kielégíti a feltételt. Ha intuitívan közelítjük meg a helyzetet, akkor járhatunk nagy valószínűséggel a legjobban, hogyha megmondjuk minden járműnek, hogy amennyiben a jelenlegi sorrendben nem sikerül kielégíteni az ügyfeleket, próbáljon meg olyan ütemben haladni, ahogyan a csúcsok elérhetővé válnak.
 
-A random hangya elvét elhagyva írtam egy új függvényt \textit{sortTrucksByReadyTime} néven. Ez a függvény minden járműhöz osztott csúcshalmazt olyan sorrendbe állítja, ahogyan azok elérhetőek lesznek.
+A teljesen random hangya elvét elhagyva írtam egy új függvényt \textit{sortTrucksByReadyTime} néven. Ez a függvény minden járműhöz osztott csúcshalmazt olyan sorrendbe állítja, ahogyan azok elérhetőek lesznek. Úgy gondolom, hogy mivel nagyrészt csak a rossz megoldásokat szűröm ki, a rendezéssel a megfelelő sorrendek halmazát nem zavarom meg nagyon.

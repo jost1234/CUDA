@@ -1,0 +1,1326 @@
+Opening file "VRPTW_C101_25.txt"!
+Given block number : 20
+Given rep number : 10
+Given Serial Try number : 10
+Closing file!
+Maximum number of vehicles: 10
+Truck capacity : 200
+Capacities: 0 10 30 10 10 10 20 20 20 10 10 10 20 30 10 40 40 20 20 10 10 20 20 10 10 40C
+apacitated Vehicle Route with Time Window Problem with Ant Colony Algorithm
+
+
+R=10
+
+
+
+1024 thread
+
+Called function with 1 Block:
+
+Attempt #0 ||
+Raw data:
+0 0 8 9 6 4 2 0 5 3 7 10 11 1 0 17 22 0 20 24 25 23 0 0 0 0 0 13 18 19 15 16 14 12 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (18) 8 (2) 9 (2) 6 (2) 4 (4) 2 (21) 0
+Vehicle #2 : 0 (15) 5 (1) 3 (2) 7 (5) 10 (3) 11 (10) 1 (19) 0
+Vehicle #3 : 0 (33) 17 (25) 22 (12) 0
+Vehicle #4 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (13) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (7) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (33) 21 (10) 0
+ Total length : 309.84
+
+Attempt #1 ||
+Need to find route in greedy mode!
+Raw data:
+0 22 19 18 9 24 25 0 6 5 21 0 1 11 10 16 14 8 17 13 4 20 7 12 0 23 15 3 0 0 0 2 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #2 ||
+Raw data:
+0 0 5 3 7 10 0 24 25 0 13 17 18 19 16 14 12 2 0 20 15 9 23 22 21 0 0 0 0 0 8 11 6 4 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (5) 10 (17) 0
+Vehicle #2 : 0 (15) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (7) 16 (2) 14 (3) 12 (25) 2 (21) 0
+Vehicle #4 : 0 (10) 20 (32) 15 (21) 9 (18) 23 (3) 22 (2) 21 (10) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (18) 8 (3) 11 (5) 6 (2) 4 (3) 1 (19) 0
+ Total length : 318.15
+
+Attempt #3 ||
+Raw data:
+0 0 20 24 25 23 1 0 0 7 8 10 9 6 4 2 0 13 17 19 11 0 0 0 0 0 5 3 18 15 16 14 12 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (21) 1 (19) 0
+Vehicle #2 : Unused
+Vehicle #3 : 0 (16) 7 (3) 8 (4) 10 (5) 9 (2) 6 (2) 4 (4) 2 (21) 0
+Vehicle #4 : 0 (31) 13 (4) 17 (6) 19 (23) 11 (20) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (28) 18 (7) 15 (5) 16 (2) 14 (3) 12 (33) 22 (2) 21 (10) 0
+ Total length : 307.56
+
+Attempt #4 ||
+Raw data:
+0 0 17 19 15 9 6 2 1 0 20 24 25 22 0 0 0 0 0 5 3 7 8 10 11 23 21 0 0 13 18 16 14 12 4
+Vehicle #0 : Unused
+Vehicle #1 : 0 (33) 17 (6) 19 (5) 15 (21) 9 (2) 6 (5) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (3) 22 (12) 0
+Vehicle #3 : Unused
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (16) 23 (4) 21 (10) 0
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (7) 18 (11) 16 (2) 14 (3) 12 (24) 4 (18) 0
+ Total length : 278.07
+
+Attempt #5 ||
+Raw data:
+0 0 7 10 9 22 0 20 24 25 19 15 14 23 21 0 0 13 17 18 16 12 0 0 0 0 0 5 3 8 11 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 7 (5) 10 (5) 9 (21) 22 (12) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (30) 19 (5) 15 (5) 14 (31) 23 (4) 21 (10) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (31) 13 (4) 17 (3) 18 (11) 16 (5) 12 (38) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (4) 8 (3) 11 (5) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 307.63
+
+Attempt #6 ||
+Raw data:
+0 0 17 18 19 10 6 0 20 24 25 23 22 21 0 0 13 15 16 14 12 2 0 0 0 0 0 5 3 7 8 11 9 4 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (33) 17 (3) 18 (5) 19 (24) 10 (6) 6 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (31) 13 (5) 15 (5) 16 (2) 14 (3) 12 (25) 2 (21) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (3) 9 (4) 4 (3) 1 (19) 0
+ Total length : 272.23
+
+Attempt #7 ||
+Raw data:
+0 0 13 6 22 0 20 24 25 10 0 17 18 19 15 16 14 12 0 23 21 0 0 0 0 0 5 3 7 8 11 9 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (19) 6 (21) 22 (12) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (17) 10 (17) 0
+Vehicle #3 : 0 (33) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : 0 (13) 23 (4) 21 (10) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (3) 9 (4) 4 (4) 2 (2) 1 (19) 0
+ Total length : 310.95
+
+Attempt #8 ||
+Raw data:
+0 0 3 11 9 6 4 2 1 0 8 0 24 25 23 21 0 20 0 5 7 10 22 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (8) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (18) 8 (18) 0
+Vehicle #3 : 0 (15) 24 (2) 25 (4) 23 (4) 21 (10) 0
+Vehicle #4 : 0 (10) 20 (10) 0
+Vehicle #5 : 0 (15) 5 (2) 7 (5) 10 (16) 22 (12) 0
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 293.00
+
+Attempt #9 ||
+Raw data:
+0 0 13 17 19 16 14 12 1 0 0 5 7 8 10 9 6 4 2 0 0 24 25 0 0 0 0 20 3 18 15 11 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (6) 19 (7) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #2 : Unused
+Vehicle #3 : 0 (15) 5 (2) 7 (3) 8 (4) 10 (5) 9 (2) 6 (2) 4 (4) 2 (21) 0
+Vehicle #4 : Unused
+Vehicle #5 : 0 (15) 24 (2) 25 (15) 0
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (20) 3 (28) 18 (7) 15 (19) 11 (16) 23 (3) 22 (2) 21 (10) 0
+ Total length : 302.25
+
+Summary:
+Average length: 299.96 (+56.80%)
+Minimal length: 272.23 (+42.31%)
+Fail Rate: 10 %
+
+16384 thread
+
+Called function with 16 Blocks:
+
+Attempt #0 ||
+Raw data:
+0 0 5 3 7 8 11 9 6 2 0 20 24 25 10 16 14 4 1 0 0 0 0 0 0 0 13 17 18 19 15 12 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (3) 9 (2) 6 (5) 2 (21) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (17) 10 (24) 16 (2) 14 (26) 4 (3) 1 (19) 0
+Vehicle #3 : Unused
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (7) 12 (30) 23 (3) 22 (2) 21 (10) 0
+ Total length : 263.80
+
+Attempt #1 ||
+Raw data:
+0 0 5 3 7 23 22 21 0 13 17 18 19 15 16 14 12 0 0 20 8 11 9 4 0 0 0 0 0 24 25 10 6 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (16) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (10) 20 (20) 8 (3) 11 (3) 9 (4) 4 (18) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 24 (2) 25 (17) 10 (6) 6 (5) 2 (2) 1 (19) 0
+ Total length : 269.92
+
+Attempt #2 ||
+Raw data:
+0 0 13 17 18 19 15 9 6 23 22 21 0 5 3 7 8 11 4 2 1 0 0 0 0 0 0 0 20 24 25 10 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (21) 9 (2) 6 (18) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (7) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : Unused
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (17) 10 (24) 16 (2) 14 (3) 12 (38) 0
+ Total length : 261.24
+
+Attempt #3 ||
+Raw data:
+0 0 20 24 25 11 23 22 21 0 5 10 9 1 0 3 7 8 6 4 2 0 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (20) 11 (16) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (15) 5 (7) 10 (5) 9 (7) 1 (19) 0
+Vehicle #3 : 0 (16) 3 (2) 7 (3) 8 (2) 6 (2) 4 (4) 2 (21) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 266.27
+
+Attempt #4 ||
+Need to find route in greedy mode!
+Raw data:
+0 19 9 23 25 22 20 4 13 24 15 21 16 0 3 14 12 17 2 0 7 5 8 10 11 0 1 6 18 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #5 ||
+Raw data:
+0 0 20 25 0 13 17 18 19 15 16 14 12 0 5 11 9 6 4 2 1 0 24 0 0 0 0 0 3 7 8 10 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 25 (15) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (8) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #4 : 0 (15) 24 (15) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (16) 3 (2) 7 (3) 8 (4) 10 (13) 23 (3) 22 (2) 21 (10) 0
+ Total length : 264.31
+
+Attempt #6 ||
+Raw data:
+0 0 23 2 1 0 0 13 17 18 19 15 16 14 12 0 20 24 25 0 0 0 0 0 5 3 7 8 10 11 9 6 4 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (13) 23 (23) 2 (2) 1 (19) 0
+Vehicle #2 : Unused
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : 0 (10) 20 (5) 24 (2) 25 (15) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (21) 22 (2) 21 (10) 0
+ Total length : 253.03
+
+Attempt #7 ||
+Raw data:
+0 0 20 24 25 10 11 9 0 23 21 0 13 17 18 19 15 16 14 12 0 5 3 7 8 6 4 2 1 0 0 0 0 0 22
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (17) 10 (3) 11 (3) 9 (20) 0
+Vehicle #2 : 0 (13) 23 (4) 21 (10) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (12) 22 (12) 0
+ Total length : 257.21
+
+Attempt #8 ||
+Raw data:
+0 0 3 7 10 11 9 4 2 1 0 20 24 25 21 0 5 8 6 23 22 0 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (5) 10 (3) 11 (3) 9 (4) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (5) 21 (10) 0
+Vehicle #3 : 0 (15) 5 (5) 8 (2) 6 (18) 23 (3) 22 (12) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 242.10
+
+Attempt #9 ||
+Raw data:
+0 0 3 8 10 11 4 2 1 0 13 17 18 19 15 16 14 12 0 24 25 23 0 5 7 9 6 0 0 0 0 0 20 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (4) 8 (4) 10 (3) 11 (7) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 24 (2) 25 (4) 23 (13) 0
+Vehicle #4 : 0 (15) 5 (2) 7 (4) 9 (2) 6 (19) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (3) 22 (2) 21 (10) 0
+ Total length : 256.79
+
+Summary:
+Average length: 259.41 (+35.60%)
+Minimal length: 242.10 (+26.56%)
+Fail Rate: 10 %
+
+20480 thread
+
+Called function with 20 Blocks:
+
+Attempt #0 ||
+Raw data:
+0 0 20 24 25 23 22 21 0 8 9 6 4 2 1 0 5 3 7 10 11 0 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (18) 8 (2) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (5) 10 (3) 11 (20) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 226.98
+
+Attempt #1 ||
+Raw data:
+0 0 20 24 25 11 9 6 4 2 1 0 5 3 21 0 0 7 8 10 23 22 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (20) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (15) 5 (1) 3 (18) 21 (10) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (16) 7 (3) 8 (4) 10 (13) 23 (3) 22 (12) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 259.94
+
+Attempt #2 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 20 24 25 0 5 3 8 23 22 21 0 0 0 0 0 0 7 10 11 9 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (4) 8 (16) 23 (3) 22 (2) 21 (10) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (16) 7 (5) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 236.14
+
+Attempt #3 ||
+Need to find route in greedy mode!
+Raw data:
+0 3 23 8 20 9 21 15 19 11 18 5 13 4 6 12 0 0 24 16 7 1 10 25 17 14 22 2 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #4 ||
+Raw data:
+0 0 23 0 20 24 25 8 9 6 4 22 21 0 5 3 7 10 11 2 1 0 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (13) 23 (13) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (21) 8 (2) 9 (2) 6 (2) 4 (21) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (5) 10 (3) 11 (10) 2 (2) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 256.29
+
+Attempt #5 ||
+Raw data:
+0 0 24 25 0 5 3 7 8 11 9 23 22 21 0 20 10 6 4 2 0 0 0 0 0 0 13 17 18 19 15 16 14 12 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 24 (2) 25 (15) 0
+Vehicle #2 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (3) 9 (18) 23 (3) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (10) 20 (17) 10 (6) 6 (2) 4 (4) 2 (21) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+ Total length : 254.43
+
+Attempt #6 ||
+Raw data:
+0 0 20 24 25 8 10 11 23 22 21 0 13 17 18 19 15 16 14 12 0 5 3 7 0 0 0 0 0 0 9 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (21) 8 (4) 10 (3) 11 (16) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (16) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (20) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 253.95
+
+Attempt #7 ||
+Raw data:
+0 0 3 7 10 9 6 4 2 1 0 0 13 17 18 19 15 16 14 12 0 20 24 25 8 0 0 0 0 0 5 11 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (5) 10 (5) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : Unused
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : 0 (10) 20 (5) 24 (2) 25 (21) 8 (18) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (8) 11 (16) 23 (3) 22 (2) 21 (10) 0
+ Total length : 262.54
+
+Attempt #8 ||
+Raw data:
+0 0 24 10 9 23 22 21 0 13 17 18 19 15 16 14 12 0 0 20 25 0 0 0 0 0 5 3 7 8 11 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 24 (19) 10 (5) 9 (18) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (10) 20 (5) 25 (15) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (5) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 254.14
+
+Attempt #9 ||
+Need to find route in greedy mode!
+Raw data:
+0 11 15 23 20 10 13 18 1 12 6 25 9 0 19 8 21 4 22 5 24 7 2 3 0 0 17 14 16 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Summary:
+Average length: 250.55 (+30.97%)
+Minimal length: 226.98 (+18.65%)
+Fail Rate: 20 %
+
+R=30
+
+
+
+1024 thread
+
+Called function with 1 Block:
+
+Attempt #0 ||
+Need to find route in greedy mode!
+Raw data:
+0 10 19 7 18 1 2 20 16 25 12 21 14 17 24 4 13 9 6 0 22 3 11 8 23 0 0 15 5 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #1 ||
+Raw data:
+0 0 3 8 6 23 21 0 13 17 18 19 15 16 14 12 1 0 5 7 10 11 9 4 2 0 0 0 0 20 24 0 0 25 22
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (4) 8 (2) 6 (18) 23 (4) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #3 : 0 (15) 5 (2) 7 (5) 10 (3) 11 (3) 9 (4) 4 (4) 2 (21) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : 0 (10) 20 (5) 24 (15) 0
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 25 (3) 22 (12) 0
+ Total length : 275.33
+
+Attempt #2 ||
+Raw data:
+0 5 3 7 8 23 0 22 21 0 20 24 25 10 11 9 4 0 13 17 18 19 15 16 14 12 1 0 0 0 0 0 0 6 2
+Vehicle #0 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (16) 23 (13) 0
+Vehicle #1 : 0 (12) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (17) 10 (3) 11 (3) 9 (4) 4 (18) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (19) 6 (5) 2 (21) 0
+ Total length : 285.13
+
+Attempt #3 ||
+Raw data:
+0 0 20 24 25 23 22 21 0 13 19 15 14 12 4 2 1 0 5 3 7 8 10 11 9 0 0 0 0 0 0 17 18 16 6
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (9) 19 (5) 15 (5) 14 (3) 12 (24) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (20) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (33) 17 (3) 18 (11) 16 (26) 6 (19) 0
+ Total length : 280.49
+
+Attempt #4 ||
+Raw data:
+0 0 3 7 8 10 11 9 6 4 1 0 20 24 23 22 0 13 25 21 0 0 0 0 0 0 5 17 18 19 15 16 14 12 2
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (3) 1 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (6) 23 (3) 22 (12) 0
+Vehicle #3 : 0 (31) 13 (23) 25 (5) 21 (10) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (26) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (25) 2 (21) 0
+ Total length : 271.82
+
+Attempt #5 ||
+Raw data:
+0 0 7 8 10 11 9 23 22 21 0 5 3 0 13 17 18 19 15 6 4 0 0 0 0 0 0 20 24 25 16 14 12 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 7 (3) 8 (4) 10 (3) 11 (3) 9 (18) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (15) 5 (1) 3 (16) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (23) 6 (2) 4 (18) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (33) 16 (2) 14 (3) 12 (25) 2 (2) 1 (19) 0
+ Total length : 286.12
+
+Attempt #6 ||
+Raw data:
+0 0 5 8 10 11 9 12 2 1 0 20 24 25 23 21 0 13 17 18 19 15 16 14 22 0 0 0 0 0 0 3 7 6 4
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (5) 8 (4) 10 (3) 11 (3) 9 (20) 12 (25) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (4) 21 (10) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (34) 22 (12) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (16) 3 (2) 7 (3) 6 (2) 4 (18) 0
+ Total length : 272.46
+
+Attempt #7 ||
+Raw data:
+0 0 20 24 25 23 22 21 0 13 17 18 19 16 14 12 2 0 5 3 7 8 15 0 0 0 0 0 0 10 11 9 6 4 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (7) 16 (2) 14 (3) 12 (25) 2 (21) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (22) 15 (36) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (17) 10 (3) 11 (3) 9 (2) 6 (2) 4 (3) 1 (19) 0
+ Total length : 264.66
+
+Attempt #8 ||
+Raw data:
+0 0 20 24 25 22 21 0 0 13 18 16 14 23 0 17 19 15 12 4 2 0 0 0 0 0 5 3 7 8 10 11 9 6 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 24 (2) 25 (3) 22 (2) 21 (10) 0
+Vehicle #2 : Unused
+Vehicle #3 : 0 (31) 13 (7) 18 (11) 16 (2) 14 (31) 23 (13) 0
+Vehicle #4 : 0 (33) 17 (6) 19 (5) 15 (7) 12 (24) 4 (4) 2 (21) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (5) 1 (19) 0
+ Total length : 282.99
+
+Attempt #9 ||
+Raw data:
+0 0 3 7 10 6 21 0 13 17 18 19 15 16 14 23 0 20 24 25 22 0 0 0 0 0 0 5 8 11 9 12 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (5) 10 (6) 6 (20) 21 (10) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (31) 23 (13) 0
+Vehicle #3 : 0 (10) 20 (5) 24 (2) 25 (3) 22 (12) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (5) 8 (3) 11 (3) 9 (20) 12 (24) 4 (4) 2 (2) 1 (19) 0
+ Total length : 284.08
+
+Summary:
+Average length: 278.12 (+45.38%)
+Minimal length: 264.66 (+38.35%)
+Fail Rate: 10 %
+
+16384 thread
+
+Called function with 16 Blocks:
+
+Attempt #0 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 1 0 3 8 9 6 4 2 0 5 7 10 11 0 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #2 : 0 (16) 3 (4) 8 (2) 9 (2) 6 (2) 4 (4) 2 (21) 0
+Vehicle #3 : 0 (15) 5 (2) 7 (5) 10 (3) 11 (20) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 235.48
+
+Attempt #1 ||
+Raw data:
+0 0 24 25 8 10 11 9 6 4 2 1 0 13 17 18 19 15 16 14 12 0 5 3 7 0 20 0 0 0 0 0 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 24 (2) 25 (21) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (16) 0
+Vehicle #4 : 0 (10) 20 (10) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (13) 23 (3) 22 (2) 21 (10) 0
+ Total length : 254.36
+
+Attempt #2 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 3 7 8 10 11 9 6 4 2 1 0 20 0 0 5 0 0 0 0 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (16) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : 0 (10) 20 (10) 0
+Vehicle #4 : Unused
+Vehicle #5 : 0 (15) 5 (15) 0
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 242.07
+
+Attempt #3 ||
+Raw data:
+0 0 3 8 11 9 6 2 0 13 17 18 19 15 16 14 12 0 5 7 10 4 1 0 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (4) 8 (3) 11 (3) 9 (2) 6 (5) 2 (21) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (2) 7 (5) 10 (7) 4 (3) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 238.53
+
+Attempt #4 ||
+Raw data:
+0 0 5 3 7 8 10 11 9 6 4 2 1 0 13 17 18 19 15 16 14 12 0 20 24 25 0 0 0 0 0 0 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (10) 20 (5) 24 (2) 25 (15) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (13) 23 (3) 22 (2) 21 (10) 0
+ Total length : 215.70
+
+Attempt #5 ||
+Raw data:
+0 0 5 7 8 10 11 9 6 4 2 1 0 13 17 18 19 15 16 14 12 0 3 0 20 24 0 0 0 0 0 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (16) 3 (16) 0
+Vehicle #4 : 0 (10) 20 (5) 24 (15) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 251.43
+
+Attempt #6 ||
+Need to find route in greedy mode!
+Raw data:
+0 10 18 25 22 7 3 19 23 1 20 4 2 12 14 24 6 8 16 9 17 21 15 11 5 0 0 13 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #7 ||
+Need to find route in greedy mode!
+Raw data:
+0 11 18 20 25 3 14 21 12 2 9 15 24 23 19 0 5 13 16 6 7 10 1 8 4 22 17 0 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #8 ||
+Raw data:
+0 0 3 7 10 9 4 2 0 13 17 18 19 15 16 14 12 1 0 5 8 11 6 21 0 0 0 0 0 0 20 24 25 23 22
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (5) 10 (5) 9 (4) 4 (4) 2 (21) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #3 : 0 (15) 5 (5) 8 (3) 11 (5) 6 (20) 21 (10) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (12) 0
+ Total length : 254.18
+
+Attempt #9 ||
+Raw data:
+0 0 20 23 22 21 0 24 25 10 6 4 2 1 0 5 3 7 8 11 9 0 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (15) 24 (2) 25 (17) 10 (6) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (3) 11 (3) 9 (20) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 240.41
+
+Summary:
+Average length: 241.52 (+26.25%)
+Minimal length: 215.70 (+12.76%)
+Fail Rate: 20 %
+
+20480 thread
+
+Called function with 20 Blocks:
+
+Attempt #0 ||
+Raw data:
+0 0 5 3 8 10 9 0 20 24 25 23 22 21 0 13 17 18 19 15 16 14 12 0 0 0 0 0 0 7 11 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (4) 8 (4) 10 (5) 9 (20) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (16) 7 (6) 11 (5) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 234.99
+
+Attempt #1 ||
+Need to find route in greedy mode!
+Raw data:
+0 25 6 8 16 19 11 13 17 0 7 15 10 21 1 9 2 14 0 4 23 20 18 24 3 5 12 0 0 22 0 0 0 0 0
+Time Window condition failed!
+Route not found!
+
+Attempt #2 ||
+Need to find route in greedy mode!
+Raw data:
+0 16 15 3 21 20 2 4 6 10 25 7 13 0 23 22 12 24 9 1 14 8 19 17 0 11 5 18 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #3 ||
+Raw data:
+0 0 20 7 10 9 4 2 1 0 13 17 18 19 15 16 14 12 0 5 3 8 11 6 0 0 0 0 0 0 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (19) 7 (5) 10 (5) 9 (4) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (4) 8 (3) 11 (5) 6 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 247.72
+
+Attempt #4 ||
+Need to find route in greedy mode!
+Raw data:
+0 17 20 15 19 18 9 16 7 13 1 2 11 4 21 14 24 3 12 23 25 5 6 8 0 10 0 22 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #5 ||
+Need to find route in greedy mode!
+Raw data:
+0 14 9 1 11 12 20 25 24 5 23 13 21 4 16 15 0 17 8 18 22 19 0 7 3 0 2 6 0 0 0 10 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #6 ||
+Raw data:
+0 0 3 7 8 10 11 6 4 2 1 0 13 17 18 19 15 16 14 12 0 5 9 0 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (3) 8 (4) 10 (3) 11 (5) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (6) 9 (20) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 233.04
+
+Attempt #7 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 20 3 8 10 11 9 6 4 0 5 7 2 1 0 0 0 0 0 0 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (10) 20 (20) 3 (4) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (18) 0
+Vehicle #3 : 0 (15) 5 (2) 7 (6) 2 (2) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 243.60
+
+Attempt #8 ||
+Need to find route in greedy mode!
+Raw data:
+0 11 21 9 18 2 3 19 0 23 7 6 22 16 5 12 25 24 17 4 20 13 1 14 0 15 10 8 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #9 ||
+Need to find route in greedy mode!
+Raw data:
+0 6 21 12 16 2 11 4 22 13 8 9 24 14 15 5 10 7 1 25 0 3 23 19 20 17 0 18 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Summary:
+Average length: 239.84 (+25.37%)
+Minimal length: 233.04 (+21.82%)
+Fail Rate: 60 %
+
+R=50
+
+
+
+1024 thread
+
+Called function with 1 Block:
+
+Attempt #0 ||
+Raw data:
+0 0 3 7 8 10 11 9 2 1 0 13 19 6 4 0 20 24 25 23 22 0 0 0 0 0 0 5 17 18 15 16 14 12 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (7) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (9) 19 (27) 6 (2) 4 (18) 0
+Vehicle #3 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (12) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (26) 17 (3) 18 (7) 15 (5) 16 (2) 14 (3) 12 (33) 21 (10) 0
+ Total length : 286.66
+
+Attempt #1 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 5 25 22 21 0 24 23 0 0 0 0 0 0 20 3 7 8 10 11 9 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (15) 5 (21) 25 (3) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (15) 24 (6) 23 (13) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (20) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 254.80
+
+Attempt #2 ||
+Raw data:
+0 0 20 8 11 4 2 0 24 25 0 13 17 18 19 15 16 14 12 1 0 0 0 0 0 0 5 3 7 10 9 6 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (20) 8 (3) 11 (7) 4 (4) 2 (21) 0
+Vehicle #2 : 0 (15) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (5) 10 (5) 9 (2) 6 (18) 23 (3) 22 (2) 21 (10) 0
+ Total length : 263.03
+
+Attempt #3 ||
+Raw data:
+0 0 0 24 25 23 0 13 17 18 19 15 16 14 12 0 20 9 4 2 1 0 0 0 0 0 5 3 7 8 10 11 6 22 21
+Vehicle #0 : Unused
+Vehicle #1 : Unused
+Vehicle #2 : 0 (15) 24 (2) 25 (4) 23 (13) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : 0 (10) 20 (22) 9 (4) 4 (4) 2 (2) 1 (19) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (5) 6 (21) 22 (2) 21 (10) 0
+ Total length : 256.00
+
+Attempt #4 ||
+Raw data:
+0 0 5 3 7 10 11 9 6 2 0 13 17 19 15 16 14 12 4 1 0 20 24 25 22 0 0 0 0 0 0 18 8 23 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (5) 10 (3) 11 (3) 9 (2) 6 (5) 2 (21) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (6) 19 (5) 15 (5) 16 (2) 14 (3) 12 (24) 4 (3) 1 (19) 0
+Vehicle #3 : 0 (10) 20 (5) 24 (2) 25 (3) 22 (12) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (35) 18 (24) 8 (16) 23 (4) 21 (10) 0
+ Total length : 280.37
+
+Attempt #5 ||
+Raw data:
+0 0 5 7 10 23 22 0 3 8 15 11 9 6 4 2 1 0 20 24 25 0 0 0 0 0 0 13 17 18 19 16 14 12 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (2) 7 (5) 10 (13) 23 (3) 22 (12) 0
+Vehicle #2 : 0 (16) 3 (4) 8 (22) 15 (19) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : 0 (10) 20 (5) 24 (2) 25 (15) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (7) 16 (2) 14 (3) 12 (33) 21 (10) 0
+ Total length : 273.91
+
+Attempt #6 ||
+Raw data:
+0 0 10 9 2 1 0 20 24 25 22 21 0 5 3 7 4 0 8 11 6 23 0 0 0 0 0 13 17 18 19 15 16 14 12
+Vehicle #0 : Unused
+Vehicle #1 : 0 (17) 10 (5) 9 (7) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (3) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (3) 4 (18) 0
+Vehicle #4 : 0 (18) 8 (3) 11 (5) 6 (18) 23 (13) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+ Total length : 274.31
+
+Attempt #7 ||
+Need to find route in greedy mode!
+Raw data:
+0 2 25 18 8 13 1 6 4 19 11 16 23 10 9 0 20 5 22 15 21 12 7 14 0 24 3 17 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #8 ||
+Raw data:
+0 0 7 8 10 11 9 23 0 20 25 22 21 0 24 0 5 3 6 4 2 0 0 0 0 0 13 17 18 19 15 16 14 12 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 7 (3) 8 (4) 10 (3) 11 (3) 9 (18) 23 (13) 0
+Vehicle #2 : 0 (10) 20 (5) 25 (3) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (15) 24 (15) 0
+Vehicle #4 : 0 (15) 5 (1) 3 (4) 6 (2) 4 (4) 2 (21) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+ Total length : 269.14
+
+Attempt #9 ||
+Raw data:
+0 0 13 17 18 19 11 9 6 4 0 5 3 8 10 21 0 20 24 25 23 22 0 0 0 0 0 0 7 15 16 14 12 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (23) 11 (3) 9 (2) 6 (2) 4 (18) 0
+Vehicle #2 : 0 (15) 5 (1) 3 (4) 8 (4) 10 (15) 21 (10) 0
+Vehicle #3 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (12) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (16) 7 (24) 15 (5) 16 (2) 14 (3) 12 (25) 2 (2) 1 (19) 0
+ Total length : 273.15
+
+Summary:
+Average length: 270.15 (+41.22%)
+Minimal length: 254.80 (+33.20%)
+Fail Rate: 10 %
+
+16384 thread
+
+Called function with 16 Blocks:
+
+Attempt #0 ||
+Raw data:
+0 0 7 8 10 11 9 6 4 2 1 0 13 17 18 19 15 16 14 12 0 5 3 0 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (16) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 221.94
+
+Attempt #1 ||
+Raw data:
+0 0 7 8 10 6 0 13 17 18 19 15 16 14 12 0 5 3 11 9 4 2 1 0 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 7 (3) 8 (4) 10 (6) 6 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (8) 11 (3) 9 (4) 4 (4) 2 (2) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 235.26
+
+Attempt #2 ||
+Need to find route in greedy mode!
+Raw data:
+0 1 23 3 7 16 13 25 11 4 9 5 2 24 21 8 22 15 18 17 10 12 14 0 19 0 6 20 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #3 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 0 5 3 7 11 0 20 24 25 8 10 9 6 4 2 1 0 0 0 0 0 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : Unused
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (6) 11 (20) 0
+Vehicle #4 : 0 (10) 20 (5) 24 (2) 25 (21) 8 (4) 10 (5) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (13) 23 (3) 22 (2) 21 (10) 0
+ Total length : 242.67
+
+Attempt #4 ||
+Raw data:
+0 0 20 23 22 21 0 24 25 0 5 3 7 0 13 17 18 19 15 16 14 12 0 0 0 0 0 8 10 11 9 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (10) 20 (5) 23 (3) 22 (2) 21 (10) 0
+Vehicle #2 : 0 (15) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (16) 0
+Vehicle #4 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (18) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 249.37
+
+Attempt #5 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 20 23 22 21 0 5 3 7 0 0 0 0 0 0 24 25 8 10 11 9 6 4 2 1
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (10) 20 (5) 23 (3) 22 (2) 21 (10) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (16) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 24 (2) 25 (21) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+ Total length : 236.74
+
+Attempt #6 ||
+Raw data:
+0 0 5 8 9 6 4 2 0 13 17 18 19 15 16 14 12 1 0 0 3 7 10 11 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (5) 8 (2) 9 (2) 6 (2) 4 (4) 2 (21) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (16) 3 (2) 7 (5) 10 (3) 11 (20) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 235.77
+
+Attempt #7 ||
+Need to find route in greedy mode!
+Raw data:
+0 25 0 11 16 10 6 14 15 19 8 4 22 17 24 18 2 7 1 21 3 0 0 9 13 5 12 0 23 0 0 20 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #8 ||
+Raw data:
+0 0 5 3 7 8 10 11 9 6 4 2 1 0 13 17 18 15 16 14 12 0 0 0 0 0 0 0 20 24 25 19 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (7) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : Unused
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (30) 19 (28) 23 (3) 22 (2) 21 (10) 0
+ Total length : 242.55
+
+Attempt #9 ||
+Raw data:
+0 0 5 3 7 8 10 11 9 6 4 2 1 0 13 17 18 16 14 12 0 0 0 0 0 0 0 20 24 25 19 15 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (11) 16 (2) 14 (3) 12 (38) 0
+Vehicle #3 : Unused
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (30) 19 (5) 15 (26) 23 (3) 22 (2) 21 (10) 0
+ Total length : 244.73
+
+Summary:
+Average length: 238.63 (+24.74%)
+Minimal length: 221.94 (+16.02%)
+Fail Rate: 20 %
+
+20480 thread
+
+Called function with 20 Blocks:
+
+Attempt #0 ||
+Raw data:
+0 0 3 7 10 11 6 4 2 1 0 20 24 25 0 13 17 18 19 15 16 14 12 0 0 0 0 0 0 5 8 9 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (16) 3 (2) 7 (5) 10 (3) 11 (5) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (15) 5 (5) 8 (2) 9 (18) 23 (3) 22 (2) 21 (10) 0
+ Total length : 241.02
+
+Attempt #1 ||
+Raw data:
+0 0 10 11 4 2 0 13 17 18 19 15 16 14 12 1 0 5 3 7 8 9 6 0 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (17) 10 (3) 11 (7) 4 (4) 2 (21) 0
+Vehicle #2 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (26) 1 (19) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (2) 7 (3) 8 (2) 9 (2) 6 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 234.43
+
+Attempt #2 ||
+Need to find route in greedy mode!
+Raw data:
+0 5 17 9 16 2 1 6 24 7 15 21 4 23 22 10 8 0 3 25 11 0 13 19 20 18 12 0 14 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #3 ||
+Need to find route in greedy mode!
+Raw data:
+0 9 16 5 10 8 20 15 0 21 6 2 24 17 11 18 22 4 1 0 3 12 13 0 14 23 19 0 7 25 0 0 0 0 0
+Time Window condition failed!
+Route not found!
+
+Attempt #4 ||
+Need to find route in greedy mode!
+Raw data:
+0 15 2 20 12 11 16 10 25 18 7 0 4 0 21 5 0 17 14 24 8 13 9 6 19 0 1 3 23 0 22 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #5 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 24 25 0 5 3 8 11 9 6 4 2 1 0 0 0 0 0 0 20 7 10 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (15) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (4) 8 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (19) 7 (5) 10 (13) 23 (3) 22 (2) 21 (10) 0
+ Total length : 245.81
+
+Attempt #6 ||
+Need to find route in greedy mode!
+Raw data:
+0 14 3 17 10 15 23 8 9 20 7 18 5 25 1 2 16 22 24 13 21 6 11 4 12 19 0 0 0 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #7 ||
+Need to find route in greedy mode!
+Raw data:
+0 21 24 2 12 0 25 4 17 18 7 15 20 0 8 22 1 16 3 9 13 23 14 6 0 5 11 10 0 0 19 0 0 0 0
+Time Window condition failed!
+Route not found!
+
+Attempt #8 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 5 7 8 10 11 9 4 2 1 0 0 0 3 6 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (15) 5 (2) 7 (3) 8 (4) 10 (3) 11 (3) 9 (4) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : Unused
+Vehicle #4 : Unused
+Vehicle #5 : 0 (16) 3 (4) 6 (19) 0
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 229.78
+
+Attempt #9 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 20 24 25 0 5 3 9 4 2 1 0 0 0 0 0 0 7 8 10 11 6 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (10) 20 (5) 24 (2) 25 (15) 0
+Vehicle #3 : 0 (15) 5 (1) 3 (6) 9 (4) 4 (4) 2 (2) 1 (19) 0
+Vehicle #4 : Unused
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (16) 7 (3) 8 (4) 10 (3) 11 (5) 6 (18) 23 (3) 22 (2) 21 (10) 0
+ Total length : 242.64
+
+Summary:
+Average length: 238.74 (+24.80%)
+Minimal length: 229.78 (+20.11%)
+Fail Rate: 50 %
+
+R=50
+
+Called function with 20 Blocks:
+
+Attempt #0 ||
+Need to find route in greedy mode!
+Raw data:
+0 16 0 4 3 22 19 8 10 13 17 15 24 21 1 11 20 23 25 2 18 0 6 12 0 5 9 7 14 0 0 0 0 0 0
+Capacity condition failed!
+Route not found!
+
+Attempt #5 ||
+Raw data:
+0 0 13 17 18 19 15 16 14 12 0 3 10 11 9 6 4 2 1 0 0 5 7 8 0 0 0 0 0 20 24 25 23 22 21
+Vehicle #0 : Unused
+Vehicle #1 : 0 (31) 13 (4) 17 (3) 18 (5) 19 (5) 15 (5) 16 (2) 14 (3) 12 (38) 0
+Vehicle #2 : 0 (16) 3 (7) 10 (3) 11 (3) 9 (2) 6 (2) 4 (4) 2 (2) 1 (19) 0
+Vehicle #3 : Unused
+Vehicle #4 : 0 (15) 5 (2) 7 (3) 8 (18) 0
+Vehicle #5 : Unused
+Vehicle #6 : Unused
+Vehicle #7 : Unused
+Vehicle #8 : Unused
+Vehicle #9 : 0 (10) 20 (5) 24 (2) 25 (4) 23 (3) 22 (2) 21 (10) 0
+ Total length : 228.68
+
+Attempt #9 ||
+Need to find route in greedy mode!
+Raw data:
+0 13 9 8 17 11 21 4 14 2 24 3 0 22 1 5 0 25 10 18 20 6 23 0 19 15 16 0 7 12 0 0 0 0 0
+Time Window condition failed!
+Route not found!
+
+Summary:
+Average length: 236.59 (+23.67%)
+Minimal length: 228.68 (+19.54%)
+Fail Rate: 20 %
+C:\Iskola dolgok\Projektek\CUDA\Project Solutions\VRP\x64\Release\VRPTW.exe (process 17172) exited with code 0.
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . . .
