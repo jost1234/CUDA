@@ -119,11 +119,6 @@ Cuda c++ programming guide - cooperative groups.
 \bibNewBlock
   \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#cooperative-groups}.
 
-\bibitem{CUDAdoc_threadblockTile}
-Cuda c++ programming guide - cooperative groups thread block tile.
-\bibNewBlock
-  \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#thread-block-tile-group-cg}.
-
 \bibitem{CUDAdoc}
 Cuda c++ programming guide.
 \bibNewBlock
@@ -143,11 +138,6 @@ Cvrplib - capacitated vehicle routing problem library.
 Datasets fot traveling salesperson problem - florida state university.
 \bibNewBlock \url{https://people.sc.fsu.edu/~jburkardt/datasets/tsp/tsp.html}.
 
-\bibitem{implicitSzink}
-Prof.~Wu Feng:
-\bibNewBlock To gpu synchronize or not gpu synchronize?
-\bibNewBlock \url{https://www.nvidia.com/content/GTC/documents/SC09_Feng.pdf}.
-
 \bibitem{HeldKarp}
 Michael Held\bibAnd 1Richard~M. Karp:
 \bibNewBlock A dynamic programming approach to sequencing problems.
@@ -163,6 +153,10 @@ Rishal Hurbans:
 \bibUrll{URL}
   >https://rishalhurbans.medium.com/ant-colony-optimization-for-beginners-
   841d2be60cc6>.
+
+\bibitem{HeurisztikaJelenteseKeziszotar}
+{\em Magyar értelmező kéziszótár}.
+\bibNewBlock Budapest, 1982, Akadémiai Kiadó, Budapest, 541.~p.
 
 \bibitem{supportedWinOS}
 Támogatott windows operációs rendszerek listája.

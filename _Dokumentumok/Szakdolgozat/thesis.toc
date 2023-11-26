@@ -6,67 +6,72 @@
 \select@language {magyar} \contentsline {chapter}{\numberline {2}Elméleti háttér}{5}{chapter.2}%
 \select@language {magyar} \contentsline {section}{\numberline {2.1}Utazóügynök probléma }{5}{section.2.1}%
 \select@language {magyar} \contentsline {section}{\numberline {2.2}Járműútvonal-tervezési problémák }{6}{section.2.2}%
-\select@language {magyar} \contentsline {section}{\numberline {2.3}Hangyakolónia optimalizáció}{8}{section.2.3}%
-\select@language {magyar} \contentsline {section}{\numberline {2.4}Alternatív megoldások}{9}{section.2.4}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.4.1}„Brute force” algoritmus}{9}{subsection.2.4.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.4.2}Held - Karp algoritmus }{10}{subsection.2.4.2}%
+\select@language {magyar} \contentsline {section}{\numberline {2.3}Heurisztikus algoritmusok}{8}{section.2.3}%
+\select@language {magyar} \contentsline {section}{\numberline {2.4}Hangyakolónia optimalizáció}{8}{section.2.4}%
+\select@language {magyar} \contentsline {section}{\numberline {2.5}Alternatív megoldások}{9}{section.2.5}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.5.1}„Brute force” algoritmus}{9}{subsection.2.5.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.5.2}Held - Karp algoritmus }{10}{subsection.2.5.2}%
 \select@language {magyar} \contentsline {paragraph}{}{10}{section*.8}%
 \select@language {magyar} \contentsline {paragraph}{}{10}{section*.9}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {2.4.2.1}Az eljárás Értékelése}{10}{subsubsection.2.4.2.1}%
-\select@language {magyar} \contentsline {chapter}{\numberline {3}Technológiai háttér}{11}{chapter.3}%
-\select@language {magyar} \contentsline {section}{\numberline {3.1}GPGPU}{11}{section.3.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {3.1.1}Motiváció}{11}{subsection.3.1.1}%
-\select@language {magyar} \contentsline {section}{\numberline {3.2}CUDA}{12}{section.3.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {3.2.1}Programozási modell }{13}{subsection.3.2.1}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1.1}Kernel, és a többi függvénytípus}{13}{subsubsection.3.2.1.1}%
-\select@language {magyar} \contentsline {paragraph}{}{14}{section*.12}%
-\select@language {magyar} \contentsline {paragraph}{Példa:}{14}{section*.14}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1.2}Szálkezelés}{14}{subsubsection.3.2.1.2}%
-\select@language {magyar} \contentsline {paragraph}{Thread csoportok}{15}{section*.15}%
-\select@language {magyar} \contentsline {paragraph}{Thread csoportokon végrahajtható kollektív (egyenhatású) műveletek}{16}{section*.16}%
-\select@language {magyar} \contentsline {paragraph}{Thread Blokk}{16}{section*.17}%
-\select@language {magyar} \contentsline {subsection}{\numberline {3.2.2}Moduláris programszerkesztés}{16}{subsection.3.2.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {3.2.3}Grid csoport}{17}{subsection.3.2.3}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3.1}Teljes Grid csoporton belüli szinkronizáció}{17}{subsubsection.3.2.3.1}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3.2}Program felkészítése több blokkos futtatásra}{19}{subsubsection.3.2.3.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {3.2.4}CUDA használata Visual Studio alatt}{19}{subsection.3.2.4}%
-\select@language {magyar} \contentsline {paragraph}{CUDA Extension letöltése}{19}{section*.18}%
-\select@language {magyar} \contentsline {paragraph}{Új projekt létrehozása}{20}{section*.20}%
-\select@language {magyar} \contentsline {paragraph}{Példakód futtatása}{20}{section*.22}%
-\select@language {magyar} \contentsline {chapter}{\numberline {4}Implementáció}{22}{chapter.4}%
-\select@language {magyar} \contentsline {section}{\numberline {4.1}Hangyakolónia algoritmus}{22}{section.4.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.1.1}Adatstruktúrák}{22}{subsection.4.1.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.1.2}Feromonok nyilvántartása}{22}{subsection.4.1.2}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {4.1.2.1}TSP}{22}{subsubsection.4.1.2.1}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {4.1.2.2}VRP variánsok}{23}{subsubsection.4.1.2.2}%
-\select@language {magyar} \contentsline {paragraph}{}{24}{section*.25}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.1.3}A rulettkerék algoritmus }{24}{subsection.4.1.3}%
-\select@language {magyar} \contentsline {section}{\numberline {4.2}A végeredmény számítása}{25}{section.4.2}%
-\select@language {magyar} \contentsline {section}{\numberline {4.3}TSP első verzió}{25}{section.4.3}%
-\select@language {magyar} \contentsline {section}{\numberline {4.4}TSP második verzió}{26}{section.4.4}%
-\select@language {magyar} \contentsline {section}{\numberline {4.5}VRP}{27}{section.4.5}%
-\select@language {magyar} \contentsline {section}{\numberline {4.6}CVRP}{27}{section.4.6}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {2.5.2.1}Az eljárás Értékelése}{10}{subsubsection.2.5.2.1}%
+\select@language {magyar} \contentsline {section}{\numberline {2.6}A párhuzamos programozás alapjai}{11}{section.2.6}%
+\select@language {magyar} \contentsline {chapter}{\numberline {3}Technológiai háttér}{12}{chapter.3}%
+\select@language {magyar} \contentsline {section}{\numberline {3.1}GPGPU}{12}{section.3.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {3.1.1}Motiváció}{12}{subsection.3.1.1}%
+\select@language {magyar} \contentsline {section}{\numberline {3.2}CUDA}{13}{section.3.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {3.2.1}Programozási modell }{14}{subsection.3.2.1}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1.1}Kernel, és a többi függvénytípus}{14}{subsubsection.3.2.1.1}%
+\select@language {magyar} \contentsline {paragraph}{}{15}{section*.12}%
+\select@language {magyar} \contentsline {paragraph}{Példa:}{15}{section*.14}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.1.2}Szálkezelés}{15}{subsubsection.3.2.1.2}%
+\select@language {magyar} \contentsline {paragraph}{Thread csoportok}{16}{section*.15}%
+\select@language {magyar} \contentsline {paragraph}{Thread csoportokon végrahajtható kollektív (egyenhatású) műveletek}{17}{section*.16}%
+\select@language {magyar} \contentsline {paragraph}{Thread Blokk}{17}{section*.17}%
+\select@language {magyar} \contentsline {subsection}{\numberline {3.2.2}Moduláris programszerkesztés}{17}{subsection.3.2.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {3.2.3}Grid csoport}{18}{subsection.3.2.3}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3.1}Teljes Grid csoporton belüli szinkronizáció}{18}{subsubsection.3.2.3.1}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {3.2.3.2}Program felkészítése több blokkos futtatásra}{20}{subsubsection.3.2.3.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {3.2.4}CUDA használata Visual Studio alatt}{20}{subsection.3.2.4}%
+\select@language {magyar} \contentsline {paragraph}{CUDA Extension letöltése}{20}{section*.18}%
+\select@language {magyar} \contentsline {paragraph}{Új projekt létrehozása}{21}{section*.20}%
+\select@language {magyar} \contentsline {paragraph}{Példakód futtatása}{21}{section*.22}%
+\select@language {magyar} \contentsline {chapter}{\numberline {4}Implementáció}{23}{chapter.4}%
+\select@language {magyar} \contentsline {section}{\numberline {4.1}Hangyakolónia algoritmus}{23}{section.4.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1.1}Adatstruktúrák}{23}{subsection.4.1.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1.2}Feromonok nyilvántartása}{23}{subsection.4.1.2}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.1.2.1}TSP}{23}{subsubsection.4.1.2.1}%
+\select@language {magyar} \contentsline {paragraph}{}{24}{section*.24}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {4.1.2.2}VRP variánsok}{24}{subsubsection.4.1.2.2}%
+\select@language {magyar} \contentsline {paragraph}{}{25}{section*.26}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.1.3}A rulettkerék algoritmus }{25}{subsection.4.1.3}%
+\select@language {magyar} \contentsline {section}{\numberline {4.2}A végeredmény számítása}{26}{section.4.2}%
+\select@language {magyar} \contentsline {section}{\numberline {4.3}TSP első verzió}{26}{section.4.3}%
+\select@language {magyar} \contentsline {paragraph}{}{26}{section*.27}%
+\select@language {magyar} \contentsline {paragraph}{}{26}{section*.28}%
+\select@language {magyar} \contentsline {section}{\numberline {4.4}TSP második verzió}{27}{section.4.4}%
+\select@language {magyar} \contentsline {section}{\numberline {4.5}VRP}{28}{section.4.5}%
+\select@language {magyar} \contentsline {section}{\numberline {4.6}CVRP}{28}{section.4.6}%
 \select@language {magyar} \contentsline {section}{\numberline {4.7}CVRPTW}{28}{section.4.7}%
 \select@language {magyar} \contentsline {subsection}{\numberline {4.7.1}Kezdeti kudarcok}{28}{subsection.4.7.1}%
 \select@language {magyar} \contentsline {subsection}{\numberline {4.7.2}A probléma forrása}{28}{subsection.4.7.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {4.7.3}A megoldás felé vezető út}{28}{subsection.4.7.3}%
-\select@language {magyar} \contentsline {chapter}{\numberline {5}Mérési eredmények}{30}{chapter.5}%
-\select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{30}{section.5.1}%
-\select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{30}{section.5.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.1}TSP első verzió}{32}{subsection.5.2.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.2}TSP második (konzisztens) verzió}{33}{subsection.5.2.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.3}VRP}{35}{subsection.5.2.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.4}CVRP}{35}{subsection.5.2.4}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.5}CVRPTW random kereséssel}{36}{subsection.5.2.5}%
-\select@language {magyar} \contentsline {subsection}{\numberline {5.2.6}CVRPTW rendezett kereséssel}{38}{subsection.5.2.6}%
-\select@language {magyar} \contentsline {chapter}{\numberline {6}Eredmények értékelése, továbbfejlesztési lehetőségek}{41}{chapter.6}%
-\select@language {magyar} \contentsline {section}{\numberline {6.1}A két Utazóügynök probléma (TSP) verzió összehasonlítása}{41}{section.6.1}%
-\select@language {magyar} \contentsline {section}{\numberline {6.2}A különböző Járműútvonal-tervezési problémák}{42}{section.6.2}%
-\select@language {magyar} \contentsline {section}{\numberline {6.3}Kritériumfeltételek problémája a Hangyakolónia algoritmussal}{42}{section.6.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {6.3.1}Kapacitásfeltétel}{42}{subsection.6.3.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {6.3.2}Időablakok feltétele}{43}{subsection.6.3.2}%
-\select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{44}{chapter*.54}%
-\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{45}{chapter*.54}%
-\select@language {magyar} \contentsline {chapter}{Függelék}{47}{appendix*.56}%
+\select@language {magyar} \contentsline {subsection}{\numberline {4.7.3}A megoldás felé vezető út}{29}{subsection.4.7.3}%
+\select@language {magyar} \contentsline {chapter}{\numberline {5}Mérési eredmények}{31}{chapter.5}%
+\select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{31}{section.5.1}%
+\select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{31}{section.5.2}%
+\select@language {magyar} \contentsline {section}{\numberline {5.3}TSP első verzió}{33}{section.5.3}%
+\select@language {magyar} \contentsline {section}{\numberline {5.4}TSP második (konzisztens) verzió}{34}{section.5.4}%
+\select@language {magyar} \contentsline {section}{\numberline {5.5}VRP}{36}{section.5.5}%
+\select@language {magyar} \contentsline {section}{\numberline {5.6}CVRP}{36}{section.5.6}%
+\select@language {magyar} \contentsline {section}{\numberline {5.7}CVRPTW random kereséssel}{37}{section.5.7}%
+\select@language {magyar} \contentsline {section}{\numberline {5.8}CVRPTW rendezett kereséssel}{39}{section.5.8}%
+\select@language {magyar} \contentsline {chapter}{\numberline {6}Eredmények értékelése, továbbfejlesztési lehetőségek}{42}{chapter.6}%
+\select@language {magyar} \contentsline {section}{\numberline {6.1}A két Utazóügynök probléma (TSP) verzió összehasonlítása}{42}{section.6.1}%
+\select@language {magyar} \contentsline {section}{\numberline {6.2}A különböző Járműútvonal-tervezési problémák}{43}{section.6.2}%
+\select@language {magyar} \contentsline {section}{\numberline {6.3}Kritériumfeltételek problémája a Hangyakolónia algoritmussal}{43}{section.6.3}%
+\select@language {magyar} \contentsline {subsection}{\numberline {6.3.1}Kapacitásfeltétel}{43}{subsection.6.3.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {6.3.2}Időablakok feltétele}{44}{subsection.6.3.2}%
+\select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{45}{chapter*.59}%
+\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{46}{chapter*.59}%
+\select@language {magyar} \contentsline {chapter}{Függelék}{47}{appendix*.61}%
 \select@language {magyar} \contentsline {section}{\numberline {F.1}A TeXstudio felülete}{47}{section.F.1}%
 \select@language {magyar} \contentsline {section}{\numberline {F.2}Válasz az ,,Élet, a világmindenség, meg minden'' kérdésére}{48}{section.F.2}%

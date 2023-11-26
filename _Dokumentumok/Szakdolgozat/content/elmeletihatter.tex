@@ -71,9 +71,11 @@ A cél azon \(R_1,R_2,...R_k \) útvonalak megtalálása, amelyekre a következ�
 	\item a járművek mindegyik állomásra időben megérkeznek: \(\forall v_i \in V, v_i\ne v_0\) esetén \( T_{min}(v_i) \leqslant t(v_i) \leqslant T_{max}(v_i) \)
 \end{itemize}
 
+\section{Heurisztikus algoritmusok}
+A heurisztika kifejezés az ógörög heureszisz = rátalálás szóból ered, a Magyar értelmező kéziszótár a következőt mondja róla: "Új problémák megoldásának ismert eljárásokra alapított módszertana ..." \cite{HeurisztikaJelenteseKeziszotar}. A heurisztikus algoritmusok az egyértelmű, determinisztikus algoritmusokkal ellentétben próbálgatások során, korábban megszerzett tapasztalatok útján dolgoznak. Céljuk a konkrét problémára közelítő választ adni, ezért többször egymás után végrehajtva más és más végeredményt szolgáltathatnak valószínűségi alapon. A mesterségesintelligencia-kutatásban egyre nagyobb jelentősége van a különböző heurisztikus, öntanító módszereknek.
 
 \section{Hangyakolónia optimalizáció}
-A \ref{TSPsection}. és \ref{VRPsection}. fejezetekben ismertetett problémákra az optimális megoldás megtalálása NP-nehéz feladat, tehát nagy csúcs- és élhalmaz mellett nem gazdaságos az eredmény kiszámítása. Annak érdekében, hogy a gyakorlatban használható algoritmust konstruáljunk, valamilyen közelítő megoldást érdemes használni a direkt eljárások helyett. A hangyakolónia optimalizáció (Ant Colony Optimization - ACO) egy heurisztikus alapelv, mely gráfbejárások optimalizálásához képes gyorsan, az optimálishoz nagyon közeli megoldásokat találni. Alkalmas a nagyfokú párhuzamosításra, ezért tökéletes választás az NVIDIA\textsuperscript{TM} CUDA architektúrájával történő, GPU alapú adaptálásra.
+A \ref{TSPsection}. és \ref{VRPsection}. fejezetekben ismertetett problémákra az optimális megoldás megtalálása NP-nehéz feladat, tehát nagy csúcs- és élhalmaz mellett nem gazdaságos az eredmény kiszámítása. Annak érdekében, hogy a gyakorlatban használható algoritmust konstruáljunk, valamilyen közelítő megoldást érdemes használni a direkt eljárások helyett. A hangyakolónia optimalizáció (Ant Colony Optimization - ACO) egy heurisztikus módszer, mely gráfbejárások optimalizálásához képes gyorsan, az optimálishoz nagyon közeli megoldásokat találni. Alkalmas a nagyfokú párhuzamosításra, ezért tökéletes választás az NVIDIA\textsuperscript{TM} CUDA architektúrájával történő, GPU alapú adaptálásra.
 
 Az eljárás a nevéből adódóan a hangyák (Formicidae) természetben is megfigyelhető élelemkeresési módszerén alapszik. Az első felfedező hangyák véletlenszerű útvonalakon haladva keresik az élelemhez vezető utat, majd ha sikerrel jártak, akkor a visszaúton feromonnal jelölik meg az útjukat. A többi hangya a szagokat követi, ezért könnyebben, nagy számban tudnak eljutni az elemózsiához. Ha még maradt étel, ők is visszatérve erősítik a feromon nyomokat. Utánpótlás hiányában annak erőssége idővel gyengül, ami modellezhető exponenciális lecsengéssel. Ez természetes módon biztosítja, hogy a nem optimális útvonalak (az élelemhez vezet, de már van nála rövidebb) maguktól elhaljanak. Látható, hogy olyan él, ami sok ideig nem kap feromon utánpótlást, egyre kevesebb hangyát vonz.
 
@@ -128,3 +130,17 @@ Amikor már 3 vagy több pontot tartalmaz az S halmaz, a lehetséges utak száma
 \subsubsection{Az eljárás Értékelése}
 \label{sssec:HeldKarpEvaluate}
 A Held-Karp algoritmus exponenciális idejű, \(O(2^nn^2)\), ami nagyságrendekkel jobb, mint a brute-force módszer az ő \(O(n!)\) faktoriális idejével. Előnye a Hangyakolónia algoritmussal szemben, hogy mivel determinisztikus algoritmus, a végén mindig a legrövidebb utat adja eredményül. Komoly hátránya, hogy rekurziót alkalmaz, ami kedvezőtlen a programvégrehajtás szempontjából: sok rekurzív függvényhívás ugyanis megterheli a vermet, sok felesleges másolás történik. Belátható, hogy ha különböző, adott esetekben bonyolult feltételekkel keresünk utakat, akkor az algoritmus elveszíti alapelvét, nem elég mindig az előző ciklus legjobbjaiból kiindulni. Ezzel a problémával az ACO is szembesül, de kevésbé van rá kihatással. Erre még később visszatérek a \ref{section:conditionsWithACO} fejezetben, ahol a feltételek bonyolódásával foglalkozom.
+
+
+\section{A párhuzamos programozás alapjai} \label{secParallelProgramming}
+
+A számítástechnika fejlődése annak a határnak a közelébe ért, ahonnan kezdve a processzorok egyszálú számítási teljesítménye már nem nőhet tovább drasztikus mértékben, köszönhetően olyan fizikai limitációknak, amelyeket a hardvergyártók mai ismereteink szerint nem tudnak átlépni. A teljesítmény növelésére azonban kínálkozik egy másik lehetőség is: a többszálú programozás. A modern számítógépekben a legnagyobb teljesítményű komponens a grafikus kártya, amely nagyságrendekkel több számítást képes azonos idő alatt elvégezni mint a CPU, programozása azonban merőben eltérő megközelítést igényel. Több szál azt jelenti, hogy több, mint egy elviekben független művelet-végrehajtó egység fut egyszerre. Hatékony párhuzamosított programnak három alappillére van: \cite{kvantum_optim}
+\begin{enumerate}
+	\item \emph{Szálak csoportosításának hierarchiája}
+	\item \emph{A szálak között megosztott memória}
+	\item \emph{A szálak közti szinkronizáció}
+\end{enumerate}
+
+Az egyes pontok a következő, \ref{technologyChapter}. fejezetben a konkrét technológia tárgyalása során részletesebben ki lesznek fejtve.
+
+

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <float.h>
+#include <time.h>
 
 // Cooperative groups namespace for block and grid sync
 using namespace cooperative_groups;
@@ -286,15 +287,17 @@ namespace VRPTW {
 
         REPETITIONS = 10;
         printf("\n\nR=10\n\n");
-        CUDA_main(params);
+        //CUDA_main(params);
 
         REPETITIONS = 30;
         printf("\n\nR=30\n\n");
-        CUDA_main(params);
+        //CUDA_main(params);
 
         REPETITIONS = 50;
         printf("\n\nR=50\n\n");
         CUDA_main(params);
+
+        
 
         /*printf("\n\nR=10\n\n");
         REPETITIONS = 10;
@@ -1079,7 +1082,7 @@ namespace VRPTW {
                 {
                     if (globalParams.minRes < FLT_MAX && !validRoute(&params, -1)) {
                         globalParams.minRes = FLT_MAX;
-                        evaluateSolution(&params, 0, multiplicationConst, 0, repNumber);
+                        //evaluateSolution(&params, 0, multiplicationConst, 0, repNumber);
                     }
                 }
                 grid.sync();

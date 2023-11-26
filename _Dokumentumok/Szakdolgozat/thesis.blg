@@ -22,14 +22,14 @@ Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: bib/mybib.bib
 Warning--entry type for "kvantum_optim" isn't style-file defined
---line 26 of file bib/mybib.bib
+--line 35 of file bib/mybib.bib
 Warning--entry type for "alg_optim" isn't style-file defined
---line 34 of file bib/mybib.bib
+--line 43 of file bib/mybib.bib
+Warning--to sort, need author, editor, or key in HeurisztikaJelenteseKeziszotar
 Warning--to sort, need author/key/name in CPUcores
 Warning--to sort, need author/key/name in CUDAdoc
 Warning--to sort, need author/key/name in CUDAcoopgroups
 Warning--to sort, need author/key/name in CUDAdoc_coopGroups
-Warning--to sort, need author/key/name in CUDAdoc_threadblockTile
 Warning--to sort, need author/key/name in CooperativeLaunchkernel
 Warning--to sort, need author/key/name in supportedWinOS
 Warning--to sort, need author/key/name in TSPdataset
@@ -39,45 +39,46 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 16 entries,
+Warning--empty author and editor in HeurisztikaJelenteseKeziszotar
+You've used 15 entries,
             4991 wiz_defined-function locations,
-            1203 strings with 14070 characters,
-and the built_in function-call counts, 37714 in all, are:
-= -- 7079
-> -- 206
-< -- 3
-+ -- 2493
-- -- 277
-* -- 383
-:= -- 1217
-add.period$ -- 37
-call.type$ -- 16
-change.case$ -- 65
+            1202 strings with 13881 characters,
+and the built_in function-call counts, 34946 in all, are:
+= -- 6521
+> -- 199
+< -- 4
++ -- 2278
+- -- 273
+* -- 378
+:= -- 1161
+add.period$ -- 36
+call.type$ -- 15
+change.case$ -- 60
 chr.to.int$ -- 0
 cite$ -- 26
-duplicate$ -- 5928
-empty$ -- 725
-format.name$ -- 14
-if$ -- 7917
+duplicate$ -- 5496
+empty$ -- 691
+format.name$ -- 12
+if$ -- 7325
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 1
-newline$ -- 171
-num.names$ -- 12
-pop$ -- 1602
+int.to.str$ -- 15
+missing$ -- 5
+newline$ -- 166
+num.names$ -- 10
+pop$ -- 1469
 preamble$ -- 1
-purify$ -- 49
+purify$ -- 46
 quote$ -- 22
-skip$ -- 401
+skip$ -- 384
 stack$ -- 0
-substring$ -- 4304
-swap$ -- 4292
-text.length$ -- 3
+substring$ -- 3966
+swap$ -- 3950
+text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 80
-warning$ -- 10
-while$ -- 118
-width$ -- 18
-write$ -- 228
-(There were 12 warnings)
+type$ -- 73
+warning$ -- 11
+while$ -- 110
+width$ -- 17
+write$ -- 222
+(There were 13 warnings)

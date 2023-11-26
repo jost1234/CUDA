@@ -39,11 +39,10 @@ A továbbiakban táblázatokba szedtem az egyes algoritmusokon végzett profiloz
 A CVRPTW mérése során tapasztaltam először olyat, hogy néha a program egyáltalán nem talált megoldást. Ott új oszlopot vettem fel "Hiba (\%)" névvel. Azt mutatja, hogy a programfuttatások hány százalékában nem sikerült egyáltalán megoldást találni. Ilyenkor az átlagolást a sikeres futtatásokból számoltam.
 
 \newpage
-\newpage
 
-\subsection{TSP első verzió}
+\section{TSP első verzió}
 
-Teszteléshez szükségem volt ismert eredményű adathalmazokra. A Floridai Állami Egyetem weboldalán \cite{TSPdataset} elérhető bárki számára több adathalmaz, különböző adatstruktúrában. Nekem a [fájlnév]\_d.txt nevű fájlok voltak hasznosak, ugyanis abban megtalálhatóak a szomszédossági mátrix költségei táblázatos alakban. Az itt található 6 adathalmazon végigfuttattam az algoritmusomat több konfigurációban. Mindig 10-szer ismételtem meg a futást, és lejegyeztem az eredmények átlagát (számtani középpel), illetve minimumát. Nagy adathalmaz esetén hosszú a futásidő profilozó módban, ezért időmérés céljából egyszer futtattam újra ugyanazon beállításokkal. A TSP első verziójában a feromonmátrix és az élsúlyok tárolása csak \textit{double} formátumban történik. Az összehasonlíthatóság érdekében egy iteráció során 20 random, és 500 tudatos hangya fut. A kezdeti feromon érték 1000, az elnyomási tényező \( \rho = 0.75 \), a jutalmazási arány 100, amely csak a 2. iterációtól érvényes (ha van). 
+Teszteléshez szükségem volt ismert eredményű adathalmazokra. A Floridai Állami Egyetem weboldalán \cite{TSPdataset} elérhető bárki számára több adathalmaz, különböző adatstruktúrában. Számomra a [fájlnév]\_d.txt nevű fájlok voltak hasznosak, ugyanis abban megtalálhatóak a szomszédossági mátrix költségei táblázatos alakban. Az itt található 6 adathalmazon végigfuttattam az algoritmusomat több konfigurációban. Mindig 10-szer ismételtem meg a futást, és lejegyeztem az eredmények átlagát (számtani középpel), illetve minimumát. Nagy adathalmaz esetén hosszú a futásidő profilozó módban, ezért időmérés céljából egyszer futtattam újra ugyanazon beállításokkal. A TSP első verziójában a feromonmátrix és az élsúlyok tárolása csak \textit{double} formátumban történik. Az összehasonlíthatóság érdekében egy iteráció során 20 random, és 500 tudatos hangya fut. A kezdeti feromon érték 1000, az elnyomási tényező \( \rho = 0.75 \), a jutalmazási arány 100, amely csak a 2. iterációtól érvényes (ha van). 
 
 Az egyes mérések eredményei a \ref{table:TSPv1_5} - \ref{table:TSPv1_48}. táblázatokból olvashatóak.
 
@@ -185,7 +184,7 @@ A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már oly
 \newpage
 \newpage
 
-\subsection{TSP második (konzisztens) verzió}
+\section{TSP második (konzisztens) verzió}
 Azért, hogy az előző fejezetben látott első verzióval érdemben össze tudjam hasonlítani a mostani verziót, hasonló iterációs számokat választottam: 1 rep-en belül 20 random hangyát követ 500 tudatos hangya. Az adathalmaz is az előbbi \cite{TSPdataset} helyről származó csomag. A számértékeket összevetve szembetűnő a gyorsulás az előző verzióhoz képest. A legfőbb szerepe ebben úgy gondolom, hogy az adattípus \textit{double}-ről \textit{float}-ra cserélése, illetve a függvények között szigorú pointer alapú paraméterátadás jelentette.
 
 Az egyes mérések eredményei a \ref{table:TSPv2_15} - \ref{table:TSPv2_48}. táblázatokból olvashatóak ki.
@@ -319,11 +318,11 @@ Az egyes mérések eredményei a \ref{table:TSPv2_15} - \ref{table:TSPv2_48}. t�
 
 \newpage
 
-\subsection{VRP}
+\section{VRP}
 A VRP-hez először nem értettem, hogy miért nem találtam külön adathalmazt. Később megértettem, hogy mivel nincs megadva egyéb feltétel, általában teljesen mindegy, hogy hány járművet használhat az algoritmus, a legjobban akkor fog járni, ha az összes állomást ugyanazon járművel járja végig. A VRP-hez is készült külön kódimplementáció. Ez azért jó, mert amikor különböző feltételeket szabunk meg, elég azok figyelembe vételével kiegészíteni a programot.
 
 
-\subsection{CVRP}
+\section{CVRP}
 Az első feltételes útvonaltervezést igénylő algoritmus, amivel foglalkoztam a kapacitásos járműútvonal-tervezés. Adathalmazt a következő helyről szedtem: \cite{CVRPdataset}.
 Az iterációk az előzőeknél látottakkal megegyezőek: 1 rep-en belül 20 random hangyát követ 500 tudatos hangya.
 
@@ -476,13 +475,13 @@ Az egyes mérések eredményei a \ref{table:CVRP_gr17} - \ref{table:CVRP_att48}.
 \newpage
 \newpage
 
-\subsection{CVRPTW random kereséssel} \label{CVRPTW1section}
+\section{CVRPTW random kereséssel} \label{CVRPTW1section}
 Most már az időablakok adta bonyolítást is bevesszük a feltételek közé. Olyan adathalmazzal dolgoztam \cite{VRPTWdataset}, ami egyszerre írja elő a járművek kapacitását, illetve a célpontok készen állási és határidejét. Egy rep-en belül 500 random hangyát követ 200 tudatos hangya.
 
  A program tesztelése során egy korábban nem tapasztalt jelenséget észleltem: \textbf{gyakran egyáltalán nem talált megoldást a program}.
 Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és C201. Mindkettő 101 csúcsot tartalmaz, azaz a kezdőcsúcson kívül 100 állomás van. Az algoritmus futtatható az első 25 vagy 50 pontra is. A C101 gráf esetében a különböző feltételek csak néhány klienst engednek járművenként (megközelítőleg 5-10), míg a C201 esetén szabadabbak a kritériumok. Mindkét csúcshalmazt kipróbáltam 25, 50, és 100 csúcsra is. \textbf{A 25 csúcsnál nagyobb gráfok esetében ez a megvalósítás soha nem tudott eredményt találni.}
 
-Új oszlopként megjelent a "Hiba (\%)", mely arra utal, hogy az algoritmus a programfuttatások hány \%-ában nem talált egyáltalán megoldást. 
+Új oszlopként megjelent a "Hiba (\%)", mely arra utal, hogy az algoritmus a programfuttatások hány \%-ában nem talált egyáltalán megoldást. Az mérési eredmények a \ref{table:VRTPW_25_1} - \ref{table:VRTPW_25_2}. táblázatokból olvashatóak ki.
 
 % Size = 26
 \begin{table}[ht!]
@@ -512,7 +511,7 @@ Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és 
 	\centering
 	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{5}{|c|}{C201.25: 25 csúcs, minimális út: 214.7} \\
+		\multicolumn{5}{|c|}{C201.25: 25 csúcs, minimális út: 214,7} \\
 		\hline
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
@@ -531,30 +530,9 @@ Az adathalmaz sok gráfot tartalmaz, ebből én kettőt választottam: C101 és 
 	\label{table:VRTPW_25_2}
 \end{table}
 
-% Size = x
-\begin{table}[ht!]
-	\centering
-	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
-		\hline
-		\multicolumn{5}{|c|}{Gráf neve: x csúcs, minimális út: x} \\
-		\hline
-		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
-		\hline
-		\textbf{10 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-		\textbf{30 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-		\textbf{50 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
-		\hline
-	\end{tabular}
-	\caption{}
-	\label{table:VRTPW_empty}
-\end{table}
 
-\subsection{CVRPTW rendezett kereséssel}
+
+\section{CVRPTW rendezett kereséssel}
 
 Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek útvonalat az első hangyák, közepes csúcsszám mellett is képtelenség megoldást találni. Az itteni mérési eredmények már a javított random hangyákkal ellátott CVRPTW programot mérik. A tesztadathalmaz az előzővel megegyező, C101 és C201 mellett kiegészült a C202-es gráffal is. A C202-es gráf a C201-essel azonos elhelyezkedésű csúcsokat tartalmaz, viszont eltérőek az időablakok, így jobban tudjuk nézni a kritériumfeltétel közvetlen hatását. 1 repen belül 200 random hangyát követ 500 tudatos hangya (tehát mostmár egy rep több vizsgálatot tartalmaz). Sajnálatos módon a C101-et 50 és 100 csúcsra nem tudta megoldani a program, továbbra is túl nehéz feltételnek bizonyult az időablakok ilyen szűkre vétele.
 
@@ -592,7 +570,7 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 	\centering
 	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{5}{|c|}{C201.25: 26 csúcs, minimális út: 214.7} \\
+		\multicolumn{5}{|c|}{C201.25: 26 csúcs, minimális út: 214,7} \\
 		\hline
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
@@ -606,7 +584,7 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 		20480 ant & 164,22 & 215,54 & 215,54 &  10\% \\
 		\hline
 	\end{tabular}
-	\caption{A tágabb időablakokkal bíró adathalmaz első 26 csúcsára vett rendezett kereséses CVRPTW mérés}
+	\caption{A tágabb időablakokkal bíró C201 gráf első 26 csúcsára vett rendezett kereséses CVRPTW mérés}
 	\label{table:VRTPW2_25_2}
 \end{table}
 
@@ -615,21 +593,21 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 	\centering
 	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
 		\hline
-		\multicolumn{5}{|c|}{C201.50: 51 csúcs, minimális út: 360.2} \\
+		\multicolumn{5}{|c|}{C201.50: 51 csúcs, minimális út: 360,2} \\
 		\hline
 		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
 		\hline
 		\textbf{10 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
+		20480 ant & 122 & 695 (+93\%) & 636 (+76,5\%) &  0\% \\
 		\hline
 		\textbf{30 rep} &  &  &  & \\
-		20480 ant &  &  &  &  \% \\
+		20480 ant & 415 & 626 (+74\%) & 579 (+61\%) &  0\% \\
 		\hline
 		\textbf{50 rep} &  &  &  &  \\
-		20480 ant &  &  &  &  \% \\
+		20480 ant & 720 & 610 (+69,5\%) & 588 (+63\%) &  0\% \\
 		\hline
 	\end{tabular}
-	\caption{A tágabb időablakokkal bíró adathalmaz első 26 csúcsára vett rendezett kereséses CVRPTW mérés}
+	\caption{A C201 gráf első 51 csúcsára vett rendezett kereséses CVRPTW mérés}
 	\label{table:VRTPW2_50_2}
 \end{table}
 
@@ -655,13 +633,81 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 		20480 ant & 2044 & 1570 (+167\%) & 1196,1 (+103\%) &  10\% \\
 		\hline
 	\end{tabular}
-	\caption{}
+	\caption{A C201 gráfra vett rendezett kereséses CVRPTW mérés}
 	\label{table:VRTPW2_100_2}
 \end{table}
 
+% Size = 26
+\begin{table}[ht!]
+	\centering
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
+		\hline
+		\multicolumn{5}{|c|}{C202.25: 26 csúcs, minimális út: 214,7} \\
+		\hline
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
+		\hline
+		\textbf{10 rep} &  &  &  & \\
+		20480 ant & 21,73 & 275,6 (+28,4\%) & 268,9 (+25,3) &  0\% \\
+		\hline
+		\textbf{30 rep} &  &  &  & \\
+		20480 ant & 79,24 & 263,2 (+22,6\%) & 257,4 (+19,9\%) &  0\% \\
+		\hline
+		\textbf{50 rep} &  &  &  &  \\
+		20480 ant & 141,4 & 268,2 (+24,9\%) & 262,1 (+22,1\%) &  0\% \\
+		\hline
+	\end{tabular}
+	\caption{A C202 gráf első 26 csúcsára vett rendezett kereséses CVRPTW mérés}
+	\label{table:VRTPW2_25_3}
+\end{table}
+
+% Size = 51
+\begin{table}[ht!]
+	\centering
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
+		\hline
+		\multicolumn{5}{|c|}{C202.50: 51 csúcs, minimális út: 360,2} \\
+		\hline
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
+		\hline
+		\textbf{10 rep} &  &  &  & \\
+		20480 ant & 156,2 & 965 (+168\%) & 919 (+155\%) &  0\% \\
+		\hline
+		\textbf{30 rep} &  &  &  & \\
+		20480 ant & 489,71 & 926 (+157\%) & 868 (+141\%) &  0\% \\
+		\hline
+		\textbf{50 rep} &  &  &  &  \\
+		20480 ant & 830,78 & 938 (+160\%) & 892 (+148\%) &  0\% \\
+		\hline
+	\end{tabular}
+	\caption{A C202 gráf első 51 csúcsára vett rendezett kereséses CVRPTW mérés}
+	\label{table:VRTPW2_50_3}
+\end{table}
+
+% Size = 101
+\begin{table}[ht!]
+	\centering
+	\begin{tabular}{|p{1.75cm}||p{2cm}|p{3.25cm}|p{3.25cm}|p{1.5cm}|}
+		\hline
+		\multicolumn{5}{|c|}{C202.100: 101 csúcs, minimális út: 589,1} \\
+		\hline
+		& Futásidő (s) & Végeredmény átlag & Végeredmény min. & Hiba(\%) \\
+		\hline
+		\textbf{10 rep} &  &  &  & \\
+		20480 ant & 626 & 3675 (+524\%) & 3461 (+487\%) &  0\% \\
+		\hline
+		\textbf{30 rep} &  &  &  & \\
+		20480 ant & 1548 & 3194 (+442\%) & 2327 (+295\%) &  0\% \\
+		\hline
+		\textbf{50 rep} &  &  &  &  \\
+		20480 ant & 2522 & 2702 (+359\%) & 2066 (+251\%) &  0\% \\
+		\hline
+	\end{tabular}
+	\caption{A C202 gráfra vett rendezett kereséses CVRPTW mérés}
+	\label{table:VRTPW2_100_3}
+\end{table}
 
 \chapter{Eredmények értékelése, továbbfejlesztési lehetőségek} \label{results_section}
-Sok mérést végeztem, amiből szeretnék levonni több konklúziót. Úgy gondolom, hogy tanulságos összevetni a két elkészített TSP verziót, illetve a járműútvonal-tervezési algoritmusok esetében megvizsgálni, hogy új feltételek felvétele milyen hatással lesz a program futása után a végeredményre.
+Sok mérést végeztem, amiből több konklúziót levontam. Összevetettem a két elkészített TSP verziót, illetve a járműútvonal-tervezési algoritmusok esetében megvizsgáltam, hogy az új feltételek felvétele milyen hatással volt a végeredményre.
 
 \section{A két Utazóügynök probléma (TSP) verzió összehasonlítása}
 
@@ -685,7 +731,7 @@ A futásidőkben gyakran nem fokozatos az emelkedés például a threadszám nö
 
 \section{Kritériumfeltételek problémája a Hangyakolónia algoritmussal}
 \label{section:conditionsWithACO}
-Ahogy már korábban a \ref{sssec:HeldKarpEvaluate}. részben utaltam rá, a Hangyakolónia algoritmus számára is kihívással jár az, amikor a keresett útvonal különböző feltételeknek maradéktalanul meg kell feleljen. Dolgozatomban kétféle feltételrendszert vizsgáltam: a járművek korlátozott kapacitását, illetve a felhasználók megszabott időbeosztását. A CVRP esetében Most összefoglalnám, hogy miért érhettek el a feltételes esetben végzett méréseim jelentősen rosszabb eredményeket.
+Ahogy már korábban a \ref{sssec:HeldKarpEvaluate}. részben utaltam rá, a Hangyakolónia algoritmus számára is kihívással jár az, hogy ha a keresett útvonal különböző feltételeknek maradéktalanul meg kell feleljen. Dolgozatomban kétféle feltételrendszert vizsgáltam: a járművek korlátozott kapacitását, illetve a felhasználók megszabott időbeosztását. A CVRP esetében Most összefoglalnám, hogy miért érhettek el a feltételes esetben végzett méréseim jelentősen rosszabb eredményeket.
 
 Az ACO úgy működik, hogy eleinte a gyengébb megoldásokból generál egyre jobbakat. Feltételezi, hogy találunk megoldást, amit javítani tudunk. A kritériumfeltételek olyanok, hogy vagy teljesülnek, vagy nem. Nehéz úgy értékelni, hogy az első csak kicsit hibázott, a következő közepesen stb. Ha rossz, akkor nem engedhetjük a megoldáshalmazba.
 
