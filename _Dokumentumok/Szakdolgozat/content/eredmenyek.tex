@@ -1,5 +1,5 @@
 \chapter{Mérési eredmények} \label{resultsChapter}
-
+Ebben a fejezetben bemutatom az előző fejezetben ismertetett implemen
 A méréseket a következő paraméterekkel rendelkező számítógépen végeztem:
 \begin{itemize}
 	\item	CPU: 11th Gen Intel(R) Core(TM) i5-11300H @ 3.10GHz
@@ -11,7 +11,7 @@ A méréseket a következő paraméterekkel rendelkező számítógépen végezt
 \end{itemize}
 
 \section{A mérések menete}
-Az algoritmusokhoz külön CPU és GPU kódot készítettem. Az eljárás érdemi részét megszakítás nélkül GPU-n végeztem, míg CPU-n a kezdeti értékeket állítottam be, különböző diagnosztikai kiíratásokat végeztem, illetve a parancssori argumentumok feldolgozását kezeltem. A futásidők méréséhez az NVIDIA által készített Nsight Compute(R) programot használtam, mely több szempontból képes CUDA kerneleket elemezni: futási idő, memória kihasználtsága, grid mérete, blokk mérete, szálanként regiszterek száma és még tovább. A program futását \ref{fig:nsight-compute}. ábrán ábrázoltam. 
+Az algoritmusokhoz külön CPU és GPU kódot készítettem. Az eljárás érdemi részét megszakítás nélkül GPU-n végeztem, míg CPU-n a kezdeti értékeket állítottam be, különböző diagnosztikai kiíratásokat végeztem, illetve a parancssori argumentumok feldolgozását kezeltem. A futásidők méréséhez az NVIDIA által készített Nsight Compute programot használtam, mely több szempontból képes CUDA kerneleket elemezni: futási idő, memória kihasználtsága, grid mérete, blokk mérete, szálanként regiszterek száma és még tovább. A program futását az \ref{fig:nsight-compute}. ábrán ábrázoltam. 
 
 \begin{figure}[ht!]
 	\centering
@@ -184,7 +184,7 @@ A 17 vagy nála nagyobb gráfok esetében az 1 iterációs algoritmusok már oly
 \newpage
 \newpage
 
-\section{TSP második (konzisztens) verzió}
+\section{TSP második verzió}
 Azért, hogy az előző fejezetben látott első verzióval érdemben össze tudjam hasonlítani a mostani verziót, hasonló iterációs számokat választottam: 1 rep-en belül 20 random hangyát követ 500 tudatos hangya. Az adathalmaz is az előbbi \cite{TSPdataset} helyről származó csomag. A számértékeket összevetve szembetűnő a gyorsulás az előző verzióhoz képest. A legfőbb szerepe ebben úgy gondolom, hogy az adattípus \textit{double}-ről \textit{float}-ra cserélése, illetve a függvények között szigorú pointer alapú paraméterátadás jelentette.
 
 Az egyes mérések eredményei a \ref{table:TSPv2_15} - \ref{table:TSPv2_48}. táblázatokból olvashatóak ki.
@@ -771,7 +771,7 @@ Végül elemezzük a CVRPTW-t. Itt az előzőekhez képest a futásidő drasztik
 Elmondható tehát, hogy jelentősen romlott a sebességünk, de nyertünk vele egy nagyon fontos dolgot: a százalékos hiba terén sikerült elérni, hogy a CVRPTW hibagörbéje többé-kevésbé illeszkedjen a CVRP vonulatára. Magyarul: sikerült bizonyos mértékig kiküszöbölni az időzítés okozta nehézségeket.
 
 \section{Összefoglalás}
-Dolgozatom elkészültéhez közel másfél évi munkám volt szükséges, ezalatt részletesen megismerkedtem a párhuzamos programozás sajátos világával a CUDA keretrendszeren keresztül. Kezdetben olyan mátrixműveletek, mint a determinánsszámítás többszálú megvalósítása által tapasztaltam meg a GPU-ra történő memóriaátvitel, a szálkezelés, szinkronizálás, meg még sok egyéb okozta nehézségeket. Amikor már kicsit jobban értettem a CUDA használatához, belevágtam a genetikus algoritmusok témakörébe, és elkezdtem leprogramozni az Utazóügynök probléma első verzióját. Az Önálló laboratórium végére lettem vele készen. A szakdolgozat-készítés során javítottam az előző implementáción, valamint melléírtam a kapacitás-, illetve időablak-feltételeket előíró programjaimat. A végtermékek kapcsán úgy gondolom, hogy még sok mindent lehetne fejleszteni rajtuk (mindig lehet mindenen javítani), de elértek egy olyan szintre, hogy tényleg gyakorlatban bevethetőek legyenek. Munkámmal bizonyítottam, hogy a videokártyáknak igenis van helyük ilyen komoly számításigényű területen, mint a járművek feltételes útvonaltervezésének problémaköre.
+Dolgozatom közel másfél évi munkám eredményeképpen jött létre, ezalatt részletesen megismerkedtem a párhuzamos programozás sajátos világával a CUDA keretrendszeren keresztül. Kezdetben olyan mátrixműveletek, mint a determinánsszámítás többszálú megvalósítása által tapasztaltam meg a GPU-ra történő memóriaátvitel, a szálkezelés, szinkronizálás, meg még sok egyéb okozta nehézségeket. Amikor már kicsit jobban értettem a CUDA használatához, belevágtam a genetikus algoritmusok témakörébe, és elkezdtem leprogramozni az Utazóügynök probléma első verzióját. Az Önálló laboratórium végére lettem vele készen. A szakdolgozat-készítés során javítottam az előző implementáción, valamint melléírtam a kapacitás-, illetve időablak-feltételeket előíró programjaimat. A végtermékek kapcsán úgy gondolom, hogy még sok mindent lehetne fejleszteni rajtuk (mindig lehet mindenen javítani), de elértek egy olyan szintre, hogy tényleg gyakorlatban bevethetőek legyenek. Munkámmal bizonyítottam, hogy a videokártyáknak igenis van helyük ilyen komoly számításigényű területen, mint a járművek feltételes útvonaltervezésének problémaköre.
 
 \section{Továbbfejlesztési lehetőségek}
 

@@ -1,7 +1,8 @@
+\select@language {magyar} \acswitchoff 
 \select@language {magyar} \contentsline {chapter}{Kivonat}{i}{chapter*.2}%
 \select@language {english} \contentsline {chapter}{Abstract}{ii}{chapter*.3}%
 \select@language {magyar} \contentsline {chapter}{\numberline {1}Bevezetés}{1}{chapter.1}%
-\select@language {magyar} \contentsline {section}{\numberline {1.1}Fejezetek}{3}{section.1.1}%
+\select@language {magyar} \contentsline {section}{\numberline {1.1}Áttekintés}{3}{section.1.1}%
 \select@language {magyar} \contentsline {section}{\numberline {1.2}Rövidítések}{3}{section.1.2}%
 \select@language {magyar} \contentsline {chapter}{\numberline {2}Elméleti háttér}{5}{chapter.2}%
 \select@language {magyar} \contentsline {section}{\numberline {2.1}Utazóügynök probléma }{5}{section.2.1}%
@@ -60,7 +61,7 @@
 \select@language {magyar} \contentsline {section}{\numberline {5.1}A mérések menete}{31}{section.5.1}%
 \select@language {magyar} \contentsline {section}{\numberline {5.2}Mérési eredmények}{31}{section.5.2}%
 \select@language {magyar} \contentsline {section}{\numberline {5.3}TSP első verzió}{33}{section.5.3}%
-\select@language {magyar} \contentsline {section}{\numberline {5.4}TSP második (konzisztens) verzió}{34}{section.5.4}%
+\select@language {magyar} \contentsline {section}{\numberline {5.4}TSP második verzió}{34}{section.5.4}%
 \select@language {magyar} \contentsline {section}{\numberline {5.5}VRP}{36}{section.5.5}%
 \select@language {magyar} \contentsline {section}{\numberline {5.6}CVRP}{36}{section.5.6}%
 \select@language {magyar} \contentsline {section}{\numberline {5.7}CVRPTW random kereséssel}{37}{section.5.7}%

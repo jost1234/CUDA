@@ -13,7 +13,7 @@
 ///
 
 // Number of threads = number of ants
-const int ants = 1024*16;
+const int ants = 1024;
 
 // Repetition constants
 #define REPETITIONS 10

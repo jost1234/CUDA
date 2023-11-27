@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  27 NOV 2023 02:42
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  27 NOV 2023 09:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -665,20 +665,58 @@ Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
 \multirow@cntb=\count318
 \multirow@dima=\skip66
 \bigstrutjot=\dimen195
+)
+(c:/texlive/2023/texmf-dist/tex/latex/acro/acro.sty
+(c:/texlive/2023/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty
+Package: l3keys2e 2023-10-10 LaTeX2e option processing using LaTeX3 keys
+)
+Package: acro 2022/04/01 v3.8 typeset acronyms and other abbreviations (CN)
+\l__acro_tmpa_int=\count319
+\l__acro_tmpb_int=\count320
+\l__acro_tmpc_int=\count321
+\l__acro_tmpd_int=\count322
+Loading module `base' ...
+Loading module `interface' ...
+Loading module `aux' ...
+Loading module `properties' ...
+Loading module `acronyms' ...
+Loading module `formatting' ...
+Loading module `ppfixes' ...
+Loading module `tools' ...
+\l__acro_minimal_usage_int=\count323
+\l__acro_nest_int=\count324
+\g_acro_barrier_int=\count325
+\g_acro_barrier_total_int=\count326
+Loading module `commands' ...
+\l_acro_nest_level_int=\count327
+Loading module `templates' ...
+Loading module `list' ...
+Loading module `pages' ...
+\l__acro_pages_seq_threshold_int=\count328
+Loading module `locale' ...
+
+(c:/texlive/2023/texmf-dist/tex/latex/translations/translations.sty
+Package: translations 2022/02/05 v1.12 internationalization of LaTeX2e packages
+ (CN)
+)
+Loading module `pdfsupport' ...
+Loading module `patch' ...
+Loading module `definitions' ...
+Loading module `upgrade' ...
 ))
 (./include/thesis-hu.tex) (./include/preamble.tex
 Package hyperref Info: Option `unicode' set `true' on input line 39.
 Package hyperref Info: Option `pdfnewwindow' set `true' on input line 39.
 Package hyperref Info: Option `colorlinks' set `true' on input line 39.
-\c@currexamplectr=\count319
-\c@endexamplectr=\count320
-\c@example=\count321
-\c@currdefinitionctr=\count322
-\c@enddefinitionctr=\count323
-\c@definition=\count324
-\c@currtheoremctr=\count325
-\c@endtheoremctr=\count326
-\c@theorem=\count327
+\c@currexamplectr=\count329
+\c@endexamplectr=\count330
+\c@example=\count331
+\c@currdefinitionctr=\count332
+\c@enddefinitionctr=\count333
+\c@definition=\count334
+\c@currtheoremctr=\count335
+\c@endtheoremctr=\count336
+\c@theorem=\count337
 ) (./thesis.aux
 (./include/titlepage.aux) (./include/declaration.aux) (./content/abstract.aux)
 (./content/bevezetes.aux) (./content/elmeletihatter.aux)
@@ -784,29 +822,38 @@ Package hyperref Info: Link coloring ON on input line 44.
 \@outlinefile=\write3
 \openout3 = `thesis.out'.
 
-\c@lstlisting=\count328
+\c@lstlisting=\count338
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
+Package translations Info: no dictionary file `translations-basic-dictionary-hu
+ngarian.trsl' found. on input line 44.
 
-(c:/texlive/2023/texmf-dist/tex/latex/base/report.cls
+(c:/texlive/2023/texmf-dist/tex/latex/translations/translations-basic-dictionar
+y-english.trsl
+File: translations-basic-dictionary-english.trsl (english translation file `tra
+nslations-basic-dictionary')
+)
+Package translations Info: loading dictionary `translations-basic-dictionary' f
+or `english'. on input line 44.
+ (c:/texlive/2023/texmf-dist/tex/latex/base/report.cls
 LaTeX Info: Redefining \cal on input line 577.
 LaTeX Info: Redefining \mit on input line 578.
 )
 \openout2 = `include/titlepage.aux'.
 
- (./include/titlepage.tex
+
+(./include/titlepage.tex
 Package hyperref Info: Option `pageanchor' set `false' on input line 1.
 File: figures/bme_logo.pdf Graphic file (type pdf)
 <use figures/bme_logo.pdf>
 LaTeX Font Info:    Trying to load font information for U+msa on input line 20.
 
-(c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 20.
 
-
-(c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
@@ -838,7 +885,7 @@ Package hyperref Info: Option `pageanchor' set `false' on input line 32.
 
 
 ]
-\c@romanPage=\count329
+\c@romanPage=\count339
 ) [2
 
 ]
@@ -1101,16 +1148,16 @@ Package rerunfilecheck Warning: File `thesis.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `thesis.out':
-(rerunfilecheck)             Before: 5EA33A8E6B66602B81C5FFAA703376BC;11302
-(rerunfilecheck)             After:  CB54095CE8F1587E83928DBFBCFAAD9A;11182.
+(rerunfilecheck)             Before: CC00ABDE4852D4B926F41C9044BF8D9E;11193
+(rerunfilecheck)             After:  8CAFFF70711A190D48775AA6EBDCA2C6;11114.
  ) 
 Here is how much of TeX's memory you used:
- 18879 strings out of 475160
- 357915 string characters out of 5770264
+ 22484 strings out of 475160
+ 458457 string characters out of 5770264
  2088674 words of memory out of 5000000
- 40288 multiletter control sequences out of 15000+600000
- 563237 words of font info for 75 fonts, out of 8000000 for 9000
+ 43881 multiletter control sequences out of 15000+600000
+ 563562 words of font info for 73 fonts, out of 8000000 for 9000
  1352 hyphenation exceptions out of 8191
- 84i,12n,96p,1533b,1854s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,10n,96p,1533b,1906s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on thesis.pdf (56 pages).

@@ -1013,7 +1013,7 @@ namespace TSP {
         assert(length != 0);
         float additive = multiplConstant / length; // The longer the route is, the smaller amount we are adding
         if (length < globalParams.minRes && length > 0) { // Rewarding the ant with the best yet route
-            // printf("New min found: %f, rep: %d\n", length, repNumber);
+            // printf("New min found: %f, rep: %d\n", length, repNumber);   // If you are interested you can comment out
             copyAntRoute(pkernelParams, antIndex);
             globalParams.minRes = length;
             if (repNumber > 2)
@@ -1044,7 +1044,6 @@ namespace TSP {
         {
             // Go through the row elements to find the highest
             float observed = pkernelParams->Pheromone[row * pkernelParams->size + i];
-            //if(row == 2 && idx)
 
             if (observed > max && !alreadyListed(pkernelParams, antIndex, idx, i))
             {
