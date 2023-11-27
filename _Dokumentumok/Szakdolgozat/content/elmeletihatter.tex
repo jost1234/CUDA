@@ -1,12 +1,12 @@
 \chapter{Elméleti háttér} \label{theoryChapter}
 
-Ahhoz, hogy kellőképpen megértsük a dolgozat által felvetett problémákat, úgy gondolom, hogy szükséges azokat megfelelően, matematikailag tisztán megalapozni. Célom precízen kimondani a megoldandó problémákat, valamint a rájuk alkalmazott különféle technikákat. A témával sokat foglalkozott hallgatótársam, Tóth Márk Andor, munkája számos helyen inspirált \cite{alg_optim}.
+Ahhoz, hogy kellőképpen megértsük a dolgozat által felvetett problémákat, szükséges azokat megfelelően, matematikailag tisztán megalapozni. Célom precízen megfogalmazni a megoldandó problémákat, valamint a rájuk alkalmazott különféle technikákat. A témával sokat foglalkozott hallgatótársam, Tóth Márk Andor, munkája számos helyen inspirált \cite{alg_optim}.
 
 \section{Utazóügynök probléma } \label{TSPsection}
 
 Az utazóügynök probléma (Travelling Salesman Problem - TSP)  egy optimalizációs feladat, mely során egy utazónak minél rövidebb úton kell megtennie egy körutat egy adott ponthalmazon. 
 
-Precízen fogalmazva: Adott a bemeneten egy G=(V,E) (irányított) gráf, \[n = |V(G)|, n > 2 \] az állomások száma (a kiindulási állomást beleértve),  \[m = |E(G)| \] az állomások között futó elérhető utak száma.
+Precízen fogalmazva: adott a bemeneten egy G=(V,E) (irányított) gráf, \[n = |V(G)|, n > 2 \] az állomások száma (a kiindulási állomást beleértve),  \[m = |E(G)| \] az állomások között futó elérhető utak száma.
 
 \[ V = (v_0,v_1, \dots v_n )\] az állomások halmaza (Vertex), \(0 \in V\) a kiindulási állomás,
 \[ E = (e_1,e_1, \dots e_m)\] az elérhető utak halmaza (Edge),
@@ -32,7 +32,7 @@ A járműútvonal-tervezési probléma (Vehicle Routing Problem - VRP) tekinthet
 	\item az egyes helyszínekre történő érkezési idő
 \end{itemize}
 
-A következőkben feltételezzük, hogy ha több jármű van, akkor azok egy közös kezdőpontból (0. pont, raktár, warehouse) indulnak. Útjuk során minden pontot legalább egyszer érinteniük kell a járműveknek, egyazon csúcsba nem szállíthat csomagot két autó. A \ref{VRPpelda}. ábrán látható egy vizuális szemléltető példa.
+A következőkben feltételezem, hogy ha több jármű van, akkor azok egy közös kezdőpontból (0. pont, raktár, warehouse) indulnak. Útjuk során minden pontot legalább egyszer érinteniük kell a járműveknek, egyazon csúcsba nem szállíthat csomagot két autó. A \ref{VRPpelda}. ábrán látható egy vizuális szemléltető példa.
 
 \begin{figure}[ht!]
 	\centering
@@ -52,7 +52,7 @@ Legyen \[ G = (V,E) \] (irányított) gráf, n az állomások száma (a kiindul�
 \[ T_{min} :  V(G)\setminus \{v_0\} \mapsto \mathbb{R}^+ \] az egyes állomások készenléti ideje,
 \[ T_{max} :  V(G)\setminus \{v_0\} \mapsto \mathbb{R}^+ \] az egyes állomások határideje. Értelemszerűen \(T_{max}(v_i) > T_{min}(v_i) \). A járművek sebessége 1 (tetszőleges egység), az idő és távolság egysége ugyanaz.
 
-Az élek azonosítása érdekében éljünk a következő jelöléssel: e\textsubscript{ij} a v\textsubscript{i}-ből v\textsubscript{j}-be mutató él, és d\textsubscript{i,j} az e\textsubscript{i,j} költsége (itt : távolság, distance). Adott továbbá minden csúcshoz a c\textsubscript{i} áruigény, ami ki kell elégíteni (ez a valóságban lehet db, kg, stb.).Adott minden csúcshoz a c\textsubscript{i} áruigény, amit ki kell elégíteni (ez a valóságban lehet darab, kg, stb. ).  Legyen l\textsubscript{i} az i-edik jármű szállítási kapacitása.
+Az élek azonosítása érdekében éljünk a következő jelöléssel: e\textsubscript{ij} a v\textsubscript{i}-ből v\textsubscript{j}-be mutató él, és d\textsubscript{i,j} az e\textsubscript{i,j} költsége (itt : távolság, distance). Adott továbbá minden csúcshoz a c\textsubscript{i} áruigény, amit ki kell elégíteni (ez a valóságban lehet db, kg, stb.).Adott minden csúcshoz a c\textsubscript{i} áruigény, amit ki kell elégíteni (ez a valóságban lehet darab, kg, stb. ).  Legyen l\textsubscript{i} az i-edik jármű szállítási kapacitása.
 
 Állítsuk elő útvonalak (Route) olyan \( R_{i} = (0, v_{i_1}, v_{i_2}, \dots 0) \) listáit,
 ahol az i-edik jármű azon útvonalát adja meg, amelyet alkotó élek 
@@ -62,10 +62,10 @@ ahol az i-edik jármű azon útvonalát adja meg, amelyet alkotó élek
 \end{equation}
 
 
-A cél azon \(R_1,R_2,...R_k \) útvonalak megtalálása, amelyekre a következők igazak:
+A cél azon \(R_1,R_2,...R_k \) útvonalak megkeresése, amelyekre a következők igazak:
 \begin{itemize}
 	\item összköltségük minimális
-	\item kiindulási és végpontjuk a 0. állomás
+	\item kiindulási és végpontjuk egyaránt a 0. állomás
 	\item a kiindulási csúcsot leszámítva minden csúcsot pontosan egyszer tartalmaznak, vagyis \(\forall v_i \in V, v_i\ne v_0\) esetén \( \exists!R_j : v_i \in R_j \). 
 	\item egyik jármű sem szállíthat több árut a megengedettnél, vagyis \(l_i \geqslant \sum_{v \in R_i} c(v) \)
 	\item a járművek mindegyik állomásra időben megérkeznek: \(\forall v_i \in V, v_i\ne v_0\) esetén \( T_{min}(v_i) \leqslant t(v_i) \leqslant T_{max}(v_i) \)
@@ -129,7 +129,7 @@ Amikor már 3 vagy több pontot tartalmaz az S halmaz, a lehetséges utak száma
 
 \subsubsection{Az eljárás Értékelése}
 \label{sssec:HeldKarpEvaluate}
-A Held-Karp algoritmus exponenciális idejű, \(O(2^nn^2)\), ami nagyságrendekkel jobb, mint a brute-force módszer az ő \(O(n!)\) faktoriális idejével. Előnye a Hangyakolónia algoritmussal szemben, hogy mivel determinisztikus algoritmus, a végén mindig a legrövidebb utat adja eredményül. Komoly hátránya, hogy rekurziót alkalmaz, ami kedvezőtlen a programvégrehajtás szempontjából: sok rekurzív függvényhívás ugyanis megterheli a vermet, sok felesleges másolás történik. Belátható, hogy ha különböző, adott esetekben bonyolult feltételekkel keresünk utakat, akkor az algoritmus elveszíti alapelvét, nem elég mindig az előző ciklus legjobbjaiból kiindulni. Ezzel a problémával az ACO is szembesül, de kevésbé van rá kihatással. Erre még később visszatérek a \ref{section:conditionsWithACO} fejezetben, ahol a feltételek bonyolódásával foglalkozom.
+A Held-Karp algoritmus exponenciális idejű, \(O(2^nn^2)\), ami nagyságrendekkel jobb, mint a brute-force módszer az ő \(O(n!)\) faktoriális idejével. Előnye a Hangyakolónia algoritmussal szemben, hogy mivel determinisztikus algoritmus, a végén mindig a legrövidebb utat adja eredményül. Komoly hátránya, hogy rekurziót alkalmaz, ami kedvezőtlen a programvégrehajtás szempontjából: sok rekurzív függvényhívás ugyanis megterheli a vermet, sok felesleges másolás történik. Belátható, hogy ha különböző, adott esetekben bonyolult feltételekkel keresünk utakat, akkor az algoritmus elveszíti alapelvét, nem elég mindig az előző ciklus legjobbjaiból kiindulni. Ezzel a problémával az ACO is szembesül, de kevésbé van rá kihatással. A \ref{sec:allVRPresults}. fejezetben megnézzük, hogy a feltételek bonyolódása hogyan befolyásolta a hatékonyságot.
 
 
 \section{A párhuzamos programozás alapjai} \label{secParallelProgramming}
@@ -141,6 +141,7 @@ A számítástechnika fejlődése annak a határnak a közelébe ért, ahonnan k
 	\item \emph{A szálak közti szinkronizáció}
 \end{enumerate}
 
+\noindent
 Az egyes pontok a következő, \ref{technologyChapter}. fejezetben a konkrét technológia tárgyalása során részletesebben ki lesznek fejtve.
 
 

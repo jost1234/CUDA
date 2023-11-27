@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  26 NOV 2023 14:42
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  27 NOV 2023 02:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -968,14 +968,43 @@ Overfull \hbox (2.43088pt too wide) in paragraph at lines 717--719
 
 [42
 
-] [43]) [44]
+]
+File: figures/CVRP-benchmark-error.png Graphic file (type bmp)
+<figures/CVRP-benchmark-error.png>
+File: figures/CVRP-benchmark-time.png Graphic file (type bmp)
+<figures/CVRP-benchmark-time.png>
+
+Overfull \hbox (2.43088pt too wide) in paragraph at lines 730--732
+[][] [] 
+ []
+
+File: figures/CVRPTW-benchmark-error.png Graphic file (type bmp)
+<figures/CVRPTW-benchmark-error.png>
+File: figures/CVRPTW-benchmark-time.png Graphic file (type bmp)
+<figures/CVRPTW-benchmark-time.png>
+
+Overfull \hbox (2.43088pt too wide) in paragraph at lines 742--744
+[][] [] 
+ []
+
+[43]
+File: figures/allVRP-benchmark-error.png Graphic file (type bmp)
+<figures/allVRP-benchmark-error.png>
+File: figures/allVRP-benchmark-time.png Graphic file (type bmp)
+<figures/allVRP-benchmark-time.png>
+
+Overfull \hbox (2.43088pt too wide) in paragraph at lines 754--756
+[][] [] 
+ []
+
+[44] [45]) [46]
 \openout2 = `content/osszefoglalas.aux'.
 
  (./content/osszefoglalas.tex)
 \openout2 = `content/acknowledgement.aux'.
 
  (./content/acknowledgement.tex)
-[45
+[47
 
 
 
@@ -1036,7 +1065,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 162--165
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] []
  []
 
-) [46
+) [48
 
 
 
@@ -1046,10 +1075,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 162--165
  (./content/appendices.tex
 File: figures/TeXstudio.png Graphic file (type bmp)
 <figures/TeXstudio.png>
- [47
+ [49
 
 
-]) [48
+]) [50
 
 ]
 \tf@thm=\write5
@@ -1065,16 +1094,23 @@ File: figures/TeXstudio.png Graphic file (type bmp)
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-10-10>
  ***********
-Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: E2ED6CB608CE9E49A4C5114EC79C957E;10895.
+
+
+Package rerunfilecheck Warning: File `thesis.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `thesis.out':
+(rerunfilecheck)             Before: 5EA33A8E6B66602B81C5FFAA703376BC;11302
+(rerunfilecheck)             After:  CB54095CE8F1587E83928DBFBCFAAD9A;11182.
  ) 
 Here is how much of TeX's memory you used:
- 18822 strings out of 475160
- 355837 string characters out of 5770264
- 2097674 words of memory out of 5000000
- 40237 multiletter control sequences out of 15000+600000
+ 18879 strings out of 475160
+ 357915 string characters out of 5770264
+ 2088674 words of memory out of 5000000
+ 40288 multiletter control sequences out of 15000+600000
  563237 words of font info for 75 fonts, out of 8000000 for 9000
  1352 hyphenation exceptions out of 8191
- 84i,12n,96p,1533b,1850s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,12n,96p,1533b,1854s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on thesis.pdf (54 pages).
+Output written on thesis.pdf (56 pages).

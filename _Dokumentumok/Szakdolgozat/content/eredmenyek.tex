@@ -234,7 +234,7 @@ Az egyes mérések eredményei a \ref{table:TSPv2_15} - \ref{table:TSPv2_48}. t�
 		20480 ant & 4,55 & 2175,1 (+4,3\%) & 2134 (+2,4\%) \\
 		\hline
 		\textbf{30 rep} & & & \\
-		20480 ant & 13,38 & 2146,5 & 2103 \\
+		20480 ant & 13,38 & 2146,5 (+3\%) & 2103 (+0,9\%) \\
 		\hline
 	\end{tabular}
 	\caption{17 csúcsú gráfon futtatott TSP v2}
@@ -561,7 +561,7 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 		20480 ant & 154,9 & 236,6 (+23,7\%) & 228,7 (+19,5\%) &  20\% \\
 		\hline
 	\end{tabular}
-	\caption{A szigorúbb időablakokkal bíró C101-es gráf első 26 csúcsára vett rendezett kereséses CVRPTW mérés: sajnos nagyobb csúcsméretre továbbra sem talált megoldást}
+	\caption{A szigorúbb időablakokkal bíró C101-es gráf első 26 csúcsára vett rendezett kereséses CVRPTW mérés: sajnos nagyobb csúcsszámra továbbra sem talált megoldást}
 	\label{table:VRTPW2_25_1}
 \end{table}
 
@@ -709,7 +709,7 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 \chapter{Eredmények értékelése, továbbfejlesztési lehetőségek} \label{results_section}
 Sok mérést végeztem, amiből több konklúziót levontam. Összevetettem a két elkészített TSP verziót, illetve a járműútvonal-tervezési algoritmusok esetében megvizsgáltam, hogy az új feltételek felvétele milyen hatással volt a végeredményre.
 
-\section{A két Utazóügynök probléma (TSP) verzió összehasonlítása}
+\section{Az Utazóügynök (TSP) verziók összehasonlítása}
 
 Az első megvalósított algoritmusommal a TSP, vagyis az Utazóügynök problémát oldottam meg, segítségül hívva a már korábban látott Hangyakolónia optimalizációt. Az első verzió kellő tapasztalat hiányában készült, ezért több szempontból is problémásnak bizonyult. Ilyenek a hosszú futásidő és a korlátozott bővíthetőség. Látva a profilozó mérések eredményeit, olyan változtatásokat tudtam eszközölni, mint az adattípus cseréje \textit{float}-ra, valamint a kernelen belüli szigorú pointer szerinti paraméterátadás. A módosításoknak meglett az eredménye: hasonló végeredmények mellett \textbf{a futásidők 3-4-szer rövidebbek tudtak lenni}. Az összehasonlítás a \ref{fig:TSP-benchmark}. ábrán látható.
 
@@ -720,14 +720,62 @@ Az első megvalósított algoritmusommal a TSP, vagyis az Utazóügynök problé
 	\label{fig:TSP-benchmark}
 \end{figure}
 
-Mindkét implementációról elmondható, hogy jócskán felülmúlta a "Brute force" megoldást. Míg nyers összehasonlításokkal egy 48 csúcsú gráf összes lehetséges csúcssorrendjének kiértékelése évmilliókba telt volna, az ACO képes volt erre 2 perc alatt úgy, hogy az optimális megoldástól átlagosan mindössze 41,2\%-kal hosszabb utat talált, legjobb esetben csak 31,6\%-kal.
+Mindkét implementációról elmondható, hogy nagyságrendekkel legyőzte a "Brute force" megoldást. Míg nyers összehasonlításokkal egy 48 csúcsú gráf összes lehetséges csúcssorrendjének kiértékelése évmilliókba telt volna, az ACO második verziója 30 iterációval képes volt erre 2 perc alatt úgy, hogy az optimális megoldástól átlagosan mindössze 41,2\%-kal hosszabb utat talált, legjobb esetben csak 31,6\%-kal. 10 iteráció esetében pedig mintegy 40 másodperc alatt átlagosan 48,8\%-kal múlta felül az optimális esetet.
   
 
-\section{A különböző Járműútvonal-tervezési problémák}
-szép grafikonok plusz rizsa: több szál = lassabb, de jobb eredmény
-%TODO értékelés
+\section{CVRP}
+A kapacitásos járműútvonal-tervezési probléma méréseit a \ref{fig:CVRP-benchmark}. ábrán jelenítettem meg.
 
-A futásidőkben gyakran nem fokozatos az emelkedés például a threadszám növelésével. Ez azért is lehet, mert időben nem egyszerre futtattam a teszteket, más volt a gép állapota, nem ugyanolyan programok futottak a háttérben stb.
+\begin{figure}[ht!]
+	\includegraphics[width=75mm, keepaspectratio]{figures/CVRP-benchmark-error.png}
+	\includegraphics[width=75mm, keepaspectratio]{figures/CVRP-benchmark-time.png}
+	\caption{A CVRP méréseket 20480 thread mellett ábrázoltam 10, 30 és 50 iteráció esetén}
+	\label{fig:CVRP-benchmark}
+\end{figure}
+
+A grafikonról leolvasható az az elvárt jelenség, hogy hosszabb ideig futtatva a programot, több sorrendet megvizsgálva jobb lesz a végeredmény. Szubjektív megítélésem alapján jelen tesztadatokra érdemesebb 30 iteráció után megállni, mert az utolsó 20 vizsgálati sorozat viszonylag kis mértékben tudta csak javítani az outputot. 
+
+\section{CVRPTW}
+Az időablakokkal nehezített kapacitásos járműútvonal-tervezési probléma méréseit a \ref{fig:CVRPTW-benchmark}. ábrán jelenítettem meg, számtani közepeket képeztem a C201 és C202 mérésekből.
+
+\begin{figure}[ht!]
+	\includegraphics[width=75mm, keepaspectratio]{figures/CVRPTW-benchmark-error.png}
+\includegraphics[width=75mm, keepaspectratio]{figures/CVRPTW-benchmark-time.png}
+\caption{A CVRPTW méréseket 20480 thread mellett ábrázoltam 10, 30 és 50 iteráció esetén}
+\label{fig:CVRPTW-benchmark}
+\end{figure}
+
+Az előzőkkel hasonlóan most is megemlíthető, hogy hosszabb ideig futtatva a programot jobb megoldást kapunk. Jelen esetben viszont ez olyan csekély javulásnak bizonyult, hogy esetleg érdemes lehet megállni 10 iteráció után. Egyedül a 100 csúcsú méréseknél volt észrevehető javulás: ott az 5-ször annyi várakozás eredményeképpen a végeredmény ~30\%-ot javult.
+
+\section{Az összes probléma összevetése} \label{sec:allVRPresults}
+Végül szeretném összehasonlítani, hogy mire jutottam a különböző problémák megoldása terén. Az első TSP verzióval most már nem foglalkozom, az ugyanis sohasem volt végterméknek szánva. Egységesen 20480 thread (20 teljes blokk) és 30 iteráció paraméterekkel a \ref{fig:allVRP-benchmark}. ábrán látható az összes algoritmus egymás mellett.
+
+\begin{figure}[ht!]
+	\includegraphics[width=75mm, keepaspectratio]{figures/allVRP-benchmark-error.png}
+	\includegraphics[width=75mm, keepaspectratio]{figures/allVRP-benchmark-time.png}
+	\caption{20480 thread és 30 iteráció mellett megjelenítettem az egyes algoritmusok mérési eredményeit}
+	\label{fig:allVRP-benchmark}
+\end{figure}
+
+Több dolog egyből látszik az ábrán. Az első észrevételem, hogy futásidőben \textbf{az összes mérés alacsony fokú polinomfüggvényekre hasonlít}, de természetesen ehhez nagyobb csúcsszámú mérések is kellenének. 
+
+Második, hogy bár a többihez képest igencsak alacsony csúcsszám mellett próbáltam csak ki a TSP-t (nem találtam nagyobb adathalmazt), meglepően jól teljesített mind végeredmény, illetve futásidő tekintetében. Azért örvendetes hír ez a számomra, hiszen a gyakorlatban az Utazóügynök probléma merülhet fel a leggyakrabban. Egy SMD beültetőgép esetében például egy szerelőlemezt általában egy beültetőfej szokott kezelni.
+
+Elemezzük a CVRP-t. Futásidő tekintetében elmondható, hogy tartotta az ütemet a TSP-vel kapcsolatban. Ez kifejezetten meglepett, hiszen egy n csúcsú, k járművel bejárt CVRP-t egy n+k-1 csúcsú TSP-re vezettem vissza. A végeredmény sokat romlott. Ezt annak a rovására írom, hogy jelentősen szűkült már közepes csúcsszám mellett is az érvényes megoldások halmaza.
+
+Végül elemezzük a CVRPTW-t. Itt az előzőekhez képest a futásidő drasztikusan, mintegy 2-3-szorosára nőtt. Ennek a következők lehetnek az okai:
+\begin{itemize}
+	\item 1 iteráción belül CVRPTW esetén 200 random hangya generációt futtattam, míg korábban csak 20-at
+	\item ha egy hangya nem volt sikeres, de csak az időablaok feltételét sértette meg, először rendeztem a bejárási tömbjét, majd újrasétáltattam
+\end{itemize}
+Elmondható tehát, hogy jelentősen romlott a sebességünk, de nyertünk vele egy nagyon fontos dolgot: a százalékos hiba terén sikerült elérni, hogy a CVRPTW hibagörbéje többé-kevésbé illeszkedjen a CVRP vonulatára. Magyarul: sikerült bizonyos mértékig kiküszöbölni az időzítés okozta nehézségeket.
+
+\section{Összefoglalás}
+Dolgozatom elkészültéhez közel másfél évi munkám volt szükséges, ezalatt részletesen megismerkedtem a párhuzamos programozás sajátos világával a CUDA keretrendszeren keresztül. Kezdetben olyan mátrixműveletek, mint a determinánsszámítás többszálú megvalósítása által tapasztaltam meg a GPU-ra történő memóriaátvitel, a szálkezelés, szinkronizálás, meg még sok egyéb okozta nehézségeket. Amikor már kicsit jobban értettem a CUDA használatához, belevágtam a genetikus algoritmusok témakörébe, és elkezdtem leprogramozni az Utazóügynök probléma első verzióját. Az Önálló laboratórium végére lettem vele készen. A szakdolgozat-készítés során javítottam az előző implementáción, valamint melléírtam a kapacitás-, illetve időablak-feltételeket előíró programjaimat. A végtermékek kapcsán úgy gondolom, hogy még sok mindent lehetne fejleszteni rajtuk (mindig lehet mindenen javítani), de elértek egy olyan szintre, hogy tényleg gyakorlatban bevethetőek legyenek. Munkámmal bizonyítottam, hogy a videokártyáknak igenis van helyük ilyen komoly számításigényű területen, mint a járművek feltételes útvonaltervezésének problémaköre.
+
+\section{Továbbfejlesztési lehetőségek}
+
+Munkám több módon is folytatható lenne. Amit mindig sajnáltam, hogy programjaim megmaradtak konzolos alkalmazásoknak. Lehetne a projektekhez implementálni akár egy egyszerű grafikus alkalmazást, ahol akár egyedi pontokat is fel lehetne venni a gráfba, és futás után a program vonalakkal szemléltetné a megtalált útvonalat. Van egy sokkal technikaibb észrevételem is: amikor egy tudatos hangya követi a feromonokat, mindig az összes csúcs közül sorsol magának. Ilyenkor ha már bejárt csúcsot választ, újrasorsoltatom, hiszen nem jó megoldás kétszer bejárni egy pontot. Ha eleve egy tömbben eltárolná mindegyik egyed, hogy merre járt már, a kiválasztási folyamat sokat egyszerűsödne, ami a futásidők jelentős rövidülését vonhatná magával.
 
 \section{Kritériumfeltételek problémája a Hangyakolónia algoritmussal}
 \label{section:conditionsWithACO}

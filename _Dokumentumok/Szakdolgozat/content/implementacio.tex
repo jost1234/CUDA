@@ -7,7 +7,7 @@ TSP  \(\rightarrow\) VRP \(\rightarrow\) CVRP \(\rightarrow\) (C)VRPTW
 A munkám során megvalósított algoritmusok mindegyikéhez a hangyakolónia optimalizációt használtam.
 
 \subsection{Adatstruktúrák}
-Az útvonaltervezési problémák gráfokon futnak, ezért elsődleges feladatom annak eldöntése volt, hogy milyen formában tároljam a gráfokat. Az egyik legalapvetőbb megadási mód, ami én is mindenhol alkalmaztam, az a szomszédossági mátrix reprezentáció. Előnye, hogy az egyes csúcsokhoz tartozó élek direkt lekérdezhetőek, ezért a rajtuk végzett műveletek gyorsabbak lehetnek. Hátránya viszont, hogy minél kevesebb él van a gráfban, annál pazarlóbbá válik ez a megadás. Ismertek más fajta tárolási módok is, de azokkal most nem foglalkoztam. \cite{alg_optim}
+Az útvonaltervezési problémák gráfokon futnak, ezért elsődleges feladatom annak eldöntése volt, hogy milyen formában tároljam a gráfokat. Az egyik alapvető megadási mód, amit én is követtem, a szomszédossági mátrix reprezentáció. Előnye, hogy az egyes csúcsokhoz tartozó élek direkt lekérdezhetőek, ezért a rajtuk végzett műveletek gyorsabbak lehetnek. Hátránya viszont, hogy minél kevesebb él van a gráfban, annál pazarlóbbá válik ez a megadás. Ismertek más fajta tárolási módok is, de azokkal most nem foglalkoztam. \cite{alg_optim}
 Az adattípusok megválasztásában eltérőek az egyes megvalósítások: az első TSP verzióban például minden lebegőpontos számot \textit{double} típusú változóban tárolok, míg a többi algoritmusnál \textit{float} adattípust alkalmazok. A váltás hátterében az áll, hogy kipróbálva az első algoritmust azt tapasztaltam, hogy nem javít érdemben a valószínűségek dupla pontosságú számítása, cserébe sokat lehet spórolni a futásidőn a felbontás csökkentésével.
 
 
@@ -26,7 +26,7 @@ $\begin{pmatrix}
 
 \paragraph{}
 
-Ahol P{\scriptsize i,j} az i-ből j-be él kezdeti feromonértéke. \( \forall i\in V(G) : P_{i,i}:=0 \), mert a gráfunk egyszerű, nincs benne hurokél. Praktikusan \( P_{i,j}:=0 \), ha az input gráfban \(v_{i,j}\) nincs behúzva. Ekkor már az első próbálkozások sem próbálnak meg arra menni. Ez a kikötés nem kötelező, előbb-utóbb ezen éleket úgyis elhalnának a feromonok. 
+Itt P{\scriptsize i,j} az i-ből j-be él feromonértéke. \( \forall i\in V(G) : P_{i,i}:=0 \), mert a gráfunk egyszerű, nincs benne hurokél. Praktikusan \( P_{i,j}:=0 \), ha az input gráfban \(v_{i,j}\) nincs behúzva. Ekkor már az első próbálkozások sem próbálnak meg arra menni. Ez a kikötés nem kötelező, előbb-utóbb ezen éleket úgyis elhalnának a feromonok. 
 
 \subsubsection{VRP variánsok} \label{VRPvariants_subsection}
 A VRP esetében kicsit bonyolultabb a helyzet. Ha felírjuk egymás után az egyes járművek bejárási sorrendjét, azt láthatjuk, hogy olyan, mintha több TSP-t hajtottunk volna végre egymás után. Képzeletben majdnem ez is történt. Úgy álltam hozzá a több útvonalhoz, hogy fejben kifeszítettem őket egy nagy körré. A kezdőcsúcs helyére gondolhatjuk azt, hogy k db csúcs van ott, amik egymástól 0 távolságra vannak. A gondolatmenetemet a \ref{tsp-to-vrp}. ábrán illusztrálom. 
@@ -37,7 +37,7 @@ A VRP esetében kicsit bonyolultabb a helyzet. Ha felírjuk egymás után az egy
 	\caption{A VRP visszavezethető a TSP-re, ha az egyes utakat képzeletben összefűzzük egy nagy körré \label{tsp-to-vrp} }
 \end{figure}
 
-Egy n csúcsot k járművel bejáró VRP visszavezethető egy n+k-1 csúcsú TSP-re. Ha egy jármű nem vesz részt a folyamatban, akkor olyan, mintha \( (v_0,v_0) \) útvonalat tenne meg egy hurokélen haladva. Ezt most megengedjük, ezért a feromonokat tartalmazó mátrixot kibővítjük. A \(v_{0,k} \) csúcsra vonatkozó sor 0. eleme a \( v_{0,k}\)-ból \(v_{0,k+1}\)-be mutató él feromonértéke. Az első n sor ugyanolyan, mint a TSP esetén, ezzel biztosítva, hogy további járműveket számításba véve, a TSP-ből át tudjunk menni VRP-be.
+Egy n csúcsot k járművel bejáró VRP visszavezethető egy n+k-1 csúcsú TSP-re. Ha egy jármű nem vesz részt a folyamatban, akkor olyan, mintha \( (v_0,v_0) \) útvonalat tenne meg egy hurokélen haladva. Ezt most megengedjük, ezért a feromonokat tartalmazó mátrixot kibővítjük. A \(v_{0,k} \) csúcsra vonatkozó sor 0. eleme a \( v_{0,k}\)-ból \(v_{0,k+1}\)-be mutató él feromonértéke. Az első n sor ugyanolyan, mint a TSP esetén, ezzel biztosítva, hogy további járműveket számításba véve, a TSP-ről át tudjunk térni VRP-re.
 
 A mátrix minden sora egy adott csúcsból történő továbbhaladást ír le valószínűségi szempontból. Az i. sorban a kiindulási csúcs, ha 0 < i < n+k-1:
 \begin{itemize}
@@ -71,6 +71,9 @@ Az algoritmusaimban többször feltűnik a random számok generálásának probl
 A számítógépek alapesetben determinisztikus gépek, hiszen adott utasításokat hajtanak végre. A CUDA az úgynevezett PRNG (pszeudorandomszám-generátor) elvét követi. A generált szám tökéletesen meghatározható egy kezdeti érték alapján, ezért kell egy \mbox{seed}, ami viszont már független lehet a géptől. Programozás közben az 1970. január 1. éjfél óta eltelt másodpercek számát vettem seednek, amely bevett gyakorlatnak számít.
 GPU oldalon a CuRand függvénykönyvtár videokártyás támogatást biztosít pszeudorandom számok generálására, ehhez a következő egyszerű kernelt kell futtatni:
 
+\paragraph{}
+\noindent
+
 \begin{lstlisting}[style=CStyle]
 	// Initializes a random seed for each different threads
 	__global__ void setup_kernel(curandState* state, unsigned long seed)
@@ -80,6 +83,7 @@ GPU oldalon a CuRand függvénykönyvtár videokártyás támogatást biztosít 
 	}
 \end{lstlisting}
 
+\noindent
 A kernelt CPU oldalról kell felhívni a kiválasztott seeddel:
 
 \begin{lstlisting}[style=CStyle]
@@ -90,15 +94,11 @@ A kernelt CPU oldalról kell felhívni a kiválasztott seeddel:
 	setup_kernel <<< BlockNum, threadPerBlock >>> (d_kernelParams.state, time(NULL) * rand());
 \end{lstlisting}
 
-\begin{lstlisting}[style=CStyle,showstringspaces=false]
-	
-\end{lstlisting}
-
-Amikor egy feromont követő hangya következő csúcsot választ, minden elérhető élen leméri az ottani feromonértékeket. Egy egyes élek választásának valószínűsége a \ref{ACO_My_probability}. kifejezés alapján kapható meg. A megvalósítás sokat javulhatna azzal, ha a már korábban kiválasztott éleket a hangya nem venné számításba. Sajnos már nem volt időm foglalkozni ezzel.
+Amikor egy feromont követő hangya következő csúcsot választ, minden elérhető élen leméri az ottani feromonértékeket. Egy egyes élek választásának valószínűsége a \ref{ACO_My_probability}. kifejezés alapján kapható meg. A megvalósítás sokat javulhatna azzal, ha a már korábban kiválasztott éleket a hangya nem venné számításba. Ha ez bele lenne implementálva a programba, később sokat javíthatna a futásidőn.
 
 \section{A végeredmény számítása}
 \label{sec:getResult}
-Mint minden algoritmus esetében, itt is külön figyelmet kell fordítanunk arra, hogy a végső eredményt milyen formában állítsuk elő. A legkézenfekvőbb gondolat az, hogy ha út közben egy új legrövidebb megoldást találunk, akkor feljegyezzük, és végül ezt nevezzük ki outputnak. Gyakorlatban, amikor a programjaimat teszteltem, nagyon gyakran hibás végeredményt kaptam ilyen alapon. A hiba detektálása során arra jöttem rá, hogy a GPU főleg adatmozgatások során nagyon gyakran hibázik. Ez azzal járt, hogy néha rossz eredményt, néha pedig semmit sem töltött az erre kijelölt tömbbe. Felismerésem után egyéb módot is kitaláltam. A megadott számú iteráció után ott marad a feromongráf, amivel a program önmagát tanította. Ebben a gráfban végrehajthatunk egy mohó algoritmust: kiindulva az előírt kezdőcsúcsból, következő csúcsnak a megmaradtak közül mindig azt a csúcsot választjuk, ahova a legtöbb feromon vezet. Ekkor közvetlenül a kijelölt eredménytömbbe dolgozom, megkerülve a kritikusnak tapasztalt adatmozgatást. Hogy ne írjak felül jó megoldást, a mohó keresést csak akkor hajtom végre, amikor a tömbben talált szekvencia érvénytelen.
+Mint minden algoritmus esetében, itt is külön figyelmet kell fordítanunk arra, hogy a végső eredményt milyen formában állítsuk elő. A legkézenfekvőbb gondolat az, hogy ha út közben egy új legrövidebb megoldást találunk, akkor feljegyezzük, és végül ezt nevezzük ki outputnak. Gyakorlatban, amikor a programjaimat teszteltem, gyakran hibás végeredményt kaptam ilyen alapon. A hiba detektálása során arra jöttem rá, hogy a GPU főleg adatmozgatások során nagyon gyakran hibázik. Ez azzal járt, hogy néha rossz eredményt, néha pedig semmit sem töltött az erre kijelölt tömbbe. Felismerésem után egyéb módot is kitaláltam. A megadott számú iteráció után ott marad a feromongráf, amivel a program önmagát tanította. Ebben a gráfban végrehajthatunk egy mohó algoritmust: kiindulva az előírt kezdőcsúcsból, következő csúcsnak mindig azt választjuk, amelyik felé a legtöbb feromon vezet. Ekkor közvetlenül a kijelölt eredménytömbbe dolgozom, megkerülve a kritikusnak tapasztalt adatmozgatást. Hogy ne írjak felül jó megoldást, a mohó keresést csak akkor hajtom végre, amikor a tömbben talált szekvencia érvénytelen.
 
 \begin{lstlisting}[style=CStyle,showstringspaces=false]
 	// Choosing path with greedy algorithm if we dont have a valid answer
@@ -166,7 +166,7 @@ if ((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--ants") == 0))
 }
 \end{lstlisting}
 
- Az első verzió nagyon lassúra sikerült, ezért több módon is igyekeztem gyorsabbnak lenni. Azt tapasztaltam, hogy nem olyan fontos a feromonok pontos tárolása, ezért \textit{double} helyett \textit{float} adattípusra váltottam. 
+ Az első verzió nagyon lassúra sikerült, ezért több módon is igyekeztem javítani. Azt tapasztaltam, hogy nem olyan fontos a feromonok pontos tárolása, ezért \textit{double} helyett \textit{float} adattípusra váltottam. 
  Sok függvényhívást alkalmazok, ezért kritikusnak bizonyult a paraméterátadások gyorsítása is. A kernel által használt változókat egy általam definiált struktúrába szerveztem. Ilyen struktúrák pointereit adom csak át függvények között, ezzel kevesebb utasítást vesznek el a vezérlésátadások. A random generált szekvenciákat úgy állítom elő hamarabb, hogy a csúcsok egyesével történő sorsolása helyett csak n db véletlen csúcscserét alkalmazok. 
  
  A \ref{results_section}. részben grafikonokon látható, hogy az említett változtatások mekkora sebességnövekedést okoztak.
@@ -213,7 +213,7 @@ Miután megvalósítottam és kipróbáltam a programot a kapott tesztadatokon (
 \subsection{A probléma forrása} Az eredményekből az a következtetés vonható le, hogy a teljesen random közlekedő hangya nem alkalmas az algoritmus során olyan kezdeti megoldást találni, amit majd a következő hangya tovább tudna javítani. Az időablakok feltétele a kapacitással ellentétben közvetlenül a csúcsok sorrendjére szab meg korlátozást, vagyis gyakorlatilag lehetetlen pont a jó sorrendet eltalálni. 
 
 \subsection{A megoldás felé vezető út}
-A tesztadatokon látszik, hogy viszonylag rövid időintervallumokban lehet elérni az egyes felhasználókat. Ez azt jelenti, hogy ha egy jármű számára kiosztunk egy adott csúcshalmazt, akkor ezek permutációi közül csupán néhány lesz olyan, ami kielégíti az időablak-feltételt. Ha intuitívan közelítjük meg a helyzetet, akkor nagy valószínűséggel úgy járhatunk el a legjobban, hogyha a járműveknek sikertelenség esetén azt javasoljuk, hogy próbáljanak meg olyan ütemben haladni, ahogyan a csúcsok elérhetővé válnak.
+A tesztadatokon látszik, hogy viszonylag rövid időintervallumokban lehet elérni az egyes felhasználókat. Ez azt jelenti, hogy ha egy jármű számára kiosztunk egy adott csúcshalmazt, akkor ezek permutációi közül csupán néhány lesz olyan, ami kielégíti az időablak-feltételt. Ha intuitívan közelítjük meg a helyzetet, akkor nagy valószínűséggel úgy járhatunk el a legjobban, ha a járműveknek sikertelenség esetén azt javasoljuk, hogy próbáljanak meg olyan ütemben haladni, ahogyan a csúcsok elérhetővé válnak.
 
 \noindent
 A teljesen random hangya elvét elhagyva \textit{\mbox{sortTrucksByReadyTime}} néven egy új függvényt írtam, amely minden járműhöz a ráosztott csúcshalmazt olyan sorrendbe állítja, ahogyan azok elérhetőek lesznek. Mivel csak rossz megoldásokat szűrök ki, a rendezéssel a megfelelő sorrendek halmazát vélhetően nem zavarom meg nagy mértékben.

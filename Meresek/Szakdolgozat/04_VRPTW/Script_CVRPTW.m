@@ -1,34 +1,34 @@
-% CVRP
+% CVRPTW
 
-data = readmatrix('CVRP_Grafikonok.xlsx');
+data = readmatrix('VRPTW_Grafikonok.xlsx');
 
-Csize = data(:,1);
+TWsize = data(:,1);
 
-error10 = data(:,5);
-time10 = data(:,6);
+TWerror10 = data(:,6);
+TWtime10 = data(:,7);
 
-Cerror30 = data(:,9);
-Ctime30 = data(:,10);
+TWerror30 = data(:,11);
+TWtime30 = data(:,12);
 
-error50 = data(:,13);
-time50 = data(:,14);
+TWerror50 = data(:,16);
+TWtime50 = data(:,17);
 
 f = figure;
 f.Position = [200 200 640 480];
-plot(Csize,error10,'b-x', Csize,Cerror30,'r-x',Csize,error50,'g-x');
+plot(TWsize,TWerror10,'b-x', TWsize,TWerror30,'r-x',TWsize,TWerror50,'g-x');
 xlabel('Gráfcsúcsok száma','FontSize',30);
 ylabel (' Átlagos hiba (%)','FontSize',30);
-ttl = title('CVRP Százalékos eltérés','FontSize',30);
+ttl = title('CVRPTW Százalékos eltérés','FontSize',30);
 lgd = legend({'10 rep', '30 rep', '50 rep'},'Location','northwest');
 fontsize(lgd,18,'points')
 fontsize(gca, 18,'points')
 fontsize(ttl, 25,'points')
-xlim([0,75])
-ylim([0,300]);
-%%
+xlim([0,105])
+ylim([0,600]);
+
 f = figure;
 f.Position = [840 200 640 480];
-plot(Csize,time10,'b-x', Csize,Ctime30,'r-x',Csize,time50,'g-x');
+plot(TWsize,TWtime10,'b-x', TWsize,TWtime30,'r-x',TWsize,TWtime50,'g-x');
 
 
 xlabel('Gráfcsúcsok száma','FontSize',30);
@@ -38,5 +38,5 @@ lgd = legend({'10 rep', '30 rep', '50 rep'},'Location','northwest');
 fontsize(lgd,18,'points')
 fontsize(gca, 18,'points')
 fontsize(ttl, 25,'points')
-xlim([0,75])
-ylim([0,600]);
+xlim([0,105])
+ylim([0,2600]);
