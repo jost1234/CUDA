@@ -14,7 +14,7 @@
 \select@language {magyar} \contentsline {subsection}{\numberline {2.5.2}Held - Karp algoritmus }{10}{subsection.2.5.2}%
 \select@language {magyar} \contentsline {paragraph}{}{10}{section*.8}%
 \select@language {magyar} \contentsline {paragraph}{}{10}{section*.9}%
-\select@language {magyar} \contentsline {subsubsection}{\numberline {2.5.2.1}Az eljárás Értékelése}{10}{subsubsection.2.5.2.1}%
+\select@language {magyar} \contentsline {subsubsection}{\numberline {2.5.2.1}Az eljárás értékelése}{10}{subsubsection.2.5.2.1}%
 \select@language {magyar} \contentsline {section}{\numberline {2.6}A párhuzamos programozás alapjai}{11}{section.2.6}%
 \select@language {magyar} \contentsline {chapter}{\numberline {3}Technológiai háttér}{12}{chapter.3}%
 \select@language {magyar} \contentsline {section}{\numberline {3.1}GPGPU}{12}{section.3.1}%
@@ -66,18 +66,14 @@
 \select@language {magyar} \contentsline {section}{\numberline {5.6}CVRP}{36}{section.5.6}%
 \select@language {magyar} \contentsline {section}{\numberline {5.7}CVRPTW random kereséssel}{37}{section.5.7}%
 \select@language {magyar} \contentsline {section}{\numberline {5.8}CVRPTW rendezett kereséssel}{39}{section.5.8}%
-\select@language {magyar} \contentsline {chapter}{\numberline {6}Eredmények értékelése, továbbfejlesztési lehetőségek}{42}{chapter.6}%
+\select@language {magyar} \contentsline {chapter}{\numberline {6}Eredmények értékelése}{42}{chapter.6}%
 \select@language {magyar} \contentsline {section}{\numberline {6.1}Az Utazóügynök (TSP) verziók összehasonlítása}{42}{section.6.1}%
 \select@language {magyar} \contentsline {section}{\numberline {6.2}CVRP}{43}{section.6.2}%
 \select@language {magyar} \contentsline {section}{\numberline {6.3}CVRPTW}{43}{section.6.3}%
 \select@language {magyar} \contentsline {section}{\numberline {6.4}Az összes probléma összevetése}{44}{section.6.4}%
-\select@language {magyar} \contentsline {section}{\numberline {6.5}Összefoglalás}{45}{section.6.5}%
-\select@language {magyar} \contentsline {section}{\numberline {6.6}Továbbfejlesztési lehetőségek}{45}{section.6.6}%
-\select@language {magyar} \contentsline {section}{\numberline {6.7}Kritériumfeltételek problémája a Hangyakolónia algoritmussal}{45}{section.6.7}%
-\select@language {magyar} \contentsline {subsection}{\numberline {6.7.1}Kapacitásfeltétel}{46}{subsection.6.7.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {6.7.2}Időablakok feltétele}{46}{subsection.6.7.2}%
+\select@language {magyar} \contentsline {chapter}{\numberline {7}Összefoglalás}{45}{chapter.7}%
+\select@language {magyar} \contentsline {chapter}{\numberline {8}Továbbfejlesztési lehetőségek}{46}{chapter.8}%
 \select@language {magyar} \contentsline {chapter}{Köszönetnyilvánítás}{47}{chapter*.63}%
 \select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{48}{chapter*.63}%
 \select@language {magyar} \contentsline {chapter}{Függelék}{49}{appendix*.65}%
 \select@language {magyar} \contentsline {section}{\numberline {F.1}A megvalósított CUDA kódok elérése}{49}{section.F.1}%
-\select@language {magyar} \contentsline {section}{\numberline {F.2}A dolgozat során használt rövidítések}{50}{section.F.2}%

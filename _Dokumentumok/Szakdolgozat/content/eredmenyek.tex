@@ -706,7 +706,7 @@ Ahogyan azt az előző fejezetben láttuk, ha teljesen random módon keresnek ú
 	\label{table:VRTPW2_100_3}
 \end{table}
 
-\chapter{Eredmények értékelése, továbbfejlesztési lehetőségek} \label{results_section}
+\chapter{Eredmények értékelése} \label{results_section}
 Sok mérést végeztem, amiből több konklúziót levontam. Összevetettem a két elkészített TSP verziót, illetve a járműútvonal-tervezési algoritmusok esetében megvizsgáltam, hogy az új feltételek felvétele milyen hatással volt a végeredményre.
 
 \section{Az Utazóügynök (TSP) verziók összehasonlítása}
@@ -759,76 +759,20 @@ Végül szeretném összehasonlítani, hogy mire jutottam a különböző probl�
 
 Több dolog egyből látszik az ábrán. Az első észrevételem, hogy futásidőben \textbf{az összes mérés alacsony fokú polinomfüggvényekre hasonlít}, de természetesen ehhez nagyobb csúcsszámú mérések is kellenének. 
 
-Második, hogy bár a többihez képest igencsak alacsony csúcsszám mellett próbáltam csak ki a TSP-t (nem találtam nagyobb adathalmazt), meglepően jól teljesített mind végeredmény, illetve futásidő tekintetében. Azért örvendetes hír ez a számomra, hiszen a gyakorlatban az Utazóügynök probléma merülhet fel a leggyakrabban. Egy SMD beültetőgép esetében például egy szerelőlemezt általában egy beültetőfej szokott kezelni.
+Második, hogy bár a többihez képest igencsak alacsony csúcsszám mellett próbáltam csak ki a TSP-t (nem találtam nagyobb adathalmazt), meglepően jól teljesített mind végeredmény, illetve futásidő tekintetében. Azért örvendetes hír ez a számomra, hiszen a gyakorlatban az Utazóügynök probléma merülhet fel a leggyakrabban. Egy SMD beültetőgép esetében például egy szerelőlemezt általában egy fej szokott kezelni.
 
 Elemezzük a CVRP-t. Futásidő tekintetében elmondható, hogy tartotta az ütemet a TSP-vel kapcsolatban. Ez kifejezetten meglepett, hiszen egy n csúcsú, k járművel bejárt CVRP-t egy n+k-1 csúcsú TSP-re vezettem vissza. A végeredmény sokat romlott. Ezt annak a rovására írom, hogy jelentősen szűkült már közepes csúcsszám mellett is az érvényes megoldások halmaza.
 
 Végül elemezzük a CVRPTW-t. Itt az előzőekhez képest a futásidő drasztikusan, mintegy 2-3-szorosára nőtt. Ennek a következők lehetnek az okai:
 \begin{itemize}
 	\item 1 iteráción belül CVRPTW esetén 200 random hangya generációt futtattam, míg korábban csak 20-at
-	\item ha egy hangya nem volt sikeres, de csak az időablaok feltételét sértette meg, először rendeztem a bejárási tömbjét, majd újrasétáltattam
+	\item ha egy hangya nem volt sikeres, de csak az időablakok feltételét sértette meg, először rendeztem a bejárási tömbjét, majd újrasétáltattam
 \end{itemize}
 Elmondható tehát, hogy jelentősen romlott a sebességünk, de nyertünk vele egy nagyon fontos dolgot: a százalékos hiba terén sikerült elérni, hogy a CVRPTW hibagörbéje többé-kevésbé illeszkedjen a CVRP vonulatára. Magyarul: sikerült bizonyos mértékig kiküszöbölni az időzítés okozta nehézségeket.
 
-\section{Összefoglalás}
+\chapter{Összefoglalás}
 Dolgozatom közel másfél évi munkám eredményeképpen jött létre, ezalatt részletesen megismerkedtem a párhuzamos programozás sajátos világával a CUDA keretrendszeren keresztül. Kezdetben olyan mátrixműveletek, mint a determinánsszámítás többszálú megvalósítása által tapasztaltam meg a GPU-ra történő memóriaátvitel, a szálkezelés, szinkronizálás, meg még sok egyéb okozta nehézségeket. Amikor már kicsit jobban értettem a CUDA használatához, belevágtam a genetikus algoritmusok témakörébe, és elkezdtem leprogramozni az Utazóügynök probléma első verzióját. Az Önálló laboratórium végére lettem vele készen. A szakdolgozat-készítés során javítottam az előző implementáción, valamint melléírtam a kapacitás-, illetve időablak-feltételeket előíró programjaimat. A végtermékek kapcsán úgy gondolom, hogy még sok mindent lehetne fejleszteni rajtuk (mindig lehet mindenen javítani), de elértek egy olyan szintre, hogy tényleg gyakorlatban bevethetőek legyenek. Munkámmal bizonyítottam, hogy a videokártyáknak igenis van helyük ilyen komoly számításigényű területen, mint a járművek feltételes útvonaltervezésének problémaköre.
 
-\section{Továbbfejlesztési lehetőségek}
+\chapter{Továbbfejlesztési lehetőségek}
 
-Munkám több módon is folytatható lenne. Amit mindig sajnáltam, hogy programjaim megmaradtak konzolos alkalmazásoknak. Lehetne a projektekhez implementálni akár egy egyszerű grafikus alkalmazást, ahol akár egyedi pontokat is fel lehetne venni a gráfba, és futás után a program vonalakkal szemléltetné a megtalált útvonalat. Van egy sokkal technikaibb észrevételem is: amikor egy tudatos hangya követi a feromonokat, mindig az összes csúcs közül sorsol magának. Ilyenkor ha már bejárt csúcsot választ, újrasorsoltatom, hiszen nem jó megoldás kétszer bejárni egy pontot. Ha eleve egy tömbben eltárolná mindegyik egyed, hogy merre járt már, a kiválasztási folyamat sokat egyszerűsödne, ami a futásidők jelentős rövidülését vonhatná magával.
-
-\section{Kritériumfeltételek problémája a Hangyakolónia algoritmussal}
-\label{section:conditionsWithACO}
-Ahogy már korábban a \ref{sssec:HeldKarpEvaluate}. részben utaltam rá, a Hangyakolónia algoritmus számára is kihívással jár az, hogy ha a keresett útvonal különböző feltételeknek maradéktalanul meg kell feleljen. Dolgozatomban kétféle feltételrendszert vizsgáltam: a járművek korlátozott kapacitását, illetve a felhasználók megszabott időbeosztását. A CVRP esetében Most összefoglalnám, hogy miért érhettek el a feltételes esetben végzett méréseim jelentősen rosszabb eredményeket.
-
-Az ACO úgy működik, hogy eleinte a gyengébb megoldásokból generál egyre jobbakat. Feltételezi, hogy találunk megoldást, amit javítani tudunk. A kritériumfeltételek olyanok, hogy vagy teljesülnek, vagy nem. Nehéz úgy értékelni, hogy az első csak kicsit hibázott, a következő közepesen stb. Ha rossz, akkor nem engedhetjük a megoldáshalmazba.
-
-Most azt nézném meg, hogy ha véletlenszerű csúcssorrendeket generálok úgy, ahogyan ezt a hangyák is teszik az ACO-ban, akkor mekkora annak a valószínűsége, hogy találunk egy, a kritériumnak megfelelő megoldást.
-
-Ha egy esemény bekövetkezési valószínűsége p, akkor annak a valószínűsége, hogy n-szer ismételve az eseményt legalább 1 alkalommal bekövetkezik, binomiális valószínűségi eloszlás szerint:
-\begin{equation}
-	P(x>0) = 1-(1-p)^n
-	\label{binomial_probability}
-\end{equation}
-
-\subsection{Kapacitásfeltétel}
-Kezdjük a kapacitáskritériummal, mert az az egyszerűbb. Az első 5 adathalmazban minden csúcs igénye 1, vagyis azt kell néztünk, hogy az egyes járművek hány csúcsot járnak be. A kezdőcsúcsot nem kell beleszámolni, mert annak nincs igénye. 
-
-Probléma: Az (n-1) db csúcsot véletlenszerűen szétosztjuk k db jármű között. Mennyi annak a valószínűsége, hogy egyik járműhöz sem osztanak több, mint C db-ot? Első példa (gr17): 16 állomás, 3 jármű, a járművek kapacitása 6. \(p_{gr17}=?\)
-
-\newcommand{\pgr}{0,258}
-
-Csak 6-6-4 vagy 6-5-5 felosztásban lehetnek a csúcsok. Az összes eset \(3^{16}\), mert minden csúcsra eldöntjük, hogy melyik járműhöz osztjuk be. Összesen \(\binom{16}{6}*\binom{10}{6}*3 + \binom{16}{6}*\binom{10}{5}*3 \) esetben nem lesz több, mint 6 egyik jármű kapacitása sem.
-\begin{equation}
-	p_{gr17} = 3*\frac{\binom{16}{6}*\binom{10}{6} + \binom{16}{6}*\binom{10}{5}}{3^{16}} \approx \pgr
-	\label{gr17_p}
-\end{equation}
-Nézzük meg az att48-ra is ugyanezt: \((n-1)=47\) állomás, k=3 jármű, a járművek kapacitása C=16. \(p_{att48}=?\)
-
-\newcommand{\patt}{0,051}
-
-Ebben a problémában csak 16-16-15 felosztásban lehetnek a csúcsok. Az előbbi példához hasonlóan gondolkozva a valószínűség:
-
-\begin{equation}
-	p_{gr17} = \frac{3*\binom{47}{16}*\binom{31}{16}}{3^{47}} \approx \patt
-	\label{att48_p}
-\end{equation}
-
-\newcommand{\nInTenIterations}{4096000}
-
-Ha 20480 szálon 10 iterációt végzek, és 1 iteráción belül 20-szor generálok egymás után random sorrendet, akkor összesen n=\nInTenIterations kísérletet végzek. A \ref{binomial_probability}. egyenletbe behelyettesítve annak a valószínűsége, hogy találok megoldást:
-
-\begin{equation}
-	P_{gr17} = 1-(1-\pgr)^{\nInTenIterations} = 1
-	\label{gr17_P}
-\end{equation}
-
-\begin{equation}
-	P_{att48} = 1-(1-\patt)^{\nInTenIterations} = 1
-	\label{att48_P}
-\end{equation}
-
-Ezek alapján nem meglepő, hogy mindig találtam megoldást a CVRP tesztelése során.
-
-\subsection{Időablakok feltétele}
-Most jön annak a vizsgálata, hogy miért nem találtam megoldást olyan sok esetben a CVRPTW mérésekor. Sajnos itt már nem lehet olyan szépen intuitívan megállapítani egy adott problémában egy véletlenszerű bejárás megfelelőségének a valószínűségét. 
+Munkám több módon is folytatható lenne. Amit mindig sajnáltam, hogy programjaim megmaradtak konzolos alkalmazásoknak. Lehetne a projektekhez implementálni akár egy egyszerűbb grafikus alkalmazást, ahol például egyedi pontokat is fel lehetne venni a gráfba, és futás után a program vonalakkal szemléltetné a megtalált útvonalat. Van egy sokkal technikaibb észrevételem is: amikor egy tudatos hangya követi a feromonokat, mindig az összes csúcs közül sorsol magának. Ilyenkor ha már bejárt csúcsot választ, újrasorsoltatom, hiszen nem jó megoldás kétszer bejárni egy pontot. Ha eleve egy tömbben eltárolná mindegyik egyed, hogy merre járt már, a kiválasztási folyamat sokat egyszerűsödne, és a futásidők jelentősen rövidülhetnének.

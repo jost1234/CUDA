@@ -17,12 +17,17 @@ A feromonokat az élekhez rendelem, ezért egy, az eredeti gráf topológiájáv
 \subsubsection{TSP}
 A TSP során egy NxN-es mátrix által adott feromongráfon egyértelműen végrehajtható mohó algoritmus, vagyis olyan döntéshozatal-sorozat, hogy minden csúcsból abba a következő pontba megyünk, ahova a legtöbb feromon vezet (kivéve ha az a kezdőcsúcsba vezet, és még maradtak bejáratlan csúcsok). Hogy megtartsam az implementáció egyszerűségét, a TSP során tényleg NxN-es 2 dimenziós mátrixban tárolom a feromonértékeket. Tehát az n csúcsú TSP feromonmátrix alakja a következő:
 
-$\begin{pmatrix}
-	0 & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
-	P_{1,0} & 0 & P_{1,2} & \cdots & P_{1,n-1} \\
-	\vdots & & \ddots \\
-	P_{n-1,0} & P_{n-1,1} & P_{n-1,2} & \cdots & 0
-\end{pmatrix}$
+\begin{equation}
+	\centering
+	\begin{bmatrix}
+		0 & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
+		P_{1,0} & 0 & P_{1,2} & \cdots & P_{1,n-1} \\
+		\vdots & & \ddots \\
+		P_{n-1,0} & P_{n-1,1} & P_{n-1,2} & \cdots & 0
+	\end{bmatrix}
+\end{equation}
+
+
 
 \paragraph{}
 
@@ -48,17 +53,21 @@ A mátrix minden sora egy adott csúcsból történő továbbhaladást ír le va
 
 Tehát a k járművel n csúcson futó VRP feromonmátrix alakja a következő:
 
-$\begin{pmatrix}
-	P_{v_{0,0},v_{0,1}} & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
-	P_{1,0} & 0 & P_{1,2} & \cdots & P_{1,n-1} \\
-	\vdots & & \ddots \\
-	P_{n-1,0} & P_{n-1,1} & P_{n-1,2} & \cdots & 0 \\
-	P_{v_{0,1},v_{0,2}} & P_{v_{0,1},1} & P_{v_{0,1},2} & \cdots & P_{v_{0,1},n-1} \\
-	\vdots & & \\
-	P_{v_{0,i},v_{0,i+1}} & P_{v_{0,i},1} & P_{v_{0,i},2} & \cdots & P_{v_{0,i},n-1} \\
-	\vdots & & \\
-	P_{v_{0,k-1},v_{0,0}} & P_{v_{0,k-1},1} & P_{v_{0,k-1},2} & \cdots & P_{v_{0,k-1},n-1} \\
-\end{pmatrix}$
+\begin{equation}
+	\begin{bmatrix}
+		P_{v_{0,0},v_{0,1}} & P_{0,1} & P_{0,2} & \cdots & P_{0,n-1}\\ 
+		P_{1,0} & 0 & P_{1,2} & \cdots & P_{1,n-1} \\
+		\vdots & & \ddots \\
+		P_{n-1,0} & P_{n-1,1} & P_{n-1,2} & \cdots & 0 \\
+		P_{v_{0,1},v_{0,2}} & P_{v_{0,1},1} & P_{v_{0,1},2} & \cdots & P_{v_{0,1},n-1} \\
+		\vdots & & \\
+		P_{v_{0,i},v_{0,i+1}} & P_{v_{0,i},1} & P_{v_{0,i},2} & \cdots & P_{v_{0,i},n-1} \\
+		\vdots & & \\
+		P_{v_{0,k-1},v_{0,0}} & P_{v_{0,k-1},1} & P_{v_{0,k-1},2} & \cdots & P_{v_{0,k-1},n-1} \\
+	\end{bmatrix}
+\end{equation}
+
+
 
 \paragraph{}
 Feltételek megnyilvánulása: az, hogy milyen egyéb feltételeket tűzünk még ki a feladatban, a feromonok nyilvántartásának módját nem befolyásolja. Változás annyi lesz, hogy hiába vezet út az adott körön, ha kritériumfeltétel, például egy jármű kapacitásfeltétele sérül. Olyankor egyáltalán nem veszem figyelembe az adott megoldást.

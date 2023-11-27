@@ -127,7 +127,7 @@ Amikor már 3 vagy több pontot tartalmaz az S halmaz, a lehetséges utak száma
 \paragraph{}
 Általánosan: tegyük fel, hogy a k-adik lépésben \(S=\{s_1,...s_k\}\). Jelöljük \(1\leqslant i\leqslant k\)-ra \(S_i = S-\{s_i\} = \{s_1...s_{i-1},s_{i+1}...s_k\} \). Ha a \(v_1\)-ből a legrövidebb út e-be S-en keresztül úgy vezet, hogy annak \(s_i\) az utolsó előtti eleme, akkor következik, hogy \(v_1\)-ből a legrövidebb út \(s_i\)-be \(S_i\)-n keresztül vezet. Ez azt jelenti, hogy a k-adik lépésben elég k db S halmazt továbbvinnünk, mert csak azok lehetségesek legrövidebb utat adni.
 
-\subsubsection{Az eljárás Értékelése}
+\subsubsection{Az eljárás értékelése}
 \label{sssec:HeldKarpEvaluate}
 A Held-Karp algoritmus exponenciális idejű, \(O(2^nn^2)\), ami nagyságrendekkel jobb, mint a brute-force módszer az ő \(O(n!)\) faktoriális idejével. Előnye a Hangyakolónia algoritmussal szemben, hogy mivel determinisztikus algoritmus, a végén mindig a legrövidebb utat adja eredményül. Komoly hátránya, hogy rekurziót alkalmaz, ami kedvezőtlen a programvégrehajtás szempontjából: sok rekurzív függvényhívás ugyanis megterheli a vermet, sok felesleges másolás történik. Belátható, hogy ha különböző, adott esetekben bonyolult feltételekkel keresünk utakat, akkor az algoritmus elveszíti alapelvét, nem elég mindig az előző ciklus legjobbjaiból kiindulni. Ezzel a problémával az ACO is szembesül, de kevésbé van rá kihatással. A \ref{sec:allVRPresults}. fejezetben megnézzük, hogy a feltételek bonyolódása hogyan befolyásolta a hatékonyságot.
 

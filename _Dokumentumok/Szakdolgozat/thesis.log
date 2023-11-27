@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  27 NOV 2023 09:29
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.10.16)  27 NOV 2023 18:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1044,14 +1044,21 @@ Overfull \hbox (2.43088pt too wide) in paragraph at lines 754--756
 [][] [] 
  []
 
-[44] [45]) [46]
+[44]
+7. fejezet.
+[45
+
+]
+8. fejezet.
+) [46
+
+]
 \openout2 = `content/osszefoglalas.aux'.
 
  (./content/osszefoglalas.tex)
 \openout2 = `content/acknowledgement.aux'.
 
- (./content/acknowledgement.tex)
-[47
+ (./content/acknowledgement.tex) [47
 
 
 
@@ -1059,7 +1066,8 @@ Overfull \hbox (2.43088pt too wide) in paragraph at lines 754--756
 
 
 
-] (./thesis.bbl
+]
+(./thesis.bbl
 Underfull \hbox (badness 10000) in paragraph at lines 97--100
 []\TU/lmr/m/n/10.95 55th anniversary of moore’s law. [][]$[][][][][] [] [] [] [
 ][][] [] [][][][][] [] [][][] [] [][][][] [] [][][][] [] [][] []
@@ -1120,44 +1128,35 @@ Underfull \hbox (badness 10000) in paragraph at lines 162--165
 \openout2 = `content/appendices.aux'.
 
  (./content/appendices.tex
-File: figures/TeXstudio.png Graphic file (type bmp)
-<figures/TeXstudio.png>
- [49
+File: figures/github.png Graphic file (type bmp)
+<figures/github.png>
+) [49
 
-
-]) [50
 
 ]
 \tf@thm=\write5
 \openout5 = `thesis.thm'.
 
- (./thesis.aux
-(./include/titlepage.aux) (./include/declaration.aux) (./content/abstract.aux)
-(./content/bevezetes.aux) (./content/elmeletihatter.aux)
-(./content/technologiaihatter.aux) (./content/implementacio.aux)
-(./content/eredmenyek.aux) (./content/osszefoglalas.aux)
-(./content/acknowledgement.aux) (./content/appendices.aux))
+ (./thesis.aux (./include/titlepage.aux)
+(./include/declaration.aux) (./content/abstract.aux) (./content/bevezetes.aux)
+(./content/elmeletihatter.aux) (./content/technologiaihatter.aux)
+(./content/implementacio.aux) (./content/eredmenyek.aux)
+(./content/osszefoglalas.aux) (./content/acknowledgement.aux)
+(./content/appendices.aux))
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-10-10>
  ***********
-
-
-Package rerunfilecheck Warning: File `thesis.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `thesis.out':
-(rerunfilecheck)             Before: CC00ABDE4852D4B926F41C9044BF8D9E;11193
-(rerunfilecheck)             After:  8CAFFF70711A190D48775AA6EBDCA2C6;11114.
+Package rerunfilecheck Info: File `thesis.out' has not changed.
+(rerunfilecheck)             Checksum: EE2F768AA368AD692B77E25F825701E2;9943.
  ) 
 Here is how much of TeX's memory you used:
- 22484 strings out of 475160
- 458457 string characters out of 5770264
+ 22475 strings out of 475160
+ 458323 string characters out of 5770264
  2088674 words of memory out of 5000000
- 43881 multiletter control sequences out of 15000+600000
- 563562 words of font info for 73 fonts, out of 8000000 for 9000
+ 43872 multiletter control sequences out of 15000+600000
+ 563561 words of font info for 73 fonts, out of 8000000 for 9000
  1352 hyphenation exceptions out of 8191
  84i,10n,96p,1533b,1906s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on thesis.pdf (56 pages).
+Output written on thesis.pdf (55 pages).

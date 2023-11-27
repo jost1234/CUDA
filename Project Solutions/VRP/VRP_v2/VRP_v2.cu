@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     {
         /// Distance file: REQUIRED
         // Command Line Syntax: ... --dist [file_name]
-        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--dist") == 0))
+        if ((strcmp(argv[i], "-d") == 0) || (strcmp(argv[i], "--data") == 0))
         {
             pfile = fopen(argv[++i], "r");
             if (pfile == NULL) {
